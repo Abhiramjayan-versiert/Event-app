@@ -3670,12 +3670,28 @@ export type Database = {
     };
     Views: { [_ in never]: never };
     Functions: {
+      assign_department_member: {
+        Args: { p_department: string; p_user: string; p_position: Database["public"]["Enums"]["department_position"]; p_role_key?: string };
+        Returns: string;
+      };
+      assign_event_role: {
+        Args: { p_event: string; p_user: string; p_role_key: string };
+        Returns: string;
+      };
       check_permission: {
         Args: { p_scope: string; p_id: string; p_permission: string };
         Returns: boolean;
       };
+      end_department_assignment: {
+        Args: { p_assignment: string; p_reason?: string };
+        Returns: undefined;
+      };
       event_dashboard: {
         Args: { p_event: string; p_from?: string; p_to?: string };
+        Returns: Json;
+      };
+      event_departments_overview: {
+        Args: { p_event: string };
         Returns: Json;
       };
       event_financial_summary: {
@@ -3693,6 +3709,10 @@ export type Database = {
       my_event_permissions: {
         Args: { p_event: string };
         Returns: Json;
+      };
+      remove_user_from_event: {
+        Args: { p_event: string; p_user: string; p_reason?: string };
+        Returns: undefined;
       };
     };
     Enums: {

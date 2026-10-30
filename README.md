@@ -12,8 +12,8 @@ The product is built in ten phases (see `docs/architecture.md`).
 |---|---|---|
 | 1 — Foundation | Project setup, branding, design system, Supabase clients, **full database schema (44 tables)**, RLS, auth, profiles, permission matrix | ✅ Done |
 | 2 — Administration | Super Admin / College Admin dashboard, colleges, events, event workspace & settings, users, roles & permissions, audit log | ✅ Done |
-| 3 — Departments | Department screens, head assignment, team management | ⏳ Next — schema, RLS and workspace bootstrap already in place |
-| 4 — Finance | Ledger, income, expense workflow, budgets | ⏳ Schema, immutability rules and financial summary done & tested; screens/RPCs pending |
+| 3 — Departments | Department list & workspaces, head/assistant/member appointments with history, team page, department announcements | ✅ Done |
+| 4 — Finance | Ledger, income, expense workflow, budgets | ⏳ Next — schema, immutability rules and financial summary done & tested |
 | 5 — Registrations | Registration dashboard, public website API, payment webhooks | ⏳ Schema, dedupe, API credential tables done; endpoints pending |
 | 6–10 | Sponsorship, operations, communication, reporting, hardening | ⏳ Schema done; screens pending |
 

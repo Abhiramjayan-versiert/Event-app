@@ -29,8 +29,8 @@ type EventModule = { title: string; segment: string; icon: LucideIcon; permissio
  */
 export const EVENT_MODULES: EventModule[] = [
   { title: "Overview", segment: "", icon: LayoutDashboard, permission: "event.view", available: true },
-  { title: "Departments", segment: "departments", icon: Layers, permission: "event.view", available: false },
-  { title: "Team", segment: "team", icon: UsersRound, permission: "event.view", available: false },
+  { title: "Departments", segment: "departments", icon: Layers, permission: "event.view", available: true },
+  { title: "Team", segment: "team", icon: UsersRound, permission: "event.view", available: true },
   { title: "Registrations", segment: "registrations", icon: ClipboardList, permission: "registrations.view", available: false },
   { title: "Finance", segment: "finance", icon: Wallet, permission: "finance.view", available: false },
   { title: "Sponsorship", segment: "sponsorship", icon: Handshake, permission: "sponsors.view", available: false },
