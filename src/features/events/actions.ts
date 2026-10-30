@@ -1,0 +1,148 @@
+"use server";
+
+import { revalidatePath } from "next/cache";
+import { z } from "zod";
+import { createClient } from "@/lib/supabase/server";
+import { type ActionResult, fromDbError, fromZodError } from "@/lib/actions";
+import { eventAdminSchema, eventSchema, eventToRow, registrationSettingsSchema, EVENT_STATUSES } from "@/lib/validations/event";
+import { slugify } from "@/lib/utils";
+import { findOrInviteUser } from "@/features/users/invite.server";
+import type { Json } from "@/lib/database.types";
+
+const uuid = z.string().uuid();
+
+export async function createEventAction(input: unknown, tzOffsetMinutes: number, admin?: unknown): Promise<ActionResult<{ id: string }>> {
+  const parsed = eventSchema.safeParse(input);
+  if (!parsed.success) return fromZodError(parsed.error);
+  const adminParsed = admin ? eventAdminSchema.safeParse(admin) : null;
+  if (adminParsed && !adminParsed.success) return fromZodError(adminParsed.error);
+
+  const supabase = await createClient();
+  const slug = parsed.data.slug || slugify(parsed.data.name) || `event-${Date.now()}`;
+  const { data, error } = await supabase
+    .from("events")
+    .insert({ ...eventToRow(parsed.data, tzOffsetMinutes), college_id: parsed.data.college_id, slug })
+    .select("id")
+    .single();
+  if (error) {
+    if (error.code === "23505") return { ok: false, error: "Another event in this college already uses that URL slug.", fieldErrors: { slug: ["Slug already in use"] } };
+    if (error.code === "42501") return { ok: false, error: "You are not allowed to create events in this college." };
+    return fromDbError(error, "Could not create the event.");
+  }
+
+  let message = "Event created. Its workspace, departments and sponsorship packages are ready.";
+  if (adminParsed?.success) {
+    const result = await addEventAdminAction(data.id, adminParsed.data);
+    message += result.ok ? ` ${result.message}` : ` The event admin could not be added: ${result.error}`;
+  }
+
+  revalidatePath("/events");
+  revalidatePath("/dashboard");
+  revalidatePath(`/colleges/${parsed.data.college_id}`);
+  return { ok: true, data: { id: data.id }, message };
+}
+
+export async function updateEventAction(eventId: string, input: unknown, tzOffsetMinutes: number): Promise<ActionResult> {
+  if (!uuid.safeParse(eventId).success) return { ok: false, error: "Invalid event." };
+  const parsed = eventSchema.safeParse(input);
+  if (!parsed.success) return fromZodError(parsed.error);
+  const supabase = await createClient();
+  const update = { ...eventToRow(parsed.data, tzOffsetMinutes), ...(parsed.data.slug ? { slug: parsed.data.slug } : {}) };
+  const { data, error } = await supabase.from("events").update(update).eq("id", eventId).select("id");
+  if (error) {
+    if (error.code === "23505") return { ok: false, error: "Another event in this college already uses that URL slug.", fieldErrors: { slug: ["Slug already in use"] } };
+    return fromDbError(error, "Could not update the event.");
+  }
+  if (!data?.length) return { ok: false, error: "You do not have permission to edit this event." };
+  revalidatePath(`/events/${eventId}`, "layout");
+  revalidatePath("/events");
+  return { ok: true, message: "Event updated." };
+}
+
+export async function setEventStatusAction(eventId: string, status: string): Promise<ActionResult> {
+  const parsedStatus = z.enum(EVENT_STATUSES).safeParse(status);
+  if (!uuid.safeParse(eventId).success || !parsedStatus.success) return { ok: false, error: "Invalid request." };
+  const supabase = await createClient();
+  const { data, error } = await supabase.from("events").update({ status: parsedStatus.data }).eq("id", eventId).select("id");
+  if (error) return fromDbError(error, "Could not change the event status.");
+  if (!data?.length) return { ok: false, error: "You do not have permission to change this event." };
+  revalidatePath(`/events/${eventId}`, "layout");
+  revalidatePath("/events");
+  return { ok: true, message: parsedStatus.data === "archived" ? "Event archived. All records remain available for reporting." : "Event status updated." };
+}
+
+export async function setEventImageAction(eventId: string, field: "logo_path" | "banner_path", path: string | null): Promise<ActionResult> {
+  if (!uuid.safeParse(eventId).success || !["logo_path", "banner_path"].includes(field)) return { ok: false, error: "Invalid request." };
+  if (path !== null && !path.startsWith(`events/${eventId}/`)) return { ok: false, error: "Invalid image path." };
+  const supabase = await createClient();
+  const { data, error } = await supabase.from("events").update(field === "logo_path" ? { logo_path: path } : { banner_path: path }).eq("id", eventId).select("id");
+  if (error || !data?.length) return fromDbError(error, "Could not update the image.");
+  revalidatePath(`/events/${eventId}`, "layout");
+  return { ok: true };
+}
+
+export async function updateRegistrationSettingsAction(eventId: string, input: unknown): Promise<ActionResult> {
+  if (!uuid.safeParse(eventId).success) return { ok: false, error: "Invalid event." };
+  const parsed = registrationSettingsSchema.safeParse(input);
+  if (!parsed.success) return fromZodError(parsed.error);
+  const supabase = await createClient();
+  const { data: current } = await supabase.from("event_settings").select("registration_settings").eq("event_id", eventId).single();
+  const merged = { ...((current?.registration_settings as Record<string, Json>) ?? {}), ...parsed.data };
+  const { data, error } = await supabase.from("event_settings").update({ registration_settings: merged }).eq("event_id", eventId).select("event_id");
+  if (error || !data?.length) return fromDbError(error, "Could not save registration settings.");
+  revalidatePath(`/events/${eventId}/settings`);
+  return { ok: true, message: "Registration settings saved." };
+}
+
+export async function addEventAdminAction(eventId: string, input: unknown): Promise<ActionResult> {
+  if (!uuid.safeParse(eventId).success) return { ok: false, error: "Invalid event." };
+  const parsed = eventAdminSchema.safeParse(input);
+  if (!parsed.success) return fromZodError(parsed.error);
+
+  const supabase = await createClient();
+  const { data: allowed } = await supabase.rpc("check_permission", { p_scope: "event", p_id: eventId, p_permission: "event.members.manage" });
+  if (!allowed) return { ok: false, error: "You do not have permission to appoint event administrators." };
+
+  let user: { userId: string; invited: boolean };
+  try {
+    user = await findOrInviteUser(parsed.data);
+  } catch (e) {
+    return { ok: false, error: (e as Error).message };
+  }
+  const [{ data: role }, { data: event }, { data: me }] = await Promise.all([
+    supabase.from("roles").select("id").eq("key", "event_admin").single(),
+    supabase.from("events").select("college_id, name").eq("id", eventId).single(),
+    supabase.auth.getUser(),
+  ]);
+  if (!role || !event) return { ok: false, error: "Event or role not found." };
+
+  const { error } = await supabase.from("event_members").insert({
+    event_id: eventId,
+    college_id: event.college_id,
+    user_id: user.userId,
+    role_id: role.id,
+    invited_by: me.user?.id ?? null,
+  });
+  if (error) {
+    if (error.code === "23505") return { ok: false, error: "This person is already an Event Admin for this event." };
+    return fromDbError(error, "Could not appoint the event administrator.");
+  }
+  revalidatePath(`/events/${eventId}`, "layout");
+  return { ok: true, message: user.invited ? `Invitation sent to ${parsed.data.email}.` : `${parsed.data.full_name} is now an Event Admin.` };
+}
+
+export async function endEventMembershipAction(eventId: string, membershipId: string, reason?: string): Promise<ActionResult> {
+  if (!uuid.safeParse(eventId).success || !uuid.safeParse(membershipId).success) return { ok: false, error: "Invalid request." };
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("event_members")
+    .update({ ended_at: new Date().toISOString(), end_reason: reason?.slice(0, 300) || null })
+    .eq("id", membershipId)
+    .eq("event_id", eventId)
+    .is("ended_at", null)
+    .select("id");
+  if (error) return fromDbError(error, "Could not remove the member.");
+  if (!data?.length) return { ok: false, error: "Membership not found or you do not have permission." };
+  revalidatePath(`/events/${eventId}`, "layout");
+  return { ok: true, message: "Removed from the event. The assignment stays in the history." };
+}

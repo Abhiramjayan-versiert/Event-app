@@ -1,0 +1,180 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ==========================================================================
+   EVENT APP design tokens — BLACK + WHITE + LIME GREEN.
+   Every colour used in the UI must come from these tokens.
+   ========================================================================== */
+:root {
+  /* Brand palette */
+  --brand-black: #0a0a0a;
+  --brand-white: #ffffff;
+  --brand-lime: #b6f23a;
+  --brand-lime-dark: #91c927;
+  --brand-lime-light: #eaf8c9;
+  --brand-grey: #f4f4f4;
+  --brand-border: #e5e5e5;
+  --brand-text-secondary: #777777;
+
+  /* Semantic tokens (light) */
+  --background: var(--brand-white);
+  --foreground: var(--brand-black);
+  --card: var(--brand-white);
+  --card-foreground: var(--brand-black);
+  --popover: var(--brand-white);
+  --popover-foreground: var(--brand-black);
+  --primary: var(--brand-lime);
+  --primary-hover: var(--brand-lime-dark);
+  --primary-foreground: var(--brand-black);
+  --secondary: var(--brand-grey);
+  --secondary-foreground: var(--brand-black);
+  --muted: var(--brand-grey);
+  --muted-foreground: var(--brand-text-secondary);
+  --accent: var(--brand-lime-light);
+  --accent-foreground: #3b5208;
+  --border: var(--brand-border);
+  --input: var(--brand-border);
+  --ring: var(--brand-lime-dark);
+  --success: var(--brand-lime-dark);
+  --success-foreground: #2f4506;
+  --success-surface: var(--brand-lime-light);
+  --warning: #a16207;
+  --warning-surface: #fdf6d8;
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+  --destructive-surface: #fdecec;
+
+  /* Sidebar is always black */
+  --sidebar: var(--brand-black);
+  --sidebar-foreground: #f5f5f5;
+  --sidebar-muted: #9a9a9a;
+  --sidebar-border: #1f1f1f;
+  --sidebar-hover: #171717;
+  --sidebar-active: var(--brand-lime);
+  --sidebar-active-foreground: var(--brand-black);
+
+  /* Charts: lime, black and greys only */
+  --chart-1: var(--brand-lime-dark);
+  --chart-2: var(--brand-black);
+  --chart-3: var(--brand-lime-dark);
+  --chart-4: #a3a3a3;
+  --chart-5: #d4d4d4;
+  --chart-grid: #ededed;
+
+  --radius: 0.5rem;
+}
+
+.dark {
+  --background: #0a0a0a;
+  --foreground: #fafafa;
+  --card: #111111;
+  --card-foreground: #fafafa;
+  --popover: #111111;
+  --popover-foreground: #fafafa;
+  --secondary: #1a1a1a;
+  --secondary-foreground: #fafafa;
+  --muted: #1a1a1a;
+  --muted-foreground: #8a8a8a;
+  --accent: #1d2a0b;
+  --accent-foreground: var(--brand-lime);
+  --border: #262626;
+  --input: #2a2a2a;
+  --ring: var(--brand-lime);
+  --success: var(--brand-lime);
+  --success-foreground: var(--brand-lime);
+  --success-surface: #1d2a0b;
+  --warning: #e8c24a;
+  --warning-surface: #2a2410;
+  --destructive: #f05252;
+  --destructive-surface: #2b1212;
+
+  --sidebar: #050505;
+  --sidebar-border: #1a1a1a;
+  --sidebar-hover: #141414;
+
+  --chart-1: var(--brand-lime);
+  --chart-2: #fafafa;
+  --chart-4: #6b6b6b;
+  --chart-5: #3a3a3a;
+  --chart-grid: #1f1f1f;
+}
+
+@theme inline {
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-success-surface: var(--success-surface);
+  --color-warning: var(--warning);
+  --color-warning-surface: var(--warning-surface);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-destructive-surface: var(--destructive-surface);
+
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-muted: var(--sidebar-muted);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-hover: var(--sidebar-hover);
+  --color-sidebar-active: var(--sidebar-active);
+  --color-sidebar-active-foreground: var(--sidebar-active-foreground);
+
+  --color-lime: var(--brand-lime);
+  --color-lime-dark: var(--brand-lime-dark);
+  --color-lime-light: var(--brand-lime-light);
+  --color-ink: var(--brand-black);
+
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  --radius-sm: calc(var(--radius) - 2px);
+  --radius-md: var(--radius);
+  --radius-lg: calc(var(--radius) + 2px);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  body {
+    @apply bg-background text-foreground font-sans;
+    font-feature-settings: "cv11", "ss01";
+  }
+  ::selection {
+    background: var(--brand-lime);
+    color: var(--brand-black);
+  }
+}
+
+@utility tabular {
+  font-variant-numeric: tabular-nums;
+}

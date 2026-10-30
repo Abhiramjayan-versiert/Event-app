@@ -3670,6 +3670,10 @@ export type Database = {
     };
     Views: { [_ in never]: never };
     Functions: {
+      check_permission: {
+        Args: { p_scope: string; p_id: string; p_permission: string };
+        Returns: boolean;
+      };
       event_dashboard: {
         Args: { p_event: string; p_from?: string; p_to?: string };
         Returns: Json;
