@@ -8,6 +8,15 @@ import { useShell } from "@/components/layout/shell-context";
 import { publicStorageUrl } from "@/lib/storage";
 import { InstallAppMenuItem } from "@/components/layout/pwa";
 
+async function signOut() {
+  try {
+    await fetch("/auth/signout", { method: "POST", credentials: "same-origin", redirect: "manual" });
+  } finally {
+    // Full page load so no signed-in screens stay in memory.
+    window.location.replace("/login");
+  }
+}
+
 export function UserMenu() {
   const { access } = useShell();
   return (
@@ -26,11 +35,15 @@ export function UserMenu() {
         </DropdownMenuItem>
         <InstallAppMenuItem />
         <DropdownMenuSeparator />
-        <form action="/auth/signout" method="post">
-          <DropdownMenuItem asChild>
-            <button type="submit" className="w-full"><LogOut />Sign out</button>
-          </DropdownMenuItem>
-        </form>
+        {/* The menu unmounts on select, which would cancel a <form> submit, so sign out with fetch. */}
+        <DropdownMenuItem
+          onSelect={(e) => {
+            e.preventDefault();
+            void signOut();
+          }}
+        >
+          <LogOut />Sign out
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
