@@ -3800,6 +3800,10 @@ export type Database = {
         Args: { p_department: string; p_amount: number; p_notes?: string };
         Returns: undefined;
       };
+      verify_sponsorship_payment: {
+        Args: { p_payment: string; p_approve: boolean; p_note?: string };
+        Returns: undefined;
+      };
     };
     Enums: {
       account_status: "active" | "suspended";

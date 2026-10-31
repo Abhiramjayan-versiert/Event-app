@@ -33,7 +33,7 @@ export const EVENT_MODULES: EventModule[] = [
   { title: "Team", segment: "team", icon: UsersRound, permission: "event.view", available: true },
   { title: "Registrations", segment: "registrations", icon: ClipboardList, permission: "registrations.view", available: true },
   { title: "Finance", segment: "finance", icon: Wallet, permission: "finance.view", available: true },
-  { title: "Sponsorship", segment: "sponsorship", icon: Handshake, permission: "sponsors.view", available: false },
+  { title: "Sponsorship", segment: "sponsorship", icon: Handshake, permission: "sponsors.view", available: true },
   { title: "Marketing", segment: "marketing", icon: Megaphone, permission: "marketing.view", available: false },
   { title: "Media & PR", segment: "media", icon: Camera, permission: "media.view", available: false },
   { title: "Tasks", segment: "tasks", icon: ListChecks, permission: "event.view", available: false },
