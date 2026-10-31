@@ -579,6 +579,89 @@ export type Database = {
           },
         ];
       };
+      certificates: {
+        Row: {
+          id: string;
+          event_id: string;
+          college_id: string;
+          registration_id: string;
+          kind: string;
+          title: string;
+          recipient_name: string;
+          recipient_email: string | null;
+          competition_name: string | null;
+          code: string;
+          issued_at: string;
+          issued_by: string | null;
+          emailed_at: string | null;
+          revoked_at: string | null;
+          revoked_reason: string | null;
+        };
+        Insert: {
+          id?: string;
+          event_id: string;
+          college_id: string;
+          registration_id: string;
+          kind: string;
+          title: string;
+          recipient_name: string;
+          recipient_email?: string | null;
+          competition_name?: string | null;
+          code?: string;
+          issued_at?: string;
+          issued_by?: string | null;
+          emailed_at?: string | null;
+          revoked_at?: string | null;
+          revoked_reason?: string | null;
+        };
+        Update: {
+          id?: string;
+          event_id?: string;
+          college_id?: string;
+          registration_id?: string;
+          kind?: string;
+          title?: string;
+          recipient_name?: string;
+          recipient_email?: string | null;
+          competition_name?: string | null;
+          code?: string;
+          issued_at?: string;
+          issued_by?: string | null;
+          emailed_at?: string | null;
+          revoked_at?: string | null;
+          revoked_reason?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "certificates_college_id_fkey";
+            columns: ["college_id"];
+            isOneToOne: false;
+            referencedRelation: "colleges";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "certificates_event_id_fkey";
+            columns: ["event_id"];
+            isOneToOne: false;
+            referencedRelation: "events";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "certificates_issued_by_fkey";
+            columns: ["issued_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "certificates_registration_id_fkey";
+            columns: ["registration_id"];
+            isOneToOne: false;
+            referencedRelation: "registrations";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       college_members: {
         Row: {
           id: string;
@@ -4104,9 +4187,17 @@ export type Database = {
         Args: { p_college?: string; p_event?: string; p_status?: Database["public"]["Enums"]["event_status"]; p_from?: string; p_to?: string };
         Returns: Json;
       };
+      issue_certificates: {
+        Args: { p_event: string; p_kind: string; p_only_checked_in?: boolean };
+        Returns: number;
+      };
       judging_sheet: {
         Args: { p_competition: string };
         Returns: Json;
+      };
+      mark_certificates_emailed: {
+        Args: { p_ids: string[] };
+        Returns: undefined;
       };
       my_access: {
         Args: never;
@@ -4127,6 +4218,10 @@ export type Database = {
       pending_invitations: {
         Args: never;
         Returns: { user_id: string; invited_at: string }[];
+      };
+      public_certificate: {
+        Args: { p_code: string };
+        Returns: Json;
       };
       public_event_info: {
         Args: { p_college_code: string; p_slug: string };
@@ -4182,6 +4277,10 @@ export type Database = {
       };
       revoke_api_credential: {
         Args: { p_credential: string };
+        Returns: undefined;
+      };
+      set_certificate_revoked: {
+        Args: { p_certificate: string; p_revoked: boolean; p_reason?: string };
         Returns: undefined;
       };
       set_department_allocation: {
