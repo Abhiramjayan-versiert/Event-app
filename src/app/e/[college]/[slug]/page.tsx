@@ -27,6 +27,8 @@ export default async function PublicEventPage({ params }: { params: Promise<{ co
   const e = await load(college, slug);
   if (!e) notFound();
   const state = registrationState(e);
+  const { data: resultsData } = await createAdminClient().rpc("public_results", { p_event: e.id });
+  const results = (resultsData as { competition: string; results: { position: number; title: string; name: string; college: string | null }[] | null }[] | null) ?? [];
   const banner = publicStorageUrl("branding", e.banner_path);
   const logo = publicStorageUrl("branding", e.logo_path);
 
@@ -83,6 +85,24 @@ export default async function PublicEventPage({ params }: { params: Promise<{ co
               </ul>
             )}
           </section>
+          {results.length > 0 && (
+            <section className="space-y-3">
+              <h2 className="text-lg font-semibold">Results</h2>
+              {results.map((r) => (
+                <div key={r.competition} className="rounded-lg border bg-card p-4">
+                  <p className="mb-2 font-medium">{r.competition}</p>
+                  <ol className="space-y-1 text-sm">
+                    {(r.results ?? []).map((w) => (
+                      <li key={`${w.position}-${w.name}`} className="flex justify-between gap-2">
+                        <span><span className="font-semibold">{w.title}</span> · {w.name}</span>
+                        {w.college ? <span className="text-muted-foreground">{w.college}</span> : null}
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+              ))}
+            </section>
+          )}
           {(e.contact_email || e.contact_phone) && (
             <section className="space-y-2 text-sm">
               <h2 className="text-lg font-semibold">Contact</h2>

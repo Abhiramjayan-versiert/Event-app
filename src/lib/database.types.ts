@@ -735,6 +735,147 @@ export type Database = {
           },
         ];
       };
+      competition_judges: {
+        Row: {
+          id: string;
+          competition_id: string;
+          event_id: string;
+          college_id: string;
+          user_id: string;
+          assigned_by: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          competition_id: string;
+          event_id: string;
+          college_id: string;
+          user_id: string;
+          assigned_by?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          competition_id?: string;
+          event_id?: string;
+          college_id?: string;
+          user_id?: string;
+          assigned_by?: string | null;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "competition_judges_assigned_by_fkey";
+            columns: ["assigned_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "competition_judges_college_id_fkey";
+            columns: ["college_id"];
+            isOneToOne: false;
+            referencedRelation: "colleges";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "competition_judges_competition_id_fkey";
+            columns: ["competition_id"];
+            isOneToOne: false;
+            referencedRelation: "event_competitions";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "competition_judges_event_id_fkey";
+            columns: ["event_id"];
+            isOneToOne: false;
+            referencedRelation: "events";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "competition_judges_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      competition_results: {
+        Row: {
+          id: string;
+          competition_id: string;
+          event_id: string;
+          college_id: string;
+          registration_id: string;
+          position: number;
+          title: string;
+          total_score: number | null;
+          published_by: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          competition_id: string;
+          event_id: string;
+          college_id: string;
+          registration_id: string;
+          position: number;
+          title: string;
+          total_score?: number | null;
+          published_by?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          competition_id?: string;
+          event_id?: string;
+          college_id?: string;
+          registration_id?: string;
+          position?: number;
+          title?: string;
+          total_score?: number | null;
+          published_by?: string | null;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "competition_results_college_id_fkey";
+            columns: ["college_id"];
+            isOneToOne: false;
+            referencedRelation: "colleges";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "competition_results_competition_id_fkey";
+            columns: ["competition_id"];
+            isOneToOne: false;
+            referencedRelation: "event_competitions";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "competition_results_event_id_fkey";
+            columns: ["event_id"];
+            isOneToOne: false;
+            referencedRelation: "events";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "competition_results_published_by_fkey";
+            columns: ["published_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "competition_results_registration_id_fkey";
+            columns: ["registration_id"];
+            isOneToOne: false;
+            referencedRelation: "registrations";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       department_members: {
         Row: {
           id: string;
@@ -1093,6 +1234,7 @@ export type Database = {
           is_active: boolean;
           created_at: string;
           updated_at: string;
+          results_published_at: string | null;
         };
         Insert: {
           id?: string;
@@ -1115,6 +1257,7 @@ export type Database = {
           is_active?: boolean;
           created_at?: string;
           updated_at?: string;
+          results_published_at?: string | null;
         };
         Update: {
           id?: string;
@@ -1137,6 +1280,7 @@ export type Database = {
           is_active?: boolean;
           created_at?: string;
           updated_at?: string;
+          results_published_at?: string | null;
         };
         Relationships: [
           {
@@ -2007,6 +2151,146 @@ export type Database = {
             columns: ["venue_id"];
             isOneToOne: false;
             referencedRelation: "venues";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      judging_criteria: {
+        Row: {
+          id: string;
+          competition_id: string;
+          event_id: string;
+          college_id: string;
+          name: string;
+          max_score: number;
+          weight: number;
+          sort_order: number;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          competition_id: string;
+          event_id: string;
+          college_id: string;
+          name: string;
+          max_score?: number;
+          weight?: number;
+          sort_order?: number;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          competition_id?: string;
+          event_id?: string;
+          college_id?: string;
+          name?: string;
+          max_score?: number;
+          weight?: number;
+          sort_order?: number;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "judging_criteria_college_id_fkey";
+            columns: ["college_id"];
+            isOneToOne: false;
+            referencedRelation: "colleges";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "judging_criteria_competition_id_fkey";
+            columns: ["competition_id"];
+            isOneToOne: false;
+            referencedRelation: "event_competitions";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "judging_criteria_event_id_fkey";
+            columns: ["event_id"];
+            isOneToOne: false;
+            referencedRelation: "events";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      judging_scores: {
+        Row: {
+          id: string;
+          competition_id: string;
+          event_id: string;
+          college_id: string;
+          registration_id: string;
+          criterion_id: string;
+          judge_id: string;
+          score: number;
+          comment: string | null;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          competition_id: string;
+          event_id: string;
+          college_id: string;
+          registration_id: string;
+          criterion_id: string;
+          judge_id: string;
+          score: number;
+          comment?: string | null;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          competition_id?: string;
+          event_id?: string;
+          college_id?: string;
+          registration_id?: string;
+          criterion_id?: string;
+          judge_id?: string;
+          score?: number;
+          comment?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "judging_scores_college_id_fkey";
+            columns: ["college_id"];
+            isOneToOne: false;
+            referencedRelation: "colleges";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "judging_scores_competition_id_fkey";
+            columns: ["competition_id"];
+            isOneToOne: false;
+            referencedRelation: "event_competitions";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "judging_scores_criterion_id_fkey";
+            columns: ["criterion_id"];
+            isOneToOne: false;
+            referencedRelation: "judging_criteria";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "judging_scores_event_id_fkey";
+            columns: ["event_id"];
+            isOneToOne: false;
+            referencedRelation: "events";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "judging_scores_judge_id_fkey";
+            columns: ["judge_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "judging_scores_registration_id_fkey";
+            columns: ["registration_id"];
+            isOneToOne: false;
+            referencedRelation: "registrations";
             referencedColumns: ["id"];
           },
         ];
@@ -3772,6 +4056,10 @@ export type Database = {
         Args: { p_event: string; p_note: string };
         Returns: undefined;
       };
+      competition_leaderboard: {
+        Args: { p_competition: string };
+        Returns: Json;
+      };
       create_api_credential: {
         Args: { p_event: string; p_name: string; p_environment: Database["public"]["Enums"]["api_environment"]; p_key_prefix: string; p_key_hash: string };
         Returns: string;
@@ -3816,6 +4104,10 @@ export type Database = {
         Args: { p_college?: string; p_event?: string; p_status?: Database["public"]["Enums"]["event_status"]; p_from?: string; p_to?: string };
         Returns: Json;
       };
+      judging_sheet: {
+        Args: { p_competition: string };
+        Returns: Json;
+      };
       my_access: {
         Args: never;
         Returns: Json;
@@ -3844,9 +4136,17 @@ export type Database = {
         Args: { p_event: string; p_payload: Json };
         Returns: Json;
       };
+      public_results: {
+        Args: { p_event: string };
+        Returns: Json;
+      };
       public_ticket: {
         Args: { p_code: string };
         Returns: Json;
+      };
+      publish_results: {
+        Args: { p_competition: string; p_results: Json };
+        Returns: undefined;
       };
       record_expense_payment: {
         Args: { p_expense: string; p_amount: number; p_paid_on: string; p_method: string; p_reference?: string; p_notes?: string; p_document?: string };
@@ -3888,12 +4188,24 @@ export type Database = {
         Args: { p_department: string; p_amount: number; p_notes?: string };
         Returns: undefined;
       };
+      set_judging_setup: {
+        Args: { p_competition: string; p_criteria: Json; p_judges: string[] };
+        Returns: undefined;
+      };
+      submit_scores: {
+        Args: { p_competition: string; p_registration: string; p_scores: Json; p_comment?: string };
+        Returns: undefined;
+      };
       two_step_users: {
         Args: never;
         Returns: { user_id: string }[];
       };
       undo_check_in: {
         Args: { p_registration: string };
+        Returns: undefined;
+      };
+      unpublish_results: {
+        Args: { p_competition: string };
         Returns: undefined;
       };
       verify_sponsorship_payment: {

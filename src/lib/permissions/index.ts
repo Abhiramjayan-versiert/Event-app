@@ -11,7 +11,7 @@ export const PERMISSIONS = {
     "registrations.view", "registrations.manage", "registrations.export", "registrations.checkin",
     "sponsors.view", "sponsors.manage", "media.view", "media.manage", "marketing.view", "marketing.manage",
     "tasks.view_all", "tasks.manage_all", "operations.view", "operations.manage", "announcements.manage",
-    "documents.view_all", "reports.view", "reports.export", "integrations.manage", "audit.view",
+    "documents.view_all", "judging.manage", "reports.view", "reports.export", "integrations.manage", "audit.view",
   ],
   department: [
     "department.view", "department.manage", "department.members.manage", "tasks.view", "tasks.manage",
