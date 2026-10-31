@@ -72,6 +72,7 @@ export function NotificationBell() {
             <CheckCheck /> Mark all read
           </Button>
         </div>
+        <Link href="/notifications" onClick={() => setOpen(false)} className="block border-b px-4 py-2 text-xs font-medium text-muted-foreground hover:text-foreground">View all notifications →</Link>
         <div className="max-h-96 overflow-y-auto">
           {items.length === 0 ? (
             <p className="px-4 py-10 text-center text-sm text-muted-foreground">You&apos;re all caught up.</p>

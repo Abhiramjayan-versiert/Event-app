@@ -14,6 +14,7 @@ import { ConfirmButton } from "@/components/forms/confirm-button";
 import { getEventPeople } from "@/features/departments/queries";
 import { AssigneesEditor, CommentForm, PRIORITY_VARIANT, ProgressEditor, TaskDialog, TaskStatusSelect } from "@/features/tasks/tasks-ui";
 import { deleteTaskAction } from "@/features/tasks/actions";
+import { DocumentsPanel } from "@/features/documents/documents-panel";
 import { toLocalInput } from "@/features/events/event-form";
 import { publicStorageUrl } from "@/lib/storage";
 import { TASK_MODULES, TASK_TYPES, type TaskInput } from "@/lib/validations/task";
@@ -105,6 +106,16 @@ export default async function TaskPage({ params }: { params: Promise<{ eventId: 
           </CardContent>
         </Card>
       </div>
+      <DocumentsPanel
+        eventId={eventId}
+        related={{ table: "tasks", id: t.id }}
+        title="Reference & output files"
+        canUpload={canUpdate}
+        departmentId={t.department_id}
+        defaultCategory={t.module === "media" ? "media_asset" : "operational"}
+        defaultVisibility={t.department_id ? "department" : "event"}
+        revalidate={`/events/${eventId}/tasks/${t.id}`}
+      />
       <div className="grid gap-4 lg:grid-cols-2">
         <Card>
           <CardHeader className="flex-row items-center justify-between">

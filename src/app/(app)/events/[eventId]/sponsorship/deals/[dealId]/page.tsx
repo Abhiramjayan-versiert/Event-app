@@ -12,6 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getEventPeople } from "@/features/departments/queries";
 import { DealDialog, DeliverableDialog, DeliverableStatus, SponsorshipPaymentDialog, StageSelect } from "@/features/sponsorship/sponsorship-ui";
 import { PaymentReview } from "@/features/sponsorship/payment-review";
+import { DocumentsPanel } from "@/features/documents/documents-panel";
 import { SPONSOR_STAGES } from "@/lib/validations/sponsorship";
 import { formatCurrency, formatDate, titleCase } from "@/lib/utils";
 
@@ -96,6 +97,15 @@ export default async function DealPage({ params }: { params: Promise<{ eventId: 
           </CardContent>
         </Card>
       </div>
+      <DocumentsPanel
+        eventId={eventId}
+        related={{ table: "sponsorship_deals", id: d.id }}
+        title="Proposals, agreements & receipts"
+        canUpload={canManage}
+        defaultCategory="sponsor_agreement"
+        defaultVisibility="event"
+        revalidate={`/events/${eventId}/sponsorship/deals/${d.id}`}
+      />
       <div className="grid gap-4 lg:grid-cols-2">
         <Card>
           <CardHeader className="flex-row items-center justify-between"><CardTitle>Payments</CardTitle>{canManage || can(permissions, "finance.manage") ? <SponsorshipPaymentDialog eventId={eventId} dealId={d.id} outstanding={Math.max(agreed - received, 0)} currency={cur} /> : null}</CardHeader>

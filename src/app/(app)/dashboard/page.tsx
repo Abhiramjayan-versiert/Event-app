@@ -19,6 +19,7 @@ import { BarsChart, ChartPanel, TrendChart } from "@/components/charts/charts";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MyWorkspace } from "./my-workspace";
+import { AnnouncementsCard } from "@/features/announcements/announcements-card";
 import { cn, formatCurrency, formatDate, formatDateRange, formatNumber, formatRelative, titleCase } from "@/lib/utils";
 
 export const metadata = { title: "Overview" };
@@ -211,6 +212,8 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
           </ListCard>
         ) : null}
       </section>
+
+      <AnnouncementsCard userId={access.user_id} />
 
       <Card>
         <CardHeader><CardTitle>Recent activity</CardTitle></CardHeader>

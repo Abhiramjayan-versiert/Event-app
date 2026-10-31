@@ -6,6 +6,7 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { Badge } from "@/components/ui/badge";
 import { formatDateRange } from "@/lib/utils";
+import { AnnouncementsCard } from "@/features/announcements/announcements-card";
 
 /** Home for users without college-level access: the events they are assigned to. */
 export function MyWorkspace({ access }: { access: AccessSummary }) {
@@ -13,6 +14,7 @@ export function MyWorkspace({ access }: { access: AccessSummary }) {
   return (
     <div className="space-y-8">
       <PageHeader title={`Welcome, ${firstName}`} description="Your event assignments and roles." />
+      <AnnouncementsCard userId={access.user_id} />
       {access.events.length === 0 ? (
         <EmptyState
           icon={CalendarDays}

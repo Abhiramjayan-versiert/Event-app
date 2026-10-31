@@ -7,6 +7,7 @@ import { PageHeader } from "@/components/shared/page-header";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ExpenseActions } from "@/features/finance/expense-actions";
+import { DocumentsPanel } from "@/features/documents/documents-panel";
 import { EXPENSE_CATEGORIES } from "@/lib/validations/finance";
 import { formatCurrency, formatDate, formatDateTime, titleCase } from "@/lib/utils";
 
@@ -92,6 +93,16 @@ export default async function ExpensePage({ params }: { params: Promise<{ eventI
         </Card>
       </div>
 
+      <DocumentsPanel
+        eventId={eventId}
+        related={{ table: "expense_requests", id: e.id }}
+        title="Invoices & bills"
+        canUpload={canSubmit || can(permissions, "finance.manage")}
+        departmentId={deptId}
+        defaultCategory="invoice"
+        defaultVisibility="finance"
+        revalidate={`/events/${eventId}/finance/expenses/${e.id}`}
+      />
       <div className="grid gap-4 lg:grid-cols-2">
         <Card>
           <CardHeader><CardTitle>Approval history</CardTitle></CardHeader>

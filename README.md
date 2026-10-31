@@ -17,7 +17,8 @@ The product is built in ten phases (see `docs/architecture.md`).
 | 5 — Registrations | Registration dashboard, participants, offline desk, refunds, competitions, public website API (keys, idempotency, rate limits, logs), Razorpay webhook & verification, sandbox mode | ✅ Done |
 | 6 — Sponsorship | Sponsor CRM, pipeline board, packages, deals, payments verified by finance into the ledger, deliverables | ✅ Done |
 | 7 — Operations | Tasks (list/board/calendar, my/department/all, subtasks, comments, assignments, reminders), media & PR, marketing campaigns, venues, vendors, inventory, emergency contacts, event-day master schedule | ✅ Done |
-| 8–10 | Communication & documents, reporting & closing, hardening | ⏳ In progress |
+| 8 — Communication | Global/college/event/department announcements with notifications, notification centre, private document management with signed URLs and attachments on expenses, deals and tasks | ✅ Done |
+| 9–10 | Reporting & closing, hardening | ⏳ In progress |
 
 Navigation only shows modules whose screens exist, so there are no placeholder pages.
 
