@@ -18,7 +18,8 @@ The product is built in ten phases (see `docs/architecture.md`).
 | 6 — Sponsorship | Sponsor CRM, pipeline board, packages, deals, payments verified by finance into the ledger, deliverables | ✅ Done |
 | 7 — Operations | Tasks (list/board/calendar, my/department/all, subtasks, comments, assignments, reminders), media & PR, marketing campaigns, venues, vendors, inventory, emergency contacts, event-day master schedule | ✅ Done |
 | 8 — Communication | Global/college/event/department announcements with notifications, notification centre, private document management with signed URLs and attachments on expenses, deals and tasks | ✅ Done |
-| 9–10 | Reporting & closing, hardening | ⏳ In progress |
+| 9 — Reporting & closing | 12 reports (event summary, registrations, payments, income, expenses, budget utilization, sponsorship, department performance, tasks, marketing, participants, event closing) with date/department/category/status filters and CSV, Excel and PDF export; global reports for Super Admin and College Admins; event closing checklist, financial close with frozen snapshot, Super-Admin reopen, archive | ✅ Done |
+| 10 — Hardening | Security & performance advisors, CSP, responsive pass, documentation, final deploy verification | ⏳ In progress |
 
 Navigation only shows modules whose screens exist, so there are no placeholder pages.
 

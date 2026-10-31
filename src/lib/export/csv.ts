@@ -2,6 +2,8 @@
 export function toCsv(rows: Record<string, unknown>[], columns: { key: string; header: string }[]) {
   const escape = (value: unknown) => {
     if (value === null || value === undefined) return "";
+    // Numbers cannot carry formulas; keep negatives numeric for spreadsheets.
+    if (typeof value === "number") return Number.isFinite(value) ? String(value) : "";
     let s = typeof value === "object" ? JSON.stringify(value) : String(value);
     if (/^[=+\-@\t\r]/.test(s)) s = `'${s}`;
     return /[",\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;

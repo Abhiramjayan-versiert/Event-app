@@ -1,6 +1,6 @@
 import {
   Bell, Building2, CalendarDays, CalendarRange, ClipboardList, FileText, Handshake, LayoutDashboard, Layers, ListChecks,
-  Megaphone, Camera, Plug, Settings, ShieldCheck, Users, Wallet, BarChart3, Truck, UsersRound, type LucideIcon,
+  Megaphone, Camera, Plug, Settings, ShieldCheck, Users, Wallet, BarChart3, Truck, UsersRound, Lock, type LucideIcon,
 } from "lucide-react";
 import type { AccessSummary } from "@/lib/auth/types";
 import { canSeeGlobalDashboard } from "@/lib/auth/types";
@@ -15,6 +15,7 @@ export function globalNav(access: AccessSummary): NavItem[] {
   items.push({ title: "Events", href: "/events", icon: CalendarDays });
   items.push({ title: "Announcements", href: "/announcements", icon: Megaphone });
   items.push({ title: "Notifications", href: "/notifications", icon: Bell });
+  if (collegeAdmin) items.push({ title: "Reports", href: "/reports", icon: BarChart3 });
   if (collegeAdmin) items.push({ title: "Users", href: "/users", icon: Users });
   if (access.is_super_admin) {
     items.push({ title: "Audit log", href: "/audit", icon: ShieldCheck });
@@ -43,7 +44,8 @@ export const EVENT_MODULES: EventModule[] = [
   { title: "Schedule", segment: "schedule", icon: CalendarRange, permission: "event.view", available: true },
   { title: "Announcements", segment: "announcements", icon: Megaphone, permission: "event.view", available: true },
   { title: "Documents", segment: "documents", icon: FileText, permission: "event.view", available: true },
-  { title: "Reports", segment: "reports", icon: BarChart3, permission: "reports.view", available: false },
+  { title: "Reports", segment: "reports", icon: BarChart3, permission: "reports.view", available: true },
+  { title: "Closing", segment: "closing", icon: Lock, permission: "event.close", available: true },
   { title: "Integrations", segment: "integrations", icon: Plug, permission: "integrations.manage", available: true },
   { title: "Settings", segment: "settings", icon: Settings, permission: "event.manage", available: true },
 ];

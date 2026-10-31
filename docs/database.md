@@ -46,6 +46,24 @@ The ledger (`financial_transactions`) is the single source of truth for money th
 
 Pending, failed and rejected entries are never counted. Commitments are never counted as cash, and approved-but-unpaid expenses are never counted as paid. A reversed transaction drops out of the totals, and its reversal row is informational only. These rules are covered by `tests/db/finance-and-tasks.test.ts`.
 
+## Event closing
+
+`event_closure_status(event)` returns the closing checklist (financial summary, registration counts, unverified transactions, open expense requests, approved-unpaid requests, unfinished tasks, pending deliverables and sponsorship payments, and per-department progress). It needs `event.close` or `finance.view`.
+
+`close_event_finances(event, note)` needs `event.close`, an event in `completed` or `archived` status, a note, and **zero** unverified transactions, open expense requests and unverified sponsorship payments. It stores the checklist as `events.closing_summary` (a frozen snapshot) and stamps `financially_closed_at/_by`.
+
+After closure:
+
+- inserts into `financial_transactions`, `expense_requests` and `sponsorship_payments` are rejected by trigger;
+- the closure columns can only change inside the closing RPCs (`events_guard_closure` trigger), so event managers cannot clear them with a direct update;
+- the event can only move between `completed` and `archived`.
+
+Only a Super Admin can call `reopen_event_finances(event, reason)`; the reason is appended to the closing note and the activity log. Events are never deleted; archived events stay readable for reports and audit. Covered by `tests/db/closing.test.ts`.
+
+## Reports
+
+Reports (`src/features/reports/definitions.ts`) are built server-side with the signed-in user's client, so RLS decides which rows each role sees. A report is offered when the user holds `reports.view` and the report's module permission; exporting needs `reports.export`. Exports are generated in the browser (CSV; XLSX via exceljs; PDF via jsPDF) from at most 5,000 rows per report.
+
 ## Regenerating TypeScript types
 
 ```bash

@@ -1454,6 +1454,8 @@ export type Database = {
           created_by: string | null;
           created_at: string;
           updated_at: string;
+          closing_summary: Json | null;
+          closing_note: string | null;
         };
         Insert: {
           id?: string;
@@ -1483,6 +1485,8 @@ export type Database = {
           created_by?: string | null;
           created_at?: string;
           updated_at?: string;
+          closing_summary?: Json | null;
+          closing_note?: string | null;
         };
         Update: {
           id?: string;
@@ -1512,6 +1516,8 @@ export type Database = {
           created_by?: string | null;
           created_at?: string;
           updated_at?: string;
+          closing_summary?: Json | null;
+          closing_note?: string | null;
         };
         Relationships: [
           {
@@ -3435,6 +3441,8 @@ export type Database = {
           created_by: string | null;
           created_at: string;
           updated_at: string;
+          reminded_at: string | null;
+          overdue_notified_at: string | null;
         };
         Insert: {
           id?: string;
@@ -3457,6 +3465,8 @@ export type Database = {
           created_by?: string | null;
           created_at?: string;
           updated_at?: string;
+          reminded_at?: string | null;
+          overdue_notified_at?: string | null;
         };
         Update: {
           id?: string;
@@ -3479,6 +3489,8 @@ export type Database = {
           created_by?: string | null;
           created_at?: string;
           updated_at?: string;
+          reminded_at?: string | null;
+          overdue_notified_at?: string | null;
         };
         Relationships: [
           {
@@ -3724,6 +3736,10 @@ export type Database = {
         Args: { p_event: string };
         Returns: number;
       };
+      close_event_finances: {
+        Args: { p_event: string; p_note: string };
+        Returns: undefined;
+      };
       create_api_credential: {
         Args: { p_event: string; p_name: string; p_environment: Database["public"]["Enums"]["api_environment"]; p_key_prefix: string; p_key_hash: string };
         Returns: string;
@@ -3735,6 +3751,10 @@ export type Database = {
       end_department_assignment: {
         Args: { p_assignment: string; p_reason?: string };
         Returns: undefined;
+      };
+      event_closure_status: {
+        Args: { p_event: string };
+        Returns: Json;
       };
       event_dashboard: {
         Args: { p_event: string; p_from?: string; p_to?: string };
@@ -3786,6 +3806,10 @@ export type Database = {
       };
       remove_user_from_event: {
         Args: { p_event: string; p_user: string; p_reason?: string };
+        Returns: undefined;
+      };
+      reopen_event_finances: {
+        Args: { p_event: string; p_reason: string };
         Returns: undefined;
       };
       reverse_transaction: {

@@ -25,6 +25,10 @@ export function fromDbError(error: { code?: string; message: string } | null | u
       return { ok: false, error: "The submitted values violate a validation rule." };
     case "42501":
       return { ok: false, error: error.message.includes("row-level security") ? "You do not have permission to perform this action." : error.message };
+    // Raised by our own database functions and triggers with user-facing messages.
+    case "22023":
+    case "P0002":
+      return { ok: false, error: error.message };
     case "PGRST116":
       return { ok: false, error: "Record not found or you do not have access to it." };
     default:
