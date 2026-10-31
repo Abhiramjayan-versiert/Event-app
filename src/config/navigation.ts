@@ -31,7 +31,7 @@ export const EVENT_MODULES: EventModule[] = [
   { title: "Overview", segment: "", icon: LayoutDashboard, permission: "event.view", available: true },
   { title: "Departments", segment: "departments", icon: Layers, permission: "event.view", available: true },
   { title: "Team", segment: "team", icon: UsersRound, permission: "event.view", available: true },
-  { title: "Registrations", segment: "registrations", icon: ClipboardList, permission: "registrations.view", available: false },
+  { title: "Registrations", segment: "registrations", icon: ClipboardList, permission: "registrations.view", available: true },
   { title: "Finance", segment: "finance", icon: Wallet, permission: "finance.view", available: true },
   { title: "Sponsorship", segment: "sponsorship", icon: Handshake, permission: "sponsors.view", available: false },
   { title: "Marketing", segment: "marketing", icon: Megaphone, permission: "marketing.view", available: false },
@@ -41,7 +41,7 @@ export const EVENT_MODULES: EventModule[] = [
   { title: "Schedule", segment: "schedule", icon: CalendarRange, permission: "event.view", available: false },
   { title: "Documents", segment: "documents", icon: FileText, permission: "event.view", available: false },
   { title: "Reports", segment: "reports", icon: BarChart3, permission: "reports.view", available: false },
-  { title: "Integrations", segment: "integrations", icon: Plug, permission: "integrations.manage", available: false },
+  { title: "Integrations", segment: "integrations", icon: Plug, permission: "integrations.manage", available: true },
   { title: "Settings", segment: "settings", icon: Settings, permission: "event.manage", available: true },
 ];
 

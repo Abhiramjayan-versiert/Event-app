@@ -2358,6 +2358,7 @@ export type Database = {
           raw: Json;
           created_at: string;
           updated_at: string;
+          is_test: boolean;
         };
         Insert: {
           id?: string;
@@ -2377,6 +2378,7 @@ export type Database = {
           raw?: Json;
           created_at?: string;
           updated_at?: string;
+          is_test?: boolean;
         };
         Update: {
           id?: string;
@@ -2396,6 +2398,7 @@ export type Database = {
           raw?: Json;
           created_at?: string;
           updated_at?: string;
+          is_test?: boolean;
         };
         Relationships: [
           {
@@ -2611,6 +2614,7 @@ export type Database = {
           api_credential_id: string | null;
           created_at: string;
           updated_at: string;
+          is_test: boolean;
         };
         Insert: {
           id?: string;
@@ -2650,6 +2654,7 @@ export type Database = {
           api_credential_id?: string | null;
           created_at?: string;
           updated_at?: string;
+          is_test?: boolean;
         };
         Update: {
           id?: string;
@@ -2689,6 +2694,7 @@ export type Database = {
           api_credential_id?: string | null;
           created_at?: string;
           updated_at?: string;
+          is_test?: boolean;
         };
         Relationships: [
           {
@@ -3670,6 +3676,38 @@ export type Database = {
     };
     Views: { [_ in never]: never };
     Functions: {
+      api_attach_payment_order: {
+        Args: { p_registration: string; p_provider: string; p_order_id: string; p_amount: number };
+        Returns: undefined;
+      };
+      api_authenticate: {
+        Args: { p_key_hash: string };
+        Returns: Json;
+      };
+      api_create_registration: {
+        Args: { p_credential: string; p_payload: Json };
+        Returns: Json;
+      };
+      api_idempotency_lookup: {
+        Args: { p_credential: string; p_key: string; p_request_hash: string };
+        Returns: Json;
+      };
+      api_idempotency_store: {
+        Args: { p_credential: string; p_key: string; p_request_hash: string; p_status: number; p_body: Json };
+        Returns: undefined;
+      };
+      api_log: {
+        Args: { p_event: string; p_credential: string; p_direction: string; p_method: string; p_endpoint: string; p_status: number; p_request_id: string; p_idempotency_key: string; p_ip: string; p_duration: number; p_error: string; p_summary?: Json };
+        Returns: undefined;
+      };
+      api_rate_limit: {
+        Args: { p_bucket: string; p_limit: number; p_window_seconds: number };
+        Returns: boolean;
+      };
+      apply_payment_event: {
+        Args: { p_provider: string; p_provider_event_id: string; p_event_type: string; p_payload: Json; p_signature_valid: boolean; p_order_id: string; p_payment_id: string; p_amount: number; p_currency: string; p_method: string; p_outcome: string };
+        Returns: Json;
+      };
       assign_department_member: {
         Args: { p_department: string; p_user: string; p_position: Database["public"]["Enums"]["department_position"]; p_role_key?: string };
         Returns: string;
@@ -3681,6 +3719,14 @@ export type Database = {
       check_permission: {
         Args: { p_scope: string; p_id: string; p_permission: string };
         Returns: boolean;
+      };
+      clear_sandbox_data: {
+        Args: { p_event: string };
+        Returns: number;
+      };
+      create_api_credential: {
+        Args: { p_event: string; p_name: string; p_environment: Database["public"]["Enums"]["api_environment"]; p_key_prefix: string; p_key_hash: string };
+        Returns: string;
       };
       decide_budget_revision: {
         Args: { p_revision: string; p_approve: boolean; p_note?: string };
@@ -3722,6 +3768,22 @@ export type Database = {
         Args: { p_expense: string; p_amount: number; p_paid_on: string; p_method: string; p_reference?: string; p_notes?: string; p_document?: string };
         Returns: string;
       };
+      registration_dashboard: {
+        Args: { p_event: string };
+        Returns: Json;
+      };
+      registration_record_offline_payment: {
+        Args: { p_registration: string; p_amount: number; p_method: string; p_reference?: string; p_paid_on?: string };
+        Returns: string;
+      };
+      registration_record_refund: {
+        Args: { p_registration: string; p_amount: number; p_method: string; p_reason: string; p_reference?: string };
+        Returns: string;
+      };
+      registration_set_status: {
+        Args: { p_registration: string; p_status: Database["public"]["Enums"]["registration_status"]; p_reason?: string };
+        Returns: undefined;
+      };
       remove_user_from_event: {
         Args: { p_event: string; p_user: string; p_reason?: string };
         Returns: undefined;
@@ -3729,6 +3791,10 @@ export type Database = {
       reverse_transaction: {
         Args: { p_transaction: string; p_reason: string };
         Returns: string;
+      };
+      revoke_api_credential: {
+        Args: { p_credential: string };
+        Returns: undefined;
       };
       set_department_allocation: {
         Args: { p_department: string; p_amount: number; p_notes?: string };

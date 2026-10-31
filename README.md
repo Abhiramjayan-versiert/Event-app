@@ -14,7 +14,7 @@ The product is built in ten phases (see `docs/architecture.md`).
 | 2 — Administration | Super Admin / College Admin dashboard, colleges, events, event workspace & settings, users, roles & permissions, audit log | ✅ Done |
 | 3 — Departments | Department list & workspaces, head/assistant/member appointments with history, team page, department announcements | ✅ Done |
 | 4 — Finance | Finance dashboard, ledger with verify/reject/reverse, income recording, expense approval workflow with limits and payments, budgets, allocations, revisions | ✅ Done |
-| 5 — Registrations | Registration dashboard, public website API, payment webhooks | ⏳ Schema, dedupe, API credential tables done; endpoints pending |
+| 5 — Registrations | Registration dashboard, participants, offline desk, refunds, competitions, public website API (keys, idempotency, rate limits, logs), Razorpay webhook & verification, sandbox mode | ✅ Done |
 | 6–10 | Sponsorship, operations, communication, reporting, hardening | ⏳ Schema done; screens pending |
 
 Navigation only shows modules whose screens exist, so there are no placeholder pages.

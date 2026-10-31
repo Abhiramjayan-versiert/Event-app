@@ -1,6 +1,6 @@
 # Public Website Integration API
 
-> **Status: contract defined, endpoints ship in Phase 5.** The database side is already in place: `api_credentials` (hashed keys), `api_integration_logs`, `app.api_idempotency_keys`, `app.rate_limit_buckets`, `payments`, `payment_webhook_events`, registration dedupe keys and ledger single-booking. Requests to `/api/v1/*` currently return 404.
+> **Status: live.** Manage keys, mode (sandbox/production), logs and a self-test under **Event → Integrations**. Online payments need `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET` and `RAZORPAY_WEBHOOK_SECRET`; until then use sandbox keys and `POST /registrations/{id}/sandbox-pay` to simulate the gateway. All endpoints need `SUPABASE_SERVICE_ROLE_KEY` on the server.
 
 The public event website can be built in any framework. It talks to EVENT APP **only from its server** using an event-scoped API key; the key must never be shipped to browsers.
 
@@ -24,6 +24,8 @@ Authorization: Bearer eak_live_<prefix>_<secret>
 | GET | `/api/v1/events/{eventId}/registrations` | `registrations:read` |
 | GET | `/api/v1/events/{eventId}/registrations/{registrationId}` | `registrations:read` |
 | GET | `/api/v1/events/{eventId}/registration-stats` | `registrations:read` |
+| POST | `/api/v1/events/{eventId}/registrations/{id}/sandbox-pay[?outcome=failed]` | `registrations:write` (sandbox keys only) |
+| POST | `/api/v1/payments/verify` | `registrations:write` |
 | POST | `/api/v1/payments/webhook` | gateway signature |
 
 ### Create a registration
