@@ -4616,6 +4616,10 @@ export type Database = {
         Args: { p_event: string; p_confirm_name: string };
         Returns: Json;
       };
+      delete_registration: {
+        Args: { p_registration: string; p_reason: string };
+        Returns: undefined;
+      };
       drop_push_subscription: {
         Args: { p_endpoint: string };
         Returns: undefined;

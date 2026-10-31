@@ -1,6 +1,8 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { getEventContext } from "@/lib/auth/session";
+import { getEventContext, requireAccess } from "@/lib/auth/session";
+import { TypedDeleteDialog } from "@/components/shared/typed-delete-dialog";
+import { deleteRegistrationAction } from "@/features/registrations/actions";
 import { can } from "@/lib/permissions";
 import { Crumb } from "@/components/layout/shell-context";
 import { PageHeader } from "@/components/shared/page-header";
@@ -18,6 +20,7 @@ export default async function RegistrationPage({ params }: { params: Promise<{ e
   if (!/^[0-9a-f-]{36}$/i.test(registrationId)) notFound();
   const { event, permissions } = await getEventContext(eventId);
   if (!can(permissions, "registrations.view")) notFound();
+  const access = await requireAccess();
   const supabase = await createClient();
   const { data: r } = await supabase
     .from("registrations")
@@ -38,6 +41,24 @@ export default async function RegistrationPage({ params }: { params: Promise<{ e
         eyebrow={<span className="font-mono">{r.registration_number}</span>}
         title={<span className="flex flex-wrap items-center gap-2">{r.participant_name} <StatusBadge status={r.status} /> <StatusBadge status={r.payment_status} />{r.is_test ? <Badge variant="warning">Test</Badge> : null}</span>}
         description={`${titleCase(r.category)} · ${titleCase(r.source)} · registered ${formatDateTime(r.created_at)}`}
+        actions={
+          access.is_super_admin ? (
+            <TypedDeleteDialog
+              label="Delete participant"
+              size="sm"
+              title={`Delete ${r.participant_name}?`}
+              description={
+                <>
+                  <p>Permanently removes this registration with its competitions, ticket, judging scores, results, certificates and unpaid payment attempts. This cannot be undone.</p>
+                  <p>Participants whose payments are in the finance ledger cannot be deleted. Cancel the registration (and record a refund) instead.</p>
+                </>
+              }
+              name={r.registration_number}
+              onDelete={deleteRegistrationAction.bind(null, eventId, r.id)}
+              redirectTo={`/events/${eventId}/registrations?tab=participants`}
+            />
+          ) : null
+        }
       />
       <RegistrationActions
         eventId={eventId}

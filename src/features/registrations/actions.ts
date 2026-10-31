@@ -181,3 +181,17 @@ export async function testConnectionAction(eventId: string): Promise<ActionResul
   ];
   return { ok: true, data: { checks } };
 }
+
+/** Super Admin: permanently delete a participant (not allowed once their money is in the ledger). */
+export async function deleteRegistrationAction(eventId: string, regId: string, confirmNumber: string): Promise<ActionResult> {
+  if (!ids(eventId, regId)) return { ok: false, error: "Invalid request." };
+  const supabase = await createClient();
+  const { data: reg } = await supabase.from("registrations").select("registration_number").eq("id", regId).eq("event_id", eventId).maybeSingle();
+  if (!reg) return { ok: false, error: "Registration not found." };
+  if (confirmNumber.trim().toUpperCase() !== reg.registration_number.toUpperCase()) return { ok: false, error: "Type the registration number exactly to confirm." };
+  const { error } = await supabase.rpc("delete_registration", { p_registration: regId, p_reason: "" });
+  if (error) return rpcError(error, "Could not delete the participant.");
+  refresh(eventId);
+  revalidatePath(`/events/${eventId}`, "layout");
+  return { ok: true, message: `Participant ${reg.registration_number} deleted.` };
+}
