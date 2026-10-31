@@ -16,7 +16,16 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
   // Installable on iPhone / iPad ("Add to Home Screen") and Mac Safari ("Add to Dock").
   appleWebApp: { capable: true, title: siteConfig.name, statusBarStyle: "black" },
-  icons: { apple: "/icons/apple-touch-icon.png" },
+  // Browser-tab logo (favicon) for every browser, plus home-screen icons.
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/icons/icon-192.png", type: "image/png", sizes: "192x192" },
+    ],
+    shortcut: "/favicon.ico",
+    apple: "/icons/apple-touch-icon.png",
+  },
   formatDetection: { telephone: false },
 };
 
