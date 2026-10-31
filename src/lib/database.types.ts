@@ -3784,6 +3784,10 @@ export type Database = {
         Args: { p_event: string };
         Returns: Json;
       };
+      my_profile: {
+        Args: never;
+        Returns: Json;
+      };
       pending_invitations: {
         Args: never;
         Returns: { user_id: string; invited_at: string }[];

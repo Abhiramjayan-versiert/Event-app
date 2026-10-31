@@ -10,7 +10,9 @@ export const metadata = { title: "Profile" };
 export default async function ProfilePage() {
   const access = await requireAccess();
   const supabase = await createClient();
-  const { data: profile } = await supabase.from("profiles").select("full_name, phone, job_title, avatar_path, created_at").eq("id", access.user_id).single();
+  // my_profile() returns the real details even for the Super Admin, whose public profile reads "Contact Admin".
+  const { data } = await supabase.rpc("my_profile");
+  const profile = data as { full_name: string; phone: string | null; job_title: string | null; avatar_path: string | null; created_at: string } | null;
 
   return (
     <div className="max-w-3xl space-y-6">
@@ -18,7 +20,11 @@ export default async function ProfilePage() {
       <Card>
         <CardHeader>
           <CardTitle>Your details</CardTitle>
-          <CardDescription>Visible to people you work with in your colleges and events.</CardDescription>
+          <CardDescription>
+            {access.is_super_admin
+              ? "Private. Everyone else sees the Super Admin as “Contact Admin”."
+              : "Visible to people you work with in your colleges and events."}
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <AvatarUploader userId={access.user_id} name={profile?.full_name ?? access.email} avatarPath={profile?.avatar_path ?? null} />

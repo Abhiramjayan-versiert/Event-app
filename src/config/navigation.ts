@@ -18,7 +18,7 @@ export function globalNav(access: AccessSummary): NavItem[] {
   if (collegeAdmin) items.push({ title: "Reports", href: "/reports", icon: BarChart3 });
   if (collegeAdmin) items.push({ title: "Users", href: "/users", icon: Users });
   if (access.is_super_admin) {
-    items.push({ title: "Audit log", href: "/audit", icon: ShieldCheck });
+    items.push({ title: "Activity & audit", href: "/audit", icon: ShieldCheck });
     items.push({ title: "Settings", href: "/settings", icon: Settings });
   }
   return items;

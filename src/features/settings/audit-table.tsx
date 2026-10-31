@@ -48,3 +48,49 @@ export function AuditTable({ rows }: { rows: AuditRow[] }) {
     />
   );
 }
+
+export type ActivityRow = {
+  id: string;
+  created_at: string;
+  actor: string;
+  activity_type: string;
+  summary: string;
+  college: string;
+  event: string;
+  department: string;
+};
+
+const activityColumns: ColumnDef<ActivityRow, unknown>[] = [
+  { accessorKey: "created_at", header: "When", cell: ({ getValue }) => <span className="tabular text-xs">{formatDateTime(getValue<string>())}</span> },
+  { accessorKey: "actor", header: "Who" },
+  { accessorKey: "summary", header: "What happened", cell: ({ getValue }) => <span className="block max-w-md truncate" title={getValue<string>()}>{getValue<string>()}</span> },
+  { accessorKey: "activity_type", header: "Type", filterFn: "equals", cell: ({ getValue }) => <Badge variant="muted">{getValue<string>()}</Badge> },
+  { accessorKey: "college", header: "College", filterFn: "equals" },
+  { accessorKey: "event", header: "Event", filterFn: "equals" },
+  { accessorKey: "department", header: "Department" },
+];
+
+export function ActivityTable({ rows }: { rows: ActivityRow[] }) {
+  const distinct = (key: "activity_type" | "college" | "event") => [...new Set(rows.map((r) => r[key]).filter((v) => v && v !== "—"))].sort();
+  return (
+    <DataTable
+      columns={activityColumns}
+      data={rows}
+      pageSize={50}
+      searchPlaceholder="Search people, events or actions…"
+      filters={[
+        { columnId: "activity_type", title: "Types", options: distinct("activity_type").map((v) => ({ value: v, label: v })) },
+        { columnId: "college", title: "Colleges", options: distinct("college").map((v) => ({ value: v, label: v })) },
+        { columnId: "event", title: "Events", options: distinct("event").map((v) => ({ value: v, label: v })) },
+      ]}
+      exportConfig={{
+        filename: "activity-log",
+        columns: [
+          { key: "created_at", header: "When" }, { key: "actor", header: "Who" }, { key: "summary", header: "What happened" },
+          { key: "activity_type", header: "Type" }, { key: "college", header: "College" }, { key: "event", header: "Event" }, { key: "department", header: "Department" },
+        ],
+      }}
+      emptyTitle="No activity yet"
+    />
+  );
+}

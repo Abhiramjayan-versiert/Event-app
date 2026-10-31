@@ -6,6 +6,7 @@ import { UserAvatar } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useShell } from "@/components/layout/shell-context";
 import { publicStorageUrl } from "@/lib/storage";
+import { InstallAppMenuItem } from "@/components/layout/pwa";
 
 export function UserMenu() {
   const { access } = useShell();
@@ -23,6 +24,7 @@ export function UserMenu() {
         <DropdownMenuItem asChild>
           <Link href="/profile"><UserRound />Profile</Link>
         </DropdownMenuItem>
+        <InstallAppMenuItem />
         <DropdownMenuSeparator />
         <form action="/auth/signout" method="post">
           <DropdownMenuItem asChild>

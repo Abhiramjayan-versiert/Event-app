@@ -64,16 +64,6 @@ export async function setUserStatusAction(userId: string, status: "active" | "su
   return { ok: true, message: status === "suspended" ? "Account suspended. Active sessions lose access immediately." : "Account reactivated." };
 }
 
-export async function setSuperAdminAction(userId: string, value: boolean): Promise<ActionResult> {
-  if (!uuid.safeParse(userId).success) return { ok: false, error: "Invalid request." };
-  const supabase = await createClient();
-  const { data, error } = await supabase.from("profiles").update({ is_super_admin: value }).eq("id", userId).select("id");
-  if (error) return fromDbError(error, "Could not change Super Admin access.");
-  if (!data?.length) return { ok: false, error: "Only a Super Admin can change Super Admin access." };
-  revalidatePath("/users");
-  return { ok: true, message: value ? "Super Admin access granted." : "Super Admin access revoked." };
-}
-
 /**
  * Re-sends the invitation email to someone who has not accepted yet
  * (Super Admin only). People who already set a password use "Forgot password".

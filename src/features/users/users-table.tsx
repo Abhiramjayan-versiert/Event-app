@@ -1,11 +1,12 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { MoreHorizontal, Send, ShieldCheck, ShieldOff, UserCheck, UserPlus, UserX } from "lucide-react";
+import { MoreHorizontal, Send, UserCheck, UserPlus, UserX } from "lucide-react";
 import { DataTable } from "@/components/tables/data-table";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { FormField } from "@/components/shared/form-field";
@@ -16,7 +17,7 @@ import { NativeSelect } from "@/components/ui/native-select";
 import { UserAvatar } from "@/components/ui/avatar";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { inviteUserAction, resendInvitationAction, setSuperAdminAction, setUserStatusAction } from "@/features/users/actions";
+import { inviteUserAction, resendInvitationAction, setUserStatusAction } from "@/features/users/actions";
 import { publicStorageUrl } from "@/lib/storage";
 import { formatDate } from "@/lib/utils";
 import type { ActionResult } from "@/lib/actions";
@@ -59,12 +60,7 @@ function RowActions({ user, isSuperAdmin, selfId }: { user: UserRow; isSuperAdmi
             <DropdownMenuSeparator />
           </>
         ) : null}
-        {user.is_super_admin ? (
-          <DropdownMenuItem onSelect={() => run(() => setSuperAdminAction(user.id, false))}><ShieldOff /> Revoke Super Admin</DropdownMenuItem>
-        ) : (
-          <DropdownMenuItem onSelect={() => run(() => setSuperAdminAction(user.id, true))}><ShieldCheck /> Make Super Admin</DropdownMenuItem>
-        )}
-        <DropdownMenuSeparator />
+
         {user.status === "active" ? (
           <DropdownMenuItem variant="destructive" onSelect={() => run(() => setUserStatusAction(user.id, "suspended"))}><UserX /> Suspend account</DropdownMenuItem>
         ) : (
@@ -85,7 +81,11 @@ export function UsersTable({ rows, isSuperAdmin, selfId }: { rows: UserRow[]; is
         <div className="flex items-center gap-3">
           <UserAvatar name={row.original.full_name || row.original.email} src={publicStorageUrl("avatars", row.original.avatar_path)} />
           <div className="min-w-0">
-            <p className="truncate font-medium">{row.original.full_name || "—"}</p>
+            {isSuperAdmin ? (
+              <Link href={`/users/${row.original.id}`} className="block truncate font-medium hover:underline">{row.original.full_name || "—"}</Link>
+            ) : (
+              <p className="truncate font-medium">{row.original.full_name || "—"}</p>
+            )}
             <p className="truncate text-xs text-muted-foreground">{row.original.email}</p>
           </div>
           {row.original.is_super_admin ? <Badge variant="lime">Super Admin</Badge> : null}

@@ -65,19 +65,35 @@ npm run dev
 
 With the local seed, sign in as `superadmin@eventapp.local` / `EventApp-dev-2026`. There is one account per role; see `supabase/seed.sql`. **The seed is for local development only.**
 
-## Creating the first Super Admin (staging and production)
+## The Super Admin
 
-Nobody can register as Super Admin, and public sign-ups are disabled. Provision the first one with the service-role key from a trusted machine:
+There is exactly one Super Admin: the account whose sign-in email is set in `app.super_admin_email()` (migration 19, currently `abhiramjayan72@gmail.com`).
+
+- That account becomes Super Admin automatically. Nobody can grant the role to anyone else or remove it, not even through the SQL editor or the service role, and the account cannot be suspended.
+- Everyone else sees the Super Admin as **"Contact Admin"**. The real name, phone, job title and photo are kept in the private `app.super_admin_identity` table and shown only to the Super Admin.
+- The Super Admin has every permission everywhere. They can manage any person's college, event and department access from **Users → (person)**, and see all activity and data changes under **Activity & audit**.
+
+If the account does not exist yet, send its invitation with:
 
 ```bash
-NEXT_PUBLIC_SUPABASE_URL=https://<ref>.supabase.co SUPABASE_SERVICE_ROLE_KEY=<key> NEXT_PUBLIC_APP_URL=https://<your-domain> node scripts/provision-super-admin.mjs owner@college.edu "Owner Name"
+NEXT_PUBLIC_SUPABASE_URL=https://<ref>.supabase.co SUPABASE_SERVICE_ROLE_KEY=<key> NEXT_PUBLIC_APP_URL=https://<your-domain> node scripts/provision-super-admin.mjs "Owner Name"
 ```
 
-Alternatively, run this in the Supabase SQL editor after the user exists:
+To hand the platform to someone else, change the email in a new migration that redefines `app.super_admin_email()`.
 
-```sql
-update public.profiles set is_super_admin = true where email = 'owner@college.edu';
-```
+## Installing the app (Windows, Mac, Android, iPhone, iPad)
+
+EVENT APP is a Progressive Web App: it installs from the browser, gets its own icon and window, and updates itself on every deploy. There is no app-store submission.
+
+| Device | How to install |
+|---|---|
+| Windows / Linux / ChromeOS (Chrome or Edge) | Install icon in the address bar, or account menu → **Install app** |
+| Mac (Chrome or Edge) | Same as above |
+| Mac (Safari 17+) | File → **Add to Dock** |
+| Android (Chrome, Edge, Samsung Internet) | Account menu → **Install app**, or browser menu → **Install app** / **Add to Home screen** |
+| iPhone / iPad (Safari) | Share button → **Add to Home Screen** |
+
+The service worker never caches pages, API responses or Supabase data (they are private and must be live). It caches only fingerprinted build files and icons, and shows a branded offline page when there is no connection. Regenerate the icons with `node scripts/generate-icons.mjs`.
 
 ## Scripts
 

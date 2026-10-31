@@ -77,7 +77,13 @@ export async function createUser(name: string, opts: { superAdmin?: boolean } = 
       email,
       JSON.stringify({ full_name: name }),
     ]);
-    if (opts.superAdmin) await q("update public.profiles set is_super_admin = true where id = $1", [id]);
+    if (opts.superAdmin) {
+      // Production allows exactly one Super Admin (migration 19). Fixtures need
+      // several, so set the flag with triggers bypassed (owner-only setting).
+      await q("set local session_replication_role = replica");
+      await q("update public.profiles set is_super_admin = true where id = $1", [id]);
+      await q("set local session_replication_role = origin");
+    }
   });
   return { id, email, name };
 }
