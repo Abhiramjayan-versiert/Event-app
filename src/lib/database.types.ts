@@ -3682,6 +3682,10 @@ export type Database = {
         Args: { p_scope: string; p_id: string; p_permission: string };
         Returns: boolean;
       };
+      decide_budget_revision: {
+        Args: { p_revision: string; p_approve: boolean; p_note?: string };
+        Returns: undefined;
+      };
       end_department_assignment: {
         Args: { p_assignment: string; p_reason?: string };
         Returns: undefined;
@@ -3698,6 +3702,10 @@ export type Database = {
         Args: { p_event: string; p_from?: string; p_to?: string };
         Returns: Json;
       };
+      expense_transition: {
+        Args: { p_expense: string; p_action: Database["public"]["Enums"]["approval_action"]; p_amount?: number; p_comment?: string };
+        Returns: Database["public"]["Enums"]["expense_status"];
+      };
       global_dashboard: {
         Args: { p_college?: string; p_event?: string; p_status?: Database["public"]["Enums"]["event_status"]; p_from?: string; p_to?: string };
         Returns: Json;
@@ -3710,8 +3718,20 @@ export type Database = {
         Args: { p_event: string };
         Returns: Json;
       };
+      record_expense_payment: {
+        Args: { p_expense: string; p_amount: number; p_paid_on: string; p_method: string; p_reference?: string; p_notes?: string; p_document?: string };
+        Returns: string;
+      };
       remove_user_from_event: {
         Args: { p_event: string; p_user: string; p_reason?: string };
+        Returns: undefined;
+      };
+      reverse_transaction: {
+        Args: { p_transaction: string; p_reason: string };
+        Returns: string;
+      };
+      set_department_allocation: {
+        Args: { p_department: string; p_amount: number; p_notes?: string };
         Returns: undefined;
       };
     };
