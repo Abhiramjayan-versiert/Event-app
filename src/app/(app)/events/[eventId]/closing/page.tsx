@@ -14,6 +14,7 @@ import { Progress } from "@/components/ui/progress";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ClosingActions } from "@/features/closing/closing-actions";
 import { reportsFor } from "@/features/reports/definitions";
+import type { SurveyResults } from "@/features/surveys/types";
 import { cn, formatCurrency, formatDateTime, formatNumber } from "@/lib/utils";
 
 export const metadata = { title: "Event closing" };
@@ -68,6 +69,11 @@ export default async function EventClosingPage({ params }: { params: Promise<{ e
     closedBy = p?.full_name ?? null;
   }
   const base = `/events/${eventId}`;
+  // Feedback summary from the most recent non-draft survey.
+  const { data: lastSurvey } = await supabase.from("surveys").select("id, title").eq("event_id", eventId).neq("status", "draft").order("created_at", { ascending: false }).limit(1).maybeSingle();
+  const feedback = lastSurvey ? ((await supabase.rpc("survey_results", { p_survey: lastSurvey.id })).data as unknown as SurveyResults | null) : null;
+  const rating = feedback?.questions.find((q) => q.type === "rating")?.result.average ?? null;
+  const nps = feedback?.questions.find((q) => q.type === "nps")?.result.nps ?? null;
   const reports = reportsFor(permissions);
 
   return (
@@ -112,6 +118,7 @@ export default async function EventClosingPage({ params }: { params: Promise<{ e
         <StatCard label="Refunds paid" value={formatCurrency(f.refunds_paid, cur)} />
         <StatCard label="Expenditure paid" value={formatCurrency(f.expenditure_paid, cur)} />
         <StatCard label="Approved, unpaid" value={formatCurrency(f.approved_unpaid, cur)} hint={`${formatNumber(s.unpaid_approved)} request(s)`} />
+        {feedback ? <StatCard label="Feedback" value={rating !== null ? `${rating} / 5` : "—"} hint={`${feedback.responses} responses${nps !== null ? ` · recommendation ${nps}` : ""}`} /> : null}
         <StatCard label="Pending financial requests" value={formatNumber(f.pending_expense_count)} hint={formatCurrency(f.pending_expense_amount, cur)} />
       </div>
 

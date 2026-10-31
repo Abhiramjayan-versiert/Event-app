@@ -3808,6 +3808,168 @@ export type Database = {
           },
         ];
       };
+      survey_invites: {
+        Row: {
+          survey_id: string;
+          registration_id: string;
+          sent_at: string;
+        };
+        Insert: {
+          survey_id: string;
+          registration_id: string;
+          sent_at?: string;
+        };
+        Update: {
+          survey_id?: string;
+          registration_id?: string;
+          sent_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "survey_invites_registration_id_fkey";
+            columns: ["registration_id"];
+            isOneToOne: false;
+            referencedRelation: "registrations";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "survey_invites_survey_id_fkey";
+            columns: ["survey_id"];
+            isOneToOne: false;
+            referencedRelation: "surveys";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      survey_responses: {
+        Row: {
+          id: string;
+          survey_id: string;
+          event_id: string;
+          college_id: string;
+          registration_id: string | null;
+          respondent_name: string | null;
+          answers: Json;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          survey_id: string;
+          event_id: string;
+          college_id: string;
+          registration_id?: string | null;
+          respondent_name?: string | null;
+          answers: Json;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          survey_id?: string;
+          event_id?: string;
+          college_id?: string;
+          registration_id?: string | null;
+          respondent_name?: string | null;
+          answers?: Json;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "survey_responses_college_id_fkey";
+            columns: ["college_id"];
+            isOneToOne: false;
+            referencedRelation: "colleges";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "survey_responses_event_id_fkey";
+            columns: ["event_id"];
+            isOneToOne: false;
+            referencedRelation: "events";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "survey_responses_registration_id_fkey";
+            columns: ["registration_id"];
+            isOneToOne: false;
+            referencedRelation: "registrations";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "survey_responses_survey_id_fkey";
+            columns: ["survey_id"];
+            isOneToOne: false;
+            referencedRelation: "surveys";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      surveys: {
+        Row: {
+          id: string;
+          event_id: string;
+          college_id: string;
+          title: string;
+          intro: string | null;
+          audience: string;
+          questions: Json;
+          status: string;
+          public_token: string;
+          created_by: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          event_id: string;
+          college_id: string;
+          title: string;
+          intro?: string | null;
+          audience?: string;
+          questions?: Json;
+          status?: string;
+          public_token?: string;
+          created_by?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          event_id?: string;
+          college_id?: string;
+          title?: string;
+          intro?: string | null;
+          audience?: string;
+          questions?: Json;
+          status?: string;
+          public_token?: string;
+          created_by?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "surveys_college_id_fkey";
+            columns: ["college_id"];
+            isOneToOne: false;
+            referencedRelation: "colleges";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "surveys_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "surveys_event_id_fkey";
+            columns: ["event_id"];
+            isOneToOne: false;
+            referencedRelation: "events";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       task_assignments: {
         Row: {
           id: string;
@@ -4353,6 +4515,10 @@ export type Database = {
         Args: { p_assignment: string; p_status: string };
         Returns: undefined;
       };
+      mark_survey_invited: {
+        Args: { p_survey: string; p_registrations: string[] };
+        Returns: undefined;
+      };
       my_access: {
         Args: never;
         Returns: Json;
@@ -4387,6 +4553,10 @@ export type Database = {
       };
       public_results: {
         Args: { p_event: string };
+        Returns: Json;
+      };
+      public_survey: {
+        Args: { p_token: string; p_ticket?: string };
         Returns: Json;
       };
       public_ticket: {
@@ -4441,6 +4611,10 @@ export type Database = {
         Args: { p_event: string; p_shift: string; p_data: Json };
         Returns: string;
       };
+      save_survey: {
+        Args: { p_event: string; p_survey: string; p_data: Json };
+        Returns: string;
+      };
       set_certificate_revoked: {
         Args: { p_certificate: string; p_revoked: boolean; p_reason?: string };
         Returns: undefined;
@@ -4456,6 +4630,18 @@ export type Database = {
       submit_scores: {
         Args: { p_competition: string; p_registration: string; p_scores: Json; p_comment?: string };
         Returns: undefined;
+      };
+      submit_survey_response: {
+        Args: { p_token: string; p_ticket: string; p_name: string; p_answers: Json };
+        Returns: undefined;
+      };
+      survey_invite_batch: {
+        Args: { p_survey: string; p_limit?: number };
+        Returns: { registration_id: string; name: string; email: string; ticket_code: string }[];
+      };
+      survey_results: {
+        Args: { p_survey: string };
+        Returns: Json;
       };
       two_step_users: {
         Args: never;
