@@ -16,7 +16,8 @@ The product is built in ten phases (see `docs/architecture.md`).
 | 4 — Finance | Finance dashboard, ledger with verify/reject/reverse, income recording, expense approval workflow with limits and payments, budgets, allocations, revisions | ✅ Done |
 | 5 — Registrations | Registration dashboard, participants, offline desk, refunds, competitions, public website API (keys, idempotency, rate limits, logs), Razorpay webhook & verification, sandbox mode | ✅ Done |
 | 6 — Sponsorship | Sponsor CRM, pipeline board, packages, deals, payments verified by finance into the ledger, deliverables | ✅ Done |
-| 7–10 | Operations, communication, reporting, hardening | ⏳ In progress |
+| 7 — Operations | Tasks (list/board/calendar, my/department/all, subtasks, comments, assignments, reminders), media & PR, marketing campaigns, venues, vendors, inventory, emergency contacts, event-day master schedule | ✅ Done |
+| 8–10 | Communication & documents, reporting & closing, hardening | ⏳ In progress |
 
 Navigation only shows modules whose screens exist, so there are no placeholder pages.
 
