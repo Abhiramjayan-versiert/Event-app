@@ -1,6 +1,6 @@
 import {
   Bell, Building2, CalendarDays, CalendarRange, ClipboardList, FileText, Handshake, LayoutDashboard, Layers, ListChecks,
-  Megaphone, Camera, Plug, Settings, ShieldCheck, Users, Wallet, BarChart3, Truck, UsersRound, Lock, type LucideIcon,
+  Megaphone, Camera, Plug, Settings, ShieldCheck, Users, Wallet, BarChart3, Truck, UsersRound, Lock, ScanLine, type LucideIcon,
 } from "lucide-react";
 import type { AccessSummary } from "@/lib/auth/types";
 import { canSeeGlobalDashboard } from "@/lib/auth/types";
@@ -35,6 +35,7 @@ export const EVENT_MODULES: EventModule[] = [
   { title: "Departments", segment: "departments", icon: Layers, permission: "event.view", available: true },
   { title: "Team", segment: "team", icon: UsersRound, permission: "event.view", available: true },
   { title: "Registrations", segment: "registrations", icon: ClipboardList, permission: "registrations.view", available: true },
+  { title: "Check-in", segment: "check-in", icon: ScanLine, permission: "registrations.checkin", available: true },
   { title: "Finance", segment: "finance", icon: Wallet, permission: "finance.view", available: true },
   { title: "Sponsorship", segment: "sponsorship", icon: Handshake, permission: "sponsors.view", available: true },
   { title: "Marketing", segment: "marketing", icon: Megaphone, permission: "marketing.view", available: true },

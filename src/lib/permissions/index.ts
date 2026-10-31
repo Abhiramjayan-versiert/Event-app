@@ -8,7 +8,7 @@ export const PERMISSIONS = {
   event: [
     "event.view", "event.manage", "event.close", "event.members.manage", "departments.manage",
     "finance.view", "finance.manage", "finance.review", "finance.approve", "budgets.manage", "expenses.submit",
-    "registrations.view", "registrations.manage", "registrations.export",
+    "registrations.view", "registrations.manage", "registrations.export", "registrations.checkin",
     "sponsors.view", "sponsors.manage", "media.view", "media.manage", "marketing.view", "marketing.manage",
     "tasks.view_all", "tasks.manage_all", "operations.view", "operations.manage", "announcements.manage",
     "documents.view_all", "reports.view", "reports.export", "integrations.manage", "audit.view",

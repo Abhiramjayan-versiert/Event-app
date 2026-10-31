@@ -3,7 +3,7 @@ import { createServerClient } from "@supabase/ssr";
 import type { Database } from "@/lib/database.types";
 import { publicEnv } from "@/lib/env";
 
-const PUBLIC_PATHS = ["/login", "/forgot-password", "/auth", "/api/v1", "/api/health", "/api/calendar", "/setup-required"];
+const PUBLIC_PATHS = ["/login", "/forgot-password", "/auth", "/api/v1", "/api/health", "/api/calendar", "/setup-required", "/e", "/t"];
 
 export function isPublicPath(pathname: string) {
   return pathname === "/" ? false : PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(`${p}/`));
@@ -58,7 +58,7 @@ export async function updateSession(request: NextRequest, extraHeaders: Record<s
 
   // Two-step sign-in: people who turned it on must enter their code before
   // anything else (only /auth/* stays reachable, for the code page and sign-out).
-  if (user && !pathname.startsWith("/auth/") && !pathname.startsWith("/api/")) {
+  if (user && !isPublicPath(pathname) && !pathname.startsWith("/api/")) {
     const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
     if (aal && aal.nextLevel === "aal2" && aal.currentLevel !== "aal2") {
       const url = request.nextUrl.clone();

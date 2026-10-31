@@ -32,7 +32,7 @@ export function EventBranding({ eventId, logoPath, bannerPath }: { eventId: stri
   );
 }
 
-export function RegistrationSettingsForm({ eventId, defaults }: { eventId: string; defaults: RegistrationSettingsInput }) {
+export function RegistrationSettingsForm({ eventId, defaults, publicUrl }: { eventId: string; defaults: RegistrationSettingsInput; publicUrl?: string }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const form = useForm<RegistrationSettingsInput>({ resolver: zodResolver(registrationSettingsSchema), defaultValues: defaults });
@@ -65,6 +65,22 @@ export function RegistrationSettingsForm({ eventId, defaults }: { eventId: strin
       <FormField id="max_team_size" label="Maximum team size" error={form.formState.errors.max_team_size?.message}>
         <Input id="max_team_size" type="number" min={1} max={50} className="w-32" {...form.register("max_team_size", { valueAsNumber: true })} />
       </FormField>
+      <div className="space-y-2 rounded-md border p-3">
+        <div className="flex items-center justify-between gap-4">
+          <Label htmlFor="public_page_enabled">Public registration page</Label>
+          <Controller
+            control={form.control}
+            name="public_page_enabled"
+            render={({ field }) => <Switch id="public_page_enabled" checked={field.value} onCheckedChange={field.onChange} />}
+          />
+        </div>
+        <p className="text-xs text-muted-foreground">
+          Lets anyone register on this app's own event page and get a QR ticket. No college website needed.
+        </p>
+        {publicUrl ? (
+          <a href={publicUrl} target="_blank" rel="noreferrer" className="block break-all text-xs font-medium underline underline-offset-4">{publicUrl}</a>
+        ) : null}
+      </div>
       <Button type="submit" loading={pending}>Save registration settings</Button>
     </form>
   );

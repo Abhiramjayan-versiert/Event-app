@@ -8,6 +8,7 @@ import { StatusBadge } from "@/components/shared/status-badge";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RegistrationActions } from "@/features/registrations/registrations-ui";
+import { TicketPanel } from "@/features/checkin/ticket-panel";
 import { formatCurrency, formatDateTime, titleCase } from "@/lib/utils";
 
 export const metadata = { title: "Registration" };
@@ -96,6 +97,19 @@ export default async function RegistrationPage({ params }: { params: Promise<{ e
           </CardContent>
         </Card>
       </div>
+      <Card>
+        <CardHeader><CardTitle>Ticket & check-in</CardTitle></CardHeader>
+        <CardContent>
+          <TicketPanel
+            eventId={eventId}
+            registrationId={r.id}
+            ticketCode={r.ticket_code}
+            checkedInAt={r.checked_in_at}
+            canManage={can(permissions, "registrations.manage")}
+            canCheckIn={can(permissions, "registrations.checkin") || can(permissions, "registrations.manage")}
+          />
+        </CardContent>
+      </Card>
       <Card>
         <CardHeader><CardTitle>Gateway payments</CardTitle></CardHeader>
         <CardContent>

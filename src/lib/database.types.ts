@@ -2621,6 +2621,9 @@ export type Database = {
           created_at: string;
           updated_at: string;
           is_test: boolean;
+          ticket_code: string;
+          checked_in_at: string | null;
+          checked_in_by: string | null;
         };
         Insert: {
           id?: string;
@@ -2661,6 +2664,9 @@ export type Database = {
           created_at?: string;
           updated_at?: string;
           is_test?: boolean;
+          ticket_code?: string;
+          checked_in_at?: string | null;
+          checked_in_by?: string | null;
         };
         Update: {
           id?: string;
@@ -2701,6 +2707,9 @@ export type Database = {
           created_at?: string;
           updated_at?: string;
           is_test?: boolean;
+          ticket_code?: string;
+          checked_in_at?: string | null;
+          checked_in_by?: string | null;
         };
         Relationships: [
           {
@@ -2708,6 +2717,13 @@ export type Database = {
             columns: ["api_credential_id"];
             isOneToOne: false;
             referencedRelation: "api_credentials";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "registrations_checked_in_by_fkey";
+            columns: ["checked_in_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
             referencedColumns: ["id"];
           },
           {
@@ -3732,9 +3748,17 @@ export type Database = {
         Args: { p_token: string };
         Returns: { uid: string; title: string; description: string; location: string; starts_at: string; ends_at: string; all_day: boolean; url: string }[];
       };
+      check_in_ticket: {
+        Args: { p_event: string; p_code: string };
+        Returns: Json;
+      };
       check_permission: {
         Args: { p_scope: string; p_id: string; p_permission: string };
         Returns: boolean;
+      };
+      checkin_overview: {
+        Args: { p_event: string };
+        Returns: Json;
       };
       clear_sandbox_data: {
         Args: { p_event: string };
@@ -3812,6 +3836,18 @@ export type Database = {
         Args: never;
         Returns: { user_id: string; invited_at: string }[];
       };
+      public_event_info: {
+        Args: { p_college_code: string; p_slug: string };
+        Returns: Json;
+      };
+      public_register: {
+        Args: { p_event: string; p_payload: Json };
+        Returns: Json;
+      };
+      public_ticket: {
+        Args: { p_code: string };
+        Returns: Json;
+      };
       record_expense_payment: {
         Args: { p_expense: string; p_amount: number; p_paid_on: string; p_method: string; p_reference?: string; p_notes?: string; p_document?: string };
         Returns: string;
@@ -3855,6 +3891,10 @@ export type Database = {
       two_step_users: {
         Args: never;
         Returns: { user_id: string }[];
+      };
+      undo_check_in: {
+        Args: { p_registration: string };
+        Returns: undefined;
       };
       verify_sponsorship_payment: {
         Args: { p_payment: string; p_approve: boolean; p_note?: string };

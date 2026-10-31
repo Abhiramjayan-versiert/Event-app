@@ -3,6 +3,7 @@ import { requireAccess, requireEventPermission } from "@/lib/auth/session";
 import { TypedDeleteDialog } from "@/components/shared/typed-delete-dialog";
 import { deleteEventAction } from "@/features/events/actions";
 import { CloneEventDialog } from "@/features/events/clone-event-dialog";
+import { publicEnv } from "@/lib/env";
 import { can } from "@/lib/permissions";
 import { PageHeader } from "@/components/shared/page-header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -98,7 +99,9 @@ export default async function EventSettingsPage({ params }: { params: Promise<{ 
                   duplicate_rule: (reg.duplicate_rule as RegistrationRule) ?? "email_per_category",
                   allow_team_registrations: reg.allow_team_registrations !== false,
                   max_team_size: Number(reg.max_team_size ?? 6),
+                  public_page_enabled: reg.public_page_enabled === true,
                 }}
+                publicUrl={event.college ? `${publicEnv.appUrl}/e/${event.college.code.toLowerCase()}/${event.slug}` : undefined}
               />
             </CardContent>
           </Card>

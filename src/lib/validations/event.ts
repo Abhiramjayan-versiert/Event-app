@@ -54,6 +54,7 @@ export const registrationSettingsSchema = z.object({
   duplicate_rule: z.enum(["email_per_category", "email_per_event", "phone_per_category", "none"]),
   allow_team_registrations: z.boolean(),
   max_team_size: z.number({ error: "Enter a number" }).int().min(1).max(50),
+  public_page_enabled: z.boolean(),
 });
 export type RegistrationSettingsInput = z.infer<typeof registrationSettingsSchema>;
 
