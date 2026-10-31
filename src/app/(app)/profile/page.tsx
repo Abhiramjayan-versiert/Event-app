@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { AvatarUploader, ChangePasswordForm, ProfileForm } from "@/features/profile/profile-forms";
 import { CalendarSync } from "@/features/profile/calendar-sync";
+import { TwoStepSettings } from "@/features/profile/two-step";
 import { publicEnv } from "@/lib/env";
 
 export const metadata = { title: "Profile" };
@@ -32,6 +33,13 @@ export default async function ProfilePage() {
           <AvatarUploader userId={access.user_id} name={profile?.full_name ?? access.email} avatarPath={profile?.avatar_path ?? null} />
           <ProfileForm defaults={{ full_name: profile?.full_name ?? "", phone: profile?.phone ?? "", job_title: profile?.job_title ?? "" }} />
         </CardContent>
+      </Card>
+      <Card>
+        <CardHeader>
+          <CardTitle>Two-step sign-in</CardTitle>
+          <CardDescription>Protect your account with a code from your phone in addition to your password.</CardDescription>
+        </CardHeader>
+        <CardContent><TwoStepSettings /></CardContent>
       </Card>
       <Card>
         <CardHeader>

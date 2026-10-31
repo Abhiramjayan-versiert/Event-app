@@ -33,6 +33,8 @@ export type UserRow = {
   roles: string[];
   /** Invited but has not accepted yet (Super Admin view only). */
   invite_pending?: boolean;
+  /** Two-step sign-in turned on (Super Admin view only). */
+  two_step?: boolean;
 };
 
 function RowActions({ user, isSuperAdmin, selfId }: { user: UserRow; isSuperAdmin: boolean; selfId: string }) {
@@ -112,6 +114,7 @@ export function UsersTable({ rows, isSuperAdmin, selfId }: { rows: UserRow[]; is
         <div className="flex flex-wrap items-center gap-1">
           <StatusBadge status={getValue<string>()} />
           {row.original.invite_pending ? <Badge variant="outline">Invite pending</Badge> : null}
+          {row.original.two_step ? <Badge variant="lime">2-step</Badge> : null}
         </div>
       ),
     },

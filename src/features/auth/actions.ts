@@ -26,6 +26,11 @@ export async function signInAction(input: unknown, next?: string): Promise<Actio
     return { ok: false, error: "Your account is suspended. Contact your administrator." };
   }
 
+  // Two-step sign-in: ask for the code before entering the app.
+  const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+  if (aal?.nextLevel === "aal2" && aal.currentLevel !== "aal2") {
+    return { ok: true, data: { redirectTo: `/auth/mfa?next=${encodeURIComponent(safeRedirectPath(next))}` } };
+  }
   return { ok: true, data: { redirectTo: safeRedirectPath(next) } };
 }
 

@@ -22,3 +22,13 @@ describe("pending invitations", () => {
     await expectDenied(asUser(plain.id, (q) => q("select * from public.pending_invitations()")), /Only a Super Admin/);
   });
 });
+
+describe("two-step sign-in status", () => {
+  it("lists users with a verified authenticator, for Super Admins only", async () => {
+    await asOwner((q) => q("insert into auth.mfa_factors (user_id, status) values ($1, 'verified'), ($2, 'unverified')", [accepted.id, plain.id]));
+    const rows = await asUser(superAdmin.id, (q) => q<{ user_id: string }>("select user_id from public.two_step_users()"));
+    expect(rows.map((r) => r.user_id)).toContain(accepted.id);
+    expect(rows.map((r) => r.user_id)).not.toContain(plain.id);
+    await expectDenied(asUser(plain.id, (q) => q("select * from public.two_step_users()")), /Only a Super Admin/);
+  });
+});

@@ -56,6 +56,18 @@ export async function updateSession(request: NextRequest, extraHeaders: Record<s
     return NextResponse.redirect(url);
   }
 
+  // Two-step sign-in: people who turned it on must enter their code before
+  // anything else (only /auth/* stays reachable, for the code page and sign-out).
+  if (user && !pathname.startsWith("/auth/") && !pathname.startsWith("/api/")) {
+    const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+    if (aal && aal.nextLevel === "aal2" && aal.currentLevel !== "aal2") {
+      const url = request.nextUrl.clone();
+      url.pathname = "/auth/mfa";
+      url.search = pathname === "/" || pathname === "/login" ? "" : `?next=${encodeURIComponent(pathname + search)}`;
+      return NextResponse.redirect(url);
+    }
+  }
+
   if (user && (pathname === "/login" || pathname === "/")) {
     const url = request.nextUrl.clone();
     url.pathname = "/dashboard";

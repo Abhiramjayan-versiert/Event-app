@@ -3852,6 +3852,10 @@ export type Database = {
         Args: { p_department: string; p_amount: number; p_notes?: string };
         Returns: undefined;
       };
+      two_step_users: {
+        Args: never;
+        Returns: { user_id: string }[];
+      };
       verify_sponsorship_payment: {
         Args: { p_payment: string; p_approve: boolean; p_note?: string };
         Returns: undefined;

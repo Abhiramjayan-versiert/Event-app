@@ -26,7 +26,11 @@ export default async function UsersPage() {
       : Promise.resolve({ data: access.colleges.filter((c) => c.roles.includes("college_admin")).map((c) => ({ id: c.id, name: c.name })) }),
     supabase.from("events").select("id, name, college:colleges(name)").neq("status", "archived").order("starts_on", { ascending: false }),
   ]);
-  const pending = access.is_super_admin ? new Set(((await supabase.rpc("pending_invitations")).data ?? []).map((p) => p.user_id)) : new Set<string>();
+  const [pendingRes, twoStepRes] = access.is_super_admin
+    ? await Promise.all([supabase.rpc("pending_invitations"), supabase.rpc("two_step_users")])
+    : [null, null];
+  const pending = new Set((pendingRes?.data ?? []).map((p) => p.user_id));
+  const twoStep = new Set((twoStepRes?.data ?? []).map((p) => p.user_id));
   if (error) return <ErrorState title="Could not load users" message={error.message} />;
 
   const rows: UserRow[] = (data ?? []).map((p) => ({
@@ -38,6 +42,7 @@ export default async function UsersPage() {
     is_super_admin: p.is_super_admin,
     created_at: p.created_at,
     invite_pending: pending.has(p.id),
+    two_step: twoStep.has(p.id),
     roles: [
       ...p.college_members.filter((m) => !m.ended_at).map((m) => `${m.role?.name} · ${m.college?.code}`),
       ...p.event_members.filter((m) => !m.ended_at).map((m) => `${m.role?.name} · ${m.event?.name}`),

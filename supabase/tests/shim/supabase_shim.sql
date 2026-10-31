@@ -113,3 +113,14 @@ begin
     create publication supabase_realtime;
   end if;
 end $$;
+
+-- Supabase Auth MFA factors (subset used by the app).
+create table if not exists auth.mfa_factors (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users (id) on delete cascade,
+  friendly_name text,
+  factor_type text not null default 'totp',
+  status text not null default 'unverified',
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
