@@ -3728,6 +3728,10 @@ export type Database = {
         Args: { p_event: string; p_user: string; p_role_key: string };
         Returns: string;
       };
+      calendar_feed_items: {
+        Args: { p_token: string };
+        Returns: { uid: string; title: string; description: string; location: string; starts_at: string; ends_at: string; all_day: boolean; url: string }[];
+      };
       check_permission: {
         Args: { p_scope: string; p_id: string; p_permission: string };
         Returns: boolean;
@@ -3791,6 +3795,10 @@ export type Database = {
       my_access: {
         Args: never;
         Returns: Json;
+      };
+      my_calendar_token: {
+        Args: { p_reset?: boolean };
+        Returns: string;
       };
       my_event_permissions: {
         Args: { p_event: string };

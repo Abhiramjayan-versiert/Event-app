@@ -4,6 +4,8 @@ import { PageHeader } from "@/components/shared/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { AvatarUploader, ChangePasswordForm, ProfileForm } from "@/features/profile/profile-forms";
+import { CalendarSync } from "@/features/profile/calendar-sync";
+import { publicEnv } from "@/lib/env";
 
 export const metadata = { title: "Profile" };
 
@@ -30,6 +32,13 @@ export default async function ProfilePage() {
           <AvatarUploader userId={access.user_id} name={profile?.full_name ?? access.email} avatarPath={profile?.avatar_path ?? null} />
           <ProfileForm defaults={{ full_name: profile?.full_name ?? "", phone: profile?.phone ?? "", job_title: profile?.job_title ?? "" }} />
         </CardContent>
+      </Card>
+      <Card>
+        <CardHeader>
+          <CardTitle>Calendar sync</CardTitle>
+          <CardDescription>See your events, their schedules and your task deadlines in Google, Apple or Outlook Calendar.</CardDescription>
+        </CardHeader>
+        <CardContent><CalendarSync appUrl={publicEnv.appUrl} /></CardContent>
       </Card>
       <Card>
         <CardHeader>
