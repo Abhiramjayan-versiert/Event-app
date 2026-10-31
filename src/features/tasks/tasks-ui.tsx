@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
+import { useLocalDateTimeFields } from "@/lib/use-local-datetime";
 import type { ColumnDef } from "@tanstack/react-table";
 import { toast } from "sonner";
 import { format } from "date-fns";
@@ -54,6 +55,7 @@ export function TaskDialog({
       module: "general", task_type: "general", priority: "medium", start_at: "", due_at: "", location: "", assignees: [], ...defaults,
     },
   });
+  useLocalDateTimeFields(form, ["start_at", "due_at"]);
   const assignees = form.watch("assignees") ?? [];
   const submit = form.handleSubmit((v) =>
     startTransition(async () => {

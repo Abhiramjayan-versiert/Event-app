@@ -7,7 +7,7 @@ import { publicEnv } from "@/lib/env";
 import { can } from "@/lib/permissions";
 import { PageHeader } from "@/components/shared/page-header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { EventForm, toLocalInput } from "@/features/events/event-form";
+import { EventForm } from "@/features/events/event-form";
 import { EventAdmins, EventBranding, EventLifecycle, RegistrationSettingsForm, type EventAdminRow } from "@/features/events/event-settings-panels";
 import { EVENT_CATEGORIES, CURRENCIES, type EventInput } from "@/lib/validations/event";
 
@@ -42,8 +42,8 @@ export default async function EventSettingsPage({ params }: { params: Promise<{ 
     description: event.description ?? "",
     starts_on: event.starts_on,
     ends_on: event.ends_on,
-    registration_opens_at: toLocalInput(event.registration_opens_at),
-    registration_closes_at: toLocalInput(event.registration_closes_at),
+    registration_opens_at: event.registration_opens_at ?? "",
+    registration_closes_at: event.registration_closes_at ?? "",
     venue: event.venue ?? "",
     website_url: event.website_url ?? "",
     contact_email: event.contact_email ?? "",
@@ -70,7 +70,7 @@ export default async function EventSettingsPage({ params }: { params: Promise<{ 
             <CardDescription>Including the public website URL that will send registrations.</CardDescription>
           </CardHeader>
           <CardContent>
-            {/* Server-rendered datetime defaults use the server timezone; the form re-derives them on save from the browser. */}
+            {/* Stored ISO times are converted to the browser's local time inside the form. */}
             <EventForm eventId={event.id} colleges={event.college ? [{ id: event.college.id, name: event.college.name }] : []} defaults={defaults} />
           </CardContent>
         </Card>

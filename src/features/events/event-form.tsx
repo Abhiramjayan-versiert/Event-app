@@ -1,11 +1,11 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useLocalDateTimeFields } from "@/lib/use-local-datetime";
 import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -23,10 +23,6 @@ const SOCIAL_LABELS: Record<(typeof SOCIAL_PLATFORMS)[number], string> = {
   instagram: "Instagram", linkedin: "LinkedIn", x: "X (Twitter)", youtube: "YouTube", facebook: "Facebook",
 };
 
-/** ISO timestamp → value for <input type="datetime-local"> in the browser's timezone. */
-export function toLocalInput(iso: string | null | undefined) {
-  return iso ? format(new Date(iso), "yyyy-MM-dd'T'HH:mm") : "";
-}
 
 export function EventForm({
   colleges, eventId, defaults,
@@ -50,6 +46,7 @@ export function EventForm({
       ...defaults,
     },
   });
+  useLocalDateTimeFields(form, ["registration_opens_at", "registration_closes_at"]);
   const { errors } = form.formState;
   const field = (name: Exclude<keyof EventInput, "social_links">) => ({ id: name, "aria-invalid": !!errors[name], ...form.register(name) });
 

@@ -15,7 +15,6 @@ import { getEventPeople } from "@/features/departments/queries";
 import { AssigneesEditor, CommentForm, PRIORITY_VARIANT, ProgressEditor, TaskDialog, TaskStatusSelect } from "@/features/tasks/tasks-ui";
 import { deleteTaskAction } from "@/features/tasks/actions";
 import { DocumentsPanel } from "@/features/documents/documents-panel";
-import { toLocalInput } from "@/features/events/event-form";
 import { publicStorageUrl } from "@/lib/storage";
 import { TASK_MODULES, TASK_TYPES, type TaskInput } from "@/lib/validations/task";
 import { formatDateTime, formatRelative, titleCase } from "@/lib/utils";
@@ -54,7 +53,7 @@ export default async function TaskPage({ params }: { params: Promise<{ eventId: 
     title: t.title, description: t.description ?? "", department_id: t.department_id ?? "", priority: t.priority,
     module: (TASK_MODULES as readonly string[]).includes(t.module) ? (t.module as TaskInput["module"]) : "general",
     task_type: (TASK_TYPES as readonly string[]).includes(t.task_type ?? "") ? (t.task_type as TaskInput["task_type"]) : "general",
-    start_at: toLocalInput(t.start_at), due_at: toLocalInput(t.due_at), location: t.location ?? "",
+    start_at: t.start_at ?? "", due_at: t.due_at ?? "", location: t.location ?? "",
   };
 
   return (
