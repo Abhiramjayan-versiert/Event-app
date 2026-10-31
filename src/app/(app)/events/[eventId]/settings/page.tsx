@@ -3,6 +3,9 @@ import { requireAccess, requireEventPermission } from "@/lib/auth/session";
 import { TypedDeleteDialog } from "@/components/shared/typed-delete-dialog";
 import { deleteEventAction } from "@/features/events/actions";
 import { CloneEventDialog } from "@/features/events/clone-event-dialog";
+import { CancelEventButton, RestoreEventButton } from "@/features/removal/removal-ui";
+import { Ban } from "lucide-react";
+import { formatDateTime } from "@/lib/utils";
 import { publicEnv } from "@/lib/env";
 import { can } from "@/lib/permissions";
 import { PageHeader } from "@/components/shared/page-header";
@@ -49,7 +52,7 @@ export default async function EventSettingsPage({ params }: { params: Promise<{ 
     contact_email: event.contact_email ?? "",
     contact_phone: event.contact_phone ?? "",
     currency: (CURRENCIES as readonly string[]).includes(event.currency) ? (event.currency as EventInput["currency"]) : "INR",
-    status: event.status === "archived" ? "completed" : event.status,
+    status: event.status === "archived" ? "completed" : event.status === "cancelled" ? "planning" : event.status,
     social_links: { instagram: social.instagram ?? "", linkedin: social.linkedin ?? "", x: social.x ?? "", youtube: social.youtube ?? "", facebook: social.facebook ?? "" },
   };
   const adminRows: EventAdminRow[] = (admins ?? []).flatMap((m) =>
@@ -63,6 +66,18 @@ export default async function EventSettingsPage({ params }: { params: Promise<{ 
         description="Details, branding, registration rules and administrators."
         actions={access.is_super_admin || canCreate ? <CloneEventDialog eventId={event.id} name={event.name} startsOn={event.starts_on} endsOn={event.ends_on} /> : null}
       />
+      {event.status === "cancelled" ? (
+        <Card className="border-destructive/50 bg-destructive/5">
+          <CardContent className="flex flex-wrap items-center gap-3 pt-6">
+            <Ban className="size-5 text-destructive" />
+            <div className="min-w-0 flex-1">
+              <p className="font-medium">This event was cancelled{event.cancelled_at ? ` on ${formatDateTime(event.cancelled_at)}` : ""}.</p>
+              <p className="text-sm text-muted-foreground">{event.cancel_reason ? `Reason: ${event.cancel_reason}. ` : ""}Registrations are closed. All records are kept.</p>
+            </div>
+            {canDelete ? <RestoreEventButton eventId={event.id} /> : null}
+          </CardContent>
+        </Card>
+      ) : null}
       <div className="grid gap-6 xl:grid-cols-[1fr_380px]">
         <Card>
           <CardHeader>
@@ -105,6 +120,17 @@ export default async function EventSettingsPage({ params }: { params: Promise<{ 
               />
             </CardContent>
           </Card>
+          {canDelete && event.status !== "cancelled" ? (
+            <Card className="border-destructive/40">
+              <CardHeader>
+                <CardTitle>Cancel event</CardTitle>
+                <CardDescription>
+                  Calls the event off but keeps every record: registrations close and the public page shows it as cancelled. You can restore it later.
+                </CardDescription>
+              </CardHeader>
+              <CardContent><CancelEventButton eventId={event.id} name={event.name} isSuperAdmin={access.is_super_admin} /></CardContent>
+            </Card>
+          ) : null}
           {canDelete ? (
             <Card className="border-destructive/40">
               <CardHeader>

@@ -17,8 +17,10 @@ import { ErrorState } from "@/components/shared/error-state";
 import { FilterBar } from "@/components/dashboard/filters";
 import { BarsChart, ChartPanel, TrendChart } from "@/components/charts/charts";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { MyWorkspace } from "./my-workspace";
+import { ClearRemovalLogButton } from "@/features/removal/removal-ui";
+import { Badge } from "@/components/ui/badge";
 import { AnnouncementsCard } from "@/features/announcements/announcements-card";
 import { cn, formatCurrency, formatDate, formatDateRange, formatNumber, formatRelative, titleCase } from "@/lib/utils";
 
@@ -38,7 +40,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
 
   const filters = filterSchema.parse(await searchParams);
   const supabase = await createClient();
-  const [{ data, error }, colleges, events] = await Promise.all([
+  const [{ data, error }, colleges, events, removals] = await Promise.all([
     supabase.rpc("global_dashboard", {
       p_college: filters.college,
       p_event: filters.event,
@@ -48,7 +50,13 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
     }),
     supabase.from("colleges").select("id, name").order("name"),
     supabase.from("events").select("id, name, college_id").order("starts_on", { ascending: false }).limit(500),
+    // Super Admin only (RLS): what other admins cancelled or deleted. The Super Admin's own removals are not listed.
+    access.is_super_admin
+      ? supabase.from("removal_log").select("id, item_type, action, item_name, college_name, event_id, event_name, performer_name, reason, created_at", { count: "exact" })
+          .is("cleared_at", null).eq("by_super_admin", false).order("created_at", { ascending: false }).limit(25)
+      : Promise.resolve({ data: null, count: 0 }),
   ]);
+  const removalCount = removals.count ?? 0;
 
   if (error || !data) return <ErrorState title="Could not load the dashboard" message={error?.message} />;
   const d = data as unknown as GlobalDashboard;
@@ -93,6 +101,44 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
         <StatCard label="Registration revenue" value={formatCurrency(f.registration_income)} hint="Verified payments only" icon={Receipt} />
         <StatCard label="Sponsorship committed" value={formatCurrency(f.sponsorship_committed)} hint={`${formatCurrency(f.outstanding_sponsorship)} outstanding`} icon={HandCoins} />
       </section>
+
+      {access.is_super_admin ? (
+        <Card className={cn(removalCount > 0 && "border-destructive/40")}>
+          <CardHeader className="flex flex-row flex-wrap items-start justify-between gap-3">
+            <div className="space-y-1">
+              <CardTitle className="flex items-center gap-2">
+                Cancelled &amp; deleted by admins <Badge variant={removalCount > 0 ? "destructive" : "muted"}>{removalCount}</Badge>
+              </CardTitle>
+              <CardDescription>Events and competitions other admins cancelled or deleted. Your own removals are not listed.</CardDescription>
+            </div>
+            {removalCount > 0 ? <ClearRemovalLogButton count={removalCount} /> : null}
+          </CardHeader>
+          <CardContent>
+            {removalCount === 0 ? (
+              <p className="py-2 text-sm text-muted-foreground">Nothing cancelled or deleted by other admins.</p>
+            ) : (
+              <ol className="divide-y">
+                {(removals.data ?? []).map((r) => (
+                  <li key={r.id} className="flex items-start justify-between gap-4 py-2.5 text-sm">
+                    <div className="min-w-0">
+                      <p className="truncate">
+                        <Badge variant={r.action === "deleted" ? "destructive" : "warning"} className="mr-2">{titleCase(r.action)}</Badge>
+                        <span className="font-medium">{r.item_name}</span>
+                        <span className="text-muted-foreground"> · {r.item_type === "event" ? "event" : `competition in ${r.event_name ?? "an event"}`}</span>
+                      </p>
+                      <p className="truncate text-xs text-muted-foreground">
+                        {r.college_name ?? "Unknown college"} · by {r.performer_name || "a removed user"}{r.reason ? ` · “${r.reason}”` : ""}
+                      </p>
+                    </div>
+                    <time className="shrink-0 text-xs text-muted-foreground" dateTime={r.created_at}>{formatRelative(r.created_at)}</time>
+                  </li>
+                ))}
+              </ol>
+            )}
+            {removalCount > 25 ? <p className="pt-2 text-xs text-muted-foreground">Showing the latest 25 of {removalCount}.</p> : null}
+          </CardContent>
+        </Card>
+      ) : null}
 
       <section aria-label="Finance" className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label="Total income received" value={formatCurrency(f.total_income_received)} hint="Registrations + sponsorship + other, verified" icon={CircleDollarSign} highlight />

@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { BarsChart, ChartPanel, TrendChart } from "@/components/charts/charts";
 import { RealtimeRefresh } from "@/components/dashboard/realtime-refresh";
 import { CompetitionDialog, OfflineRegistrationDialog, RegistrationsTable, type RegistrationRow } from "@/features/registrations/registrations-ui";
+import { CompetitionRemoval } from "@/features/removal/removal-ui";
 import { cn, formatCurrency, formatNumber, titleCase } from "@/lib/utils";
 
 export const metadata = { title: "Registrations" };
@@ -115,7 +116,7 @@ export default async function RegistrationsPage({ params, searchParams }: { para
                       <p className="truncate font-semibold">{c.name}</p>
                       <p className="font-mono text-xs text-muted-foreground">{c.code}</p>
                     </div>
-                    <Badge variant={c.is_active ? "success" : "muted"}>{c.is_active ? "Open" : "Closed"}</Badge>
+                    {c.cancelled_at ? <Badge variant="destructive">Cancelled</Badge> : <Badge variant={c.is_active ? "success" : "muted"}>{c.is_active ? "Open" : "Closed"}</Badge>}
                   </div>
                   <div className="grid grid-cols-2 gap-2 text-sm">
                     <span className="text-muted-foreground">Fee</span><span className="tabular text-right">{formatCurrency(c.fee, cur)}</span>
@@ -123,7 +124,8 @@ export default async function RegistrationsPage({ params, searchParams }: { para
                     <span className="text-muted-foreground">Type</span><span className="text-right">{c.registration_type === "team" ? `Team (${c.team_min}–${c.team_max})` : "Individual"}</span>
                     <span className="text-muted-foreground">Capacity</span><span className="text-right">{c.capacity ?? "Unlimited"}</span>
                   </div>
-                  {can(permissions, "event.manage") ? (
+                  {c.cancelled_at && c.cancel_reason ? <p className="text-xs text-muted-foreground">Reason: {c.cancel_reason}</p> : null}
+                  {can(permissions, "event.manage") && !c.cancelled_at ? (
                     <CompetitionDialog
                       eventId={eventId}
                       competitionId={c.id}
@@ -134,6 +136,7 @@ export default async function RegistrationsPage({ params, searchParams }: { para
                       trigger={<Button variant="outline" size="sm" className="w-full"><Pencil /> Edit</Button>}
                     />
                   ) : null}
+                  {can(permissions, "event.manage") ? <CompetitionRemoval eventId={eventId} competitionId={c.id} name={c.name} cancelled={Boolean(c.cancelled_at)} /> : null}
                 </div>
               ))}
             </div>

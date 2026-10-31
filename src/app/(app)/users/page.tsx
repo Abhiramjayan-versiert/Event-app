@@ -20,6 +20,7 @@ export default async function UsersPage() {
         college_members!college_members_user_id_fkey(ended_at, role:roles(name), college:colleges(code)),
         event_members!event_members_user_id_fkey(ended_at, role:roles(name), event:events(name)),
         department_members!department_members_user_id_fkey(ended_at, role:roles(name), department:departments(name, event:events(name)))`)
+      .neq("status", "deleted")
       .order("created_at", { ascending: false }),
     access.is_super_admin
       ? supabase.from("colleges").select("id, name").neq("status", "archived").order("name")

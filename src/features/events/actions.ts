@@ -47,7 +47,11 @@ export async function updateEventAction(eventId: string, input: unknown, tzOffse
   const parsed = eventSchema.safeParse(input);
   if (!parsed.success) return fromZodError(parsed.error);
   const supabase = await createClient();
-  const update = { ...eventToRow(parsed.data, tzOffsetMinutes), ...(parsed.data.slug ? { slug: parsed.data.slug } : {}) };
+  const full = { ...eventToRow(parsed.data, tzOffsetMinutes), ...(parsed.data.slug ? { slug: parsed.data.slug } : {}) };
+  // A cancelled event keeps its status; only Restore event changes it.
+  const { data: current } = await supabase.from("events").select("status").eq("id", eventId).maybeSingle();
+  const { status: _status, ...withoutStatus } = full;
+  const update = current?.status === "cancelled" ? withoutStatus : full;
   const { data, error } = await supabase.from("events").update(update).eq("id", eventId).select("id");
   if (error) {
     if (error.code === "23505") return { ok: false, error: "Another event in this college already uses that URL slug.", fieldErrors: { slug: ["Slug already in use"] } };

@@ -14,6 +14,7 @@ export type PublicEvent = {
 
 export function registrationState(e: PublicEvent, now = new Date()): { open: boolean; reason?: string } {
   if (!e.public_page) return { open: false, reason: "Online registration isn't available on this page." };
+  if (e.status === "cancelled") return { open: false, reason: "This event has been cancelled." };
   if (["completed", "archived", "registration_closed"].includes(e.status)) return { open: false, reason: "Registrations are closed." };
   if (e.registration_opens_at && now < new Date(e.registration_opens_at)) return { open: false, reason: `Registrations open on ${new Date(e.registration_opens_at).toLocaleString("en-IN", { timeZone: e.timezone, dateStyle: "medium", timeStyle: "short" })}.` };
   if (e.registration_closes_at && now > new Date(e.registration_closes_at)) return { open: false, reason: "Registrations are closed." };

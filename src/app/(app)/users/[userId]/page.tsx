@@ -8,6 +8,7 @@ import { StatusBadge } from "@/components/shared/status-badge";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { UserAccessManager, type AccessData } from "@/features/users/user-access";
+import { DeleteAccountCard } from "@/features/users/delete-account";
 import { formatDate } from "@/lib/utils";
 
 export const metadata = { title: "User access" };
@@ -84,6 +85,7 @@ export default async function UserAccessPage({ params }: { params: Promise<{ use
             Joined {formatDate(user.created_at)}{user.job_title ? ` · ${user.job_title}` : ""}{user.phone ? ` · ${user.phone}` : ""}. Suspend or reactivate the account and resend invitations from the Users list.
           </p>
           <UserAccessManager data={data} />
+          {isSelf || user.status === "deleted" ? null : <DeleteAccountCard userId={user.id} email={user.email} name={user.full_name} />}
         </>
       )}
       {ended.length > 0 && (

@@ -170,6 +170,9 @@ export function EventLifecycle({ eventId, status }: { eventId: string; status: s
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const archived = status === "archived";
+  if (status === "cancelled") {
+    return <p className="text-sm text-muted-foreground">This event is cancelled. Restore it to change its status again.</p>;
+  }
   return (
     <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
       <FormField id="quick-status" label="Event status" hint="Updates immediately for everyone in the event.">

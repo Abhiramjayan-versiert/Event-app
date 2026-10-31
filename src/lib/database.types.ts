@@ -1464,6 +1464,8 @@ export type Database = {
           created_at: string;
           updated_at: string;
           results_published_at: string | null;
+          cancelled_at: string | null;
+          cancel_reason: string | null;
         };
         Insert: {
           id?: string;
@@ -1487,6 +1489,8 @@ export type Database = {
           created_at?: string;
           updated_at?: string;
           results_published_at?: string | null;
+          cancelled_at?: string | null;
+          cancel_reason?: string | null;
         };
         Update: {
           id?: string;
@@ -1510,6 +1514,8 @@ export type Database = {
           created_at?: string;
           updated_at?: string;
           results_published_at?: string | null;
+          cancelled_at?: string | null;
+          cancel_reason?: string | null;
         };
         Relationships: [
           {
@@ -1829,6 +1835,9 @@ export type Database = {
           updated_at: string;
           closing_summary: Json | null;
           closing_note: string | null;
+          cancelled_at: string | null;
+          cancelled_by: string | null;
+          cancel_reason: string | null;
         };
         Insert: {
           id?: string;
@@ -1860,6 +1869,9 @@ export type Database = {
           updated_at?: string;
           closing_summary?: Json | null;
           closing_note?: string | null;
+          cancelled_at?: string | null;
+          cancelled_by?: string | null;
+          cancel_reason?: string | null;
         };
         Update: {
           id?: string;
@@ -1891,11 +1903,21 @@ export type Database = {
           updated_at?: string;
           closing_summary?: Json | null;
           closing_note?: string | null;
+          cancelled_at?: string | null;
+          cancelled_by?: string | null;
+          cancel_reason?: string | null;
         };
         Relationships: [
           {
             foreignKeyName: "events_archived_by_fkey";
             columns: ["archived_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "events_cancelled_by_fkey";
+            columns: ["cancelled_by"];
             isOneToOne: false;
             referencedRelation: "profiles";
             referencedColumns: ["id"];
@@ -3310,6 +3332,72 @@ export type Database = {
           },
         ];
       };
+      removal_log: {
+        Row: {
+          id: string;
+          item_type: string;
+          action: string;
+          item_name: string;
+          college_id: string | null;
+          college_name: string | null;
+          event_id: string | null;
+          event_name: string | null;
+          performed_by: string | null;
+          performer_name: string | null;
+          by_super_admin: boolean;
+          reason: string | null;
+          created_at: string;
+          cleared_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          item_type: string;
+          action: string;
+          item_name: string;
+          college_id?: string | null;
+          college_name?: string | null;
+          event_id?: string | null;
+          event_name?: string | null;
+          performed_by?: string | null;
+          performer_name?: string | null;
+          by_super_admin?: boolean;
+          reason?: string | null;
+          created_at?: string;
+          cleared_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          item_type?: string;
+          action?: string;
+          item_name?: string;
+          college_id?: string | null;
+          college_name?: string | null;
+          event_id?: string | null;
+          event_name?: string | null;
+          performed_by?: string | null;
+          performer_name?: string | null;
+          by_super_admin?: boolean;
+          reason?: string | null;
+          created_at?: string;
+          cleared_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "removal_log_college_id_fkey";
+            columns: ["college_id"];
+            isOneToOne: false;
+            referencedRelation: "colleges";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "removal_log_performed_by_fkey";
+            columns: ["performed_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       role_permissions: {
         Row: {
           role_id: string;
@@ -4468,6 +4556,14 @@ export type Database = {
         Args: { p_token: string };
         Returns: { uid: string; title: string; description: string; location: string; starts_at: string; ends_at: string; all_day: boolean; url: string }[];
       };
+      cancel_competition: {
+        Args: { p_competition: string; p_reason: string };
+        Returns: undefined;
+      };
+      cancel_event: {
+        Args: { p_event: string; p_reason: string };
+        Returns: undefined;
+      };
       check_in_ticket: {
         Args: { p_event: string; p_code: string };
         Returns: Json;
@@ -4479,6 +4575,10 @@ export type Database = {
       checkin_overview: {
         Args: { p_event: string };
         Returns: Json;
+      };
+      clear_removal_log: {
+        Args: never;
+        Returns: number;
       };
       clear_sandbox_data: {
         Args: { p_event: string };
@@ -4502,6 +4602,10 @@ export type Database = {
       };
       decide_budget_revision: {
         Args: { p_revision: string; p_approve: boolean; p_note?: string };
+        Returns: undefined;
+      };
+      delete_competition: {
+        Args: { p_competition: string; p_reason: string };
         Returns: undefined;
       };
       delete_department: {
@@ -4660,6 +4764,14 @@ export type Database = {
         Args: { p_event: string; p_reason: string };
         Returns: undefined;
       };
+      restore_competition: {
+        Args: { p_competition: string };
+        Returns: undefined;
+      };
+      restore_event: {
+        Args: { p_event: string };
+        Returns: undefined;
+      };
       reverse_transaction: {
         Args: { p_transaction: string; p_reason: string };
         Returns: string;
@@ -4730,7 +4842,7 @@ export type Database = {
       };
     };
     Enums: {
-      account_status: "active" | "suspended";
+      account_status: "active" | "suspended" | "deleted";
       announcement_scope: "global" | "college" | "event" | "department";
       api_environment: "sandbox" | "production";
       approval_action: "submit" | "start_review" | "approve" | "reject" | "request_changes" | "forward" | "cancel" | "record_payment" | "resubmit";
@@ -4739,7 +4851,7 @@ export type Database = {
       department_kind: "finance" | "registration" | "sponsorship" | "media" | "marketing" | "technical" | "logistics" | "operations" | "hospitality" | "general";
       department_position: "head" | "assistant_head" | "member";
       document_visibility: "event" | "department" | "finance" | "restricted";
-      event_status: "planning" | "registration_open" | "registration_closed" | "upcoming" | "live" | "completed" | "archived";
+      event_status: "planning" | "registration_open" | "registration_closed" | "upcoming" | "live" | "completed" | "archived" | "cancelled";
       expense_status: "draft" | "submitted" | "under_review" | "changes_requested" | "forwarded" | "approved" | "rejected" | "partially_paid" | "paid" | "cancelled";
       media_asset_status: "draft" | "pending_approval" | "approved" | "published" | "rejected";
       membership_status: "invited" | "active" | "suspended";
@@ -4773,7 +4885,7 @@ export type Enums<T extends keyof PublicSchema["Enums"]> = PublicSchema["Enums"]
 export const Constants = {
   public: {
     Enums: {
-      account_status: ["active", "suspended"],
+      account_status: ["active", "suspended", "deleted"],
       announcement_scope: ["global", "college", "event", "department"],
       api_environment: ["sandbox", "production"],
       approval_action: ["submit", "start_review", "approve", "reject", "request_changes", "forward", "cancel", "record_payment", "resubmit"],
@@ -4782,7 +4894,7 @@ export const Constants = {
       department_kind: ["finance", "registration", "sponsorship", "media", "marketing", "technical", "logistics", "operations", "hospitality", "general"],
       department_position: ["head", "assistant_head", "member"],
       document_visibility: ["event", "department", "finance", "restricted"],
-      event_status: ["planning", "registration_open", "registration_closed", "upcoming", "live", "completed", "archived"],
+      event_status: ["planning", "registration_open", "registration_closed", "upcoming", "live", "completed", "archived", "cancelled"],
       expense_status: ["draft", "submitted", "under_review", "changes_requested", "forwarded", "approved", "rejected", "partially_paid", "paid", "cancelled"],
       media_asset_status: ["draft", "pending_approval", "approved", "published", "rejected"],
       membership_status: ["invited", "active", "suspended"],

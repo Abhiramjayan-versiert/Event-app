@@ -143,3 +143,43 @@ export async function removeAllAccessAction(userId: string): Promise<ActionResul
   revalidatePath(`/users/${userId}`);
   return { ok: true, message: `All access removed (${events.length} event${events.length === 1 ? "" : "s"}). The account remains and can be given a new role.` };
 }
+
+/**
+ * Super Admin: delete a person's account. Their roles end, their login is
+ * blocked and their email address is released, so the same person can be
+ * invited again as a brand-new user. Past records stay and show the old
+ * name marked "(deleted)". Suspending is the reversible alternative.
+ */
+export async function deleteUserAccountAction(userId: string, confirmEmail: string): Promise<ActionResult> {
+  if (!uuid.safeParse(userId).success) return { ok: false, error: "Invalid request." };
+  const supabase = await createClient();
+  const { data: { user: me } } = await supabase.auth.getUser();
+  const { data: myProfile } = await supabase.from("profiles").select("is_super_admin, status").eq("id", me?.id ?? "").maybeSingle();
+  if (!myProfile?.is_super_admin || myProfile.status !== "active") return { ok: false, error: "Only the Super Admin can delete accounts." };
+  if (userId === me?.id) return { ok: false, error: "You cannot delete your own account." };
+
+  const admin = createAdminClient();
+  const { data: target } = await admin.from("profiles").select("email, full_name, is_super_admin, status").eq("id", userId).maybeSingle();
+  if (!target) return { ok: false, error: "User not found." };
+  if (target.is_super_admin) return { ok: false, error: "The Super Admin account cannot be deleted." };
+  if (target.status === "deleted") return { ok: false, error: "This account is already deleted." };
+  if (confirmEmail.trim().toLowerCase() !== target.email.trim().toLowerCase()) return { ok: false, error: "Type the person's email exactly to confirm." };
+
+  // End roles first so open tasks are unassigned and the change is recorded.
+  const removed = await removeAllAccessAction(userId);
+  if (!removed.ok) return removed;
+
+  // Release the email (the profile follows the login email) and block sign-in.
+  const { error: authError } = await admin.auth.admin.updateUserById(userId, {
+    email: `deleted.${userId}@deleted.invalid`,
+    email_confirm: true,
+    ban_duration: "876000h",
+  });
+  if (authError) return { ok: false, error: "Access was removed, but the login could not be deleted. Try again." };
+  const name = (target.full_name || target.email.split("@")[0]).slice(0, 108);
+  const { error: profileError } = await admin.from("profiles").update({ status: "deleted", full_name: `${name} (deleted)`, phone: null }).eq("id", userId);
+  if (profileError) return fromDbError(profileError, "The login was deleted, but the profile could not be updated.");
+
+  revalidatePath("/users");
+  return { ok: true, message: `${target.full_name || target.email}'s account was deleted. You can now invite ${target.email} again as a new user.` };
+}

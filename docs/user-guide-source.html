@@ -247,6 +247,19 @@
     <li>The new person becomes admin first, then the previous admin's admin access ends. Their history is kept.</li>
   </ol>
   <p>To give the previous admin a different role, use their access page (above) or the Team and Departments pages.</p>
+  <h3>Suspend, or delete and invite again</h3>
+  <table>
+    <tr><th>Suspend</th><th>Delete account</th></tr>
+    <tr><td><span class="path">Users → (person) → Suspend</span>. Blocks sign-in straight away. Roles and the account stay, and <b>Reactivate</b> undoes it.</td>
+        <td><span class="path">Users → (person) → Delete account</span>, then type their email. Ends every role, removes their login and frees the email address. Past records stay and show the old name marked “(deleted)”.</td></tr>
+  </table>
+  <p>After deleting, invite the same email again from <span class="path">Users → Invite user</span>. They arrive as a brand-new user, with only the role you give them now.</p>
+  <h3>Cancelled &amp; deleted by admins</h3>
+  <p>Your <span class="path">Overview</span> dashboard has a <b>Cancelled &amp; deleted by admins</b> card. It lists every event and competition that another admin cancelled or deleted, with who did it, when and why, and a count.</p>
+  <ul>
+    <li>Things you cancel or delete yourself are not listed.</li>
+    <li>Click <b>Clear</b> to empty the list and reset the count to zero. The Activity log still keeps the history.</li>
+  </ul>
   <h3>Activity &amp; audit</h3>
   <p><span class="path">Activity &amp; audit</span> has two tabs:</p>
   <ul>
@@ -284,15 +297,22 @@
     <li><b>Event administrators</b>: appoint, change role, remove.</li>
     <li><b>Registration settings</b>: duplicate rules, team sizes, and the <b>Public registration page</b> switch with its link.</li>
     <li><b>Copy as new event</b>: start next year's edition.</li>
+    <li><b>Cancel event</b>: Super Admin and College Admins only. College Admins must give a reason.</li>
     <li><b>Delete event</b>: Super Admin and College Admins only.</li>
   </ul>
   <h3>Event statuses</h3>
   <div class="flow"><span>Planning</span><i>→</i><span>Registration open</span><i>→</i><span>Registration closed</span><i>→</i><span>Upcoming</span><i>→</i><span class="on">Live</span><i>→</i><span>Completed</span><i>→</i><span>Archived</span></div>
-  <p>Registrations are refused when the event is <b>Registration closed</b>, <b>Completed</b> or <b>Archived</b>, or outside the registration window.</p>
+  <p>Registrations are refused when the event is <b>Registration closed</b>, <b>Completed</b>, <b>Archived</b> or <b>Cancelled</b>, or outside the registration window.</p>
+  <h3>Cancelling an event</h3>
+  <ol class="steps">
+    <li><span class="path">Event → Settings → Cancel event</span>, then give a reason.</li>
+    <li>Registrations close at once and the public page says the event has been cancelled. Every record is kept.</li>
+    <li>Changed your mind? Click <b>Restore event</b> on the red banner at the top of Settings. The event returns to Planning.</li>
+  </ol>
   <h3>Archive or delete?</h3>
   <table>
-    <tr><th>Archive</th><th>Delete</th></tr>
-    <tr><td>Hides the event from day-to-day lists and keeps everything for reports and audit. Can be restored.</td><td>Removes the event permanently. You must type its name to confirm. Not allowed once it has real registrations, payments or financial records; archive those instead.</td></tr>
+    <tr><th>Cancel</th><th>Archive</th><th>Delete</th></tr>
+    <tr><td>The event is called off. Registrations close, everything is kept, and it can be restored.</td><td>Hides the event from day-to-day lists and keeps everything for reports and audit. Can be restored.</td><td>Removes the event permanently. You must type its name to confirm. Not allowed once it has real registrations, payments or financial records; archive those instead.</td></tr>
   </table>
 </section>
 
@@ -339,6 +359,7 @@
     <li><b>Individual</b> or <b>Team</b>, with minimum and maximum team size;</li>
     <li>an optional <b>capacity</b>, start time, venue and rules link.</li>
   </ul>
+  <p>Each competition card also has <b>Cancel</b> (closes it and hides it from the public page; registrations stay, and <b>Restore</b> reopens it) and <b>Delete</b> (only for competitions nobody has registered for).</p>
   <h3>2. Open the public registration page</h3>
   <ol class="steps">
     <li><span class="path">Event → Settings → Registration settings</span> → switch on <b>Public registration page</b> → <b>Save</b>.</li>
