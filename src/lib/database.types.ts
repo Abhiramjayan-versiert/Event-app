@@ -3020,6 +3020,47 @@ export type Database = {
         Relationships: [
         ];
       };
+      push_subscriptions: {
+        Row: {
+          id: string;
+          user_id: string;
+          endpoint: string;
+          p256dh: string;
+          auth: string;
+          user_agent: string | null;
+          created_at: string;
+          last_used_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          endpoint: string;
+          p256dh: string;
+          auth: string;
+          user_agent?: string | null;
+          created_at?: string;
+          last_used_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          endpoint?: string;
+          p256dh?: string;
+          auth?: string;
+          user_agent?: string | null;
+          created_at?: string;
+          last_used_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "push_subscriptions_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       registration_items: {
         Row: {
           id: string;
@@ -4471,6 +4512,10 @@ export type Database = {
         Args: { p_event: string; p_confirm_name: string };
         Returns: Json;
       };
+      drop_push_subscription: {
+        Args: { p_endpoint: string };
+        Returns: undefined;
+      };
       end_department_assignment: {
         Args: { p_assignment: string; p_reason?: string };
         Returns: undefined;
@@ -4567,6 +4612,18 @@ export type Database = {
         Args: { p_competition: string; p_results: Json };
         Returns: undefined;
       };
+      push_config_get: {
+        Args: never;
+        Returns: Json;
+      };
+      push_config_init: {
+        Args: { p_public: string; p_private: string; p_secret: string; p_app_url: string };
+        Returns: Json;
+      };
+      push_payload: {
+        Args: { p_notification: string };
+        Returns: Json;
+      };
       record_expense_payment: {
         Args: { p_expense: string; p_amount: number; p_paid_on: string; p_method: string; p_reference?: string; p_notes?: string; p_document?: string };
         Returns: string;
@@ -4591,6 +4648,10 @@ export type Database = {
         Args: { p_shift: string };
         Returns: undefined;
       };
+      remove_push_subscription: {
+        Args: { p_endpoint: string };
+        Returns: undefined;
+      };
       remove_user_from_event: {
         Args: { p_event: string; p_user: string; p_reason?: string };
         Returns: undefined;
@@ -4610,6 +4671,10 @@ export type Database = {
       save_duty_shift: {
         Args: { p_event: string; p_shift: string; p_data: Json };
         Returns: string;
+      };
+      save_push_subscription: {
+        Args: { p_endpoint: string; p_p256dh: string; p_auth: string; p_user_agent?: string };
+        Returns: undefined;
       };
       save_survey: {
         Args: { p_event: string; p_survey: string; p_data: Json };

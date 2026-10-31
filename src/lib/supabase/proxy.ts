@@ -3,7 +3,7 @@ import { createServerClient } from "@supabase/ssr";
 import type { Database } from "@/lib/database.types";
 import { publicEnv } from "@/lib/env";
 
-const PUBLIC_PATHS = ["/login", "/forgot-password", "/auth", "/api/v1", "/api/health", "/api/calendar", "/setup-required", "/e", "/t", "/c", "/s"];
+const PUBLIC_PATHS = ["/login", "/forgot-password", "/auth", "/api/v1", "/api/health", "/api/calendar", "/api/push/dispatch", "/setup-required", "/e", "/t", "/c", "/s"];
 
 export function isPublicPath(pathname: string) {
   return pathname === "/" ? false : PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(`${p}/`));

@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { AvatarUploader, ChangePasswordForm, ProfileForm } from "@/features/profile/profile-forms";
 import { CalendarSync } from "@/features/profile/calendar-sync";
 import { TwoStepSettings } from "@/features/profile/two-step";
+import { PushSettings } from "@/features/push/push-settings";
 import { publicEnv } from "@/lib/env";
 
 export const metadata = { title: "Profile" };
@@ -33,6 +34,13 @@ export default async function ProfilePage() {
           <AvatarUploader userId={access.user_id} name={profile?.full_name ?? access.email} avatarPath={profile?.avatar_path ?? null} />
           <ProfileForm defaults={{ full_name: profile?.full_name ?? "", phone: profile?.phone ?? "", job_title: profile?.job_title ?? "" }} />
         </CardContent>
+      </Card>
+      <Card>
+        <CardHeader>
+          <CardTitle>Notifications on this device</CardTitle>
+          <CardDescription>Get task deadlines, approvals, duties and announcements as phone or desktop notifications.</CardDescription>
+        </CardHeader>
+        <CardContent><PushSettings /></CardContent>
       </Card>
       <Card>
         <CardHeader>
