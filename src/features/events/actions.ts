@@ -146,3 +146,45 @@ export async function endEventMembershipAction(eventId: string, membershipId: st
   revalidatePath(`/events/${eventId}`, "layout");
   return { ok: true, message: "Removed from the event. The assignment stays in the history." };
 }
+
+/**
+ * Permanently deletes an event that has no registrations, payments or
+ * financial records (Super Admin / College Admin; enforced in the database).
+ */
+export async function deleteEventAction(eventId: string, confirmName: string): Promise<ActionResult> {
+  if (!uuid.safeParse(eventId).success) return { ok: false, error: "Invalid request." };
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("delete_event", { p_event: eventId, p_confirm_name: confirmName.slice(0, 200) });
+  if (error) return error.code === "42501" ? { ok: false, error: error.message } : fromDbError(error, "Could not delete the event.");
+  // Remove the uploaded files of the deleted document records (best effort).
+  const paths = ((data as { document_paths?: string[] } | null)?.document_paths ?? []).filter(Boolean);
+  if (paths.length && process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    const { createAdminClient } = await import("@/lib/supabase/admin");
+    await createAdminClient().storage.from("documents").remove(paths).catch(() => undefined);
+  }
+  revalidatePath("/events");
+  revalidatePath("/dashboard");
+  return { ok: true, message: "Event deleted." };
+}
+
+/** Changes an event-wide role: grants the new role first, then ends the old one. */
+export async function changeEventRoleAction(eventId: string, membershipId: string, roleKey: string): Promise<ActionResult> {
+  if (!uuid.safeParse(eventId).success || !uuid.safeParse(membershipId).success || !/^[a-z_]{2,64}$/.test(roleKey)) {
+    return { ok: false, error: "Invalid request." };
+  }
+  const supabase = await createClient();
+  const { data: m } = await supabase
+    .from("event_members")
+    .select("user_id, role:roles(key)")
+    .eq("id", membershipId)
+    .eq("event_id", eventId)
+    .is("ended_at", null)
+    .maybeSingle();
+  if (!m) return { ok: false, error: "Membership not found or you do not have permission." };
+  if (m.role?.key === roleKey) return { ok: true, message: "No change." };
+  const { error } = await supabase.rpc("assign_event_role", { p_event: eventId, p_user: m.user_id, p_role_key: roleKey });
+  if (error) return fromDbError(error, "Could not change the role.");
+  const ended = await endEventMembershipAction(eventId, membershipId, `Role changed to ${roleKey}`);
+  if (!ended.ok) return ended;
+  return { ok: true, message: "Role changed." };
+}

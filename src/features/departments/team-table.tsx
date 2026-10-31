@@ -22,8 +22,8 @@ export type TeamRow = {
 };
 
 export function TeamTable({
-  eventId, rows, canManage, selfId, eventRoles,
-}: { eventId: string; rows: TeamRow[]; canManage: boolean; selfId: string; eventRoles: RoleOption[] }) {
+  eventId, rows, canManage, selfId, eventRoles, assignable = [],
+}: { eventId: string; rows: TeamRow[]; canManage: boolean; selfId: string; eventRoles: RoleOption[]; assignable?: { id: string; name: string; email: string }[] }) {
   const columns: ColumnDef<TeamRow, unknown>[] = [
     {
       accessorKey: "name",
@@ -108,8 +108,8 @@ export function TeamTable({
           <AssignMemberDialog
             trigger={<Button size="sm"><UserPlus /> Add person</Button>}
             title="Add to event"
-            description="Give someone an event-wide role. Use a department page to assign department positions."
-            people={[]}
+            description="Give an existing user or a new person an event-wide role. Use a department page to assign department positions."
+            people={assignable}
             roles={eventRoles}
             submit={(values) => assignEventRoleAction(eventId, values)}
           />

@@ -55,3 +55,20 @@ export async function getRoleOptions(scope: "event" | "department") {
   const { data } = await supabase.from("roles").select("key, name").eq("scope", scope).order("sort_order");
   return data ?? [];
 }
+
+/**
+ * Every active user the signed-in admin may see (RLS: Super Admin sees all,
+ * College Admins see people in their colleges, others see their teammates),
+ * for "assign an existing user" pickers. The Super Admin is never listed.
+ */
+export async function getAssignablePeople(): Promise<{ id: string; name: string; email: string }[]> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("profiles")
+    .select("id, full_name, email")
+    .eq("status", "active")
+    .eq("is_super_admin", false)
+    .order("full_name")
+    .limit(2000);
+  return (data ?? []).map((p) => ({ id: p.id, name: p.full_name, email: p.email }));
+}

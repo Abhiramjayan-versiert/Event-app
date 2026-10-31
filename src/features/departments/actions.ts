@@ -165,3 +165,14 @@ export async function deleteAnnouncementAction(eventId: string, departmentId: st
   refresh(eventId, departmentId);
   return { ok: true, message: "Announcement deleted." };
 }
+
+/** Permanently deletes a department without budget or expense records. Tasks move to event level. */
+export async function deleteDepartmentAction(eventId: string, departmentId: string, confirmName: string): Promise<ActionResult> {
+  if (!uuid.safeParse(eventId).success || !uuid.safeParse(departmentId).success) return { ok: false, error: "Invalid request." };
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("delete_department", { p_department: departmentId, p_confirm_name: confirmName.slice(0, 200) });
+  if (error) return rpcError(error, "Could not delete the department.");
+  refresh(eventId);
+  revalidatePath(`/events/${eventId}`, "layout");
+  return { ok: true, message: "Department deleted. Its tasks moved to the event level." };
+}

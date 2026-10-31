@@ -17,7 +17,7 @@ import { BrandingUploader } from "@/components/forms/branding-uploader";
 import { ConfirmButton } from "@/components/forms/confirm-button";
 import { InviteDialog } from "@/components/forms/invite-dialog";
 import {
-  addEventAdminAction, endEventMembershipAction, setEventImageAction, setEventStatusAction, updateRegistrationSettingsAction,
+  addEventAdminAction, changeEventRoleAction, endEventMembershipAction, setEventImageAction, setEventStatusAction, updateRegistrationSettingsAction,
 } from "@/features/events/actions";
 import { EVENT_STATUSES, registrationSettingsSchema, type RegistrationSettingsInput } from "@/lib/validations/event";
 import { publicStorageUrl } from "@/lib/storage";
@@ -72,7 +72,11 @@ export function RegistrationSettingsForm({ eventId, defaults }: { eventId: strin
 
 export type EventAdminRow = { membershipId: string; name: string; email: string; avatarPath: string | null; since: string };
 
-export function EventAdmins({ eventId, admins, canManage }: { eventId: string; admins: EventAdminRow[]; canManage: boolean }) {
+export function EventAdmins({
+  eventId, admins, canManage, roles = [],
+}: { eventId: string; admins: EventAdminRow[]; canManage: boolean; roles?: { key: string; name: string }[] }) {
+  const router = useRouter();
+  const [changing, startChange] = useTransition();
   return (
     <div className="space-y-3">
       {admins.length === 0 ? (
@@ -89,6 +93,26 @@ export function EventAdmins({ eventId, admins, canManage }: { eventId: string; a
                 </div>
               </div>
               {canManage ? (
+                <div className="flex shrink-0 items-center gap-1">
+                {roles.length > 1 ? (
+                  <NativeSelect
+                    aria-label={`Change role of ${a.name || a.email}`}
+                    className="h-8 w-36 text-xs"
+                    value="event_admin"
+                    disabled={changing}
+                    onChange={(e) => {
+                      const key = e.target.value;
+                      startChange(async () => {
+                        const r = await changeEventRoleAction(eventId, a.membershipId, key);
+                        if (!r.ok) return void toast.error(r.error);
+                        toast.success(r.message ?? "Role changed");
+                        router.refresh();
+                      });
+                    }}
+                  >
+                    {roles.map((r) => <option key={r.key} value={r.key}>{r.name}</option>)}
+                  </NativeSelect>
+                ) : null}
                 <ConfirmButton
                   variant="ghost"
                   size="sm"
@@ -100,6 +124,7 @@ export function EventAdmins({ eventId, admins, canManage }: { eventId: string; a
                 >
                   <UserMinus /> Remove
                 </ConfirmButton>
+                </div>
               ) : null}
             </li>
           ))}

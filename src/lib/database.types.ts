@@ -3748,6 +3748,14 @@ export type Database = {
         Args: { p_revision: string; p_approve: boolean; p_note?: string };
         Returns: undefined;
       };
+      delete_department: {
+        Args: { p_department: string; p_confirm_name: string };
+        Returns: undefined;
+      };
+      delete_event: {
+        Args: { p_event: string; p_confirm_name: string };
+        Returns: Json;
+      };
       end_department_assignment: {
         Args: { p_assignment: string; p_reason?: string };
         Returns: undefined;

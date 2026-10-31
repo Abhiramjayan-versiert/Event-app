@@ -1,5 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
-import { requireEventPermission } from "@/lib/auth/session";
+import { requireAccess, requireEventPermission } from "@/lib/auth/session";
+import { TypedDeleteDialog } from "@/components/shared/typed-delete-dialog";
+import { deleteEventAction } from "@/features/events/actions";
 import { can } from "@/lib/permissions";
 import { PageHeader } from "@/components/shared/page-header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,7 +15,8 @@ export default async function EventSettingsPage({ params }: { params: Promise<{ 
   const { eventId } = await params;
   const { event, permissions } = await requireEventPermission(eventId, "event.manage");
   const supabase = await createClient();
-  const [{ data: settings }, { data: admins }] = await Promise.all([
+  const access = await requireAccess();
+  const [{ data: settings }, { data: admins }, { data: collegeManager }, { data: eventRoles }] = await Promise.all([
     supabase.from("event_settings").select("registration_settings").eq("event_id", eventId).single(),
     supabase
       .from("event_members")
@@ -21,7 +24,10 @@ export default async function EventSettingsPage({ params }: { params: Promise<{ 
       .eq("event_id", eventId)
       .eq("role.key", "event_admin")
       .is("ended_at", null),
+    supabase.rpc("check_permission", { p_scope: "college", p_id: event.college_id, p_permission: "college.manage" }),
+    supabase.from("roles").select("key, name").eq("scope", "event").order("sort_order"),
   ]);
+  const canDelete = access.is_super_admin || Boolean(collegeManager);
 
   const reg = (settings?.registration_settings ?? {}) as Record<string, unknown>;
   const social = (event.social_links ?? {}) as Record<string, string>;
@@ -75,7 +81,7 @@ export default async function EventSettingsPage({ params }: { params: Promise<{ 
           </Card>
           <Card>
             <CardHeader><CardTitle>Event administrators</CardTitle></CardHeader>
-            <CardContent><EventAdmins eventId={event.id} admins={adminRows} canManage={can(permissions, "event.members.manage")} /></CardContent>
+            <CardContent><EventAdmins eventId={event.id} admins={adminRows} canManage={can(permissions, "event.members.manage")} roles={eventRoles ?? []} /></CardContent>
           </Card>
           <Card>
             <CardHeader><CardTitle>Registration settings</CardTitle></CardHeader>
@@ -90,6 +96,27 @@ export default async function EventSettingsPage({ params }: { params: Promise<{ 
               />
             </CardContent>
           </Card>
+          {canDelete ? (
+            <Card className="border-destructive/40">
+              <CardHeader>
+                <CardTitle>Delete event</CardTitle>
+                <CardDescription>
+                  Permanently removes the event with its departments, team, tasks and other planning data. Events with registrations,
+                  payments or financial records cannot be deleted; archive them instead so the records stay available.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <TypedDeleteDialog
+                  label="Delete event"
+                  title={`Delete ${event.name}?`}
+                  description={<p>This cannot be undone. Departments, team assignments, tasks, sponsors, schedule, documents and settings of this event are deleted.</p>}
+                  name={event.name}
+                  onDelete={deleteEventAction.bind(null, event.id)}
+                  redirectTo="/events"
+                />
+              </CardContent>
+            </Card>
+          ) : null}
         </div>
       </div>
     </div>

@@ -69,7 +69,7 @@ export function AssignMemberDialog({
                   onClick={() => setMode(m)}
                   className={`rounded-sm py-1.5 font-medium ${mode === m ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}
                 >
-                  {m === "existing" ? "Existing teammate" : "By email"}
+                  {m === "existing" ? "Existing user" : "New person (email)"}
                 </button>
               ))}
             </div>

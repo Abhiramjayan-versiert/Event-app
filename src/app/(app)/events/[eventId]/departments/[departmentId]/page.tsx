@@ -14,7 +14,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { DepartmentIcon } from "@/features/departments/department-icon";
 import { DepartmentFormDialog } from "@/features/departments/department-form-dialog";
 import { DepartmentAnnouncements, DepartmentTeam, type AnnouncementRow, type MemberRow } from "@/features/departments/department-panels";
-import { getEventPeople, getRoleOptions } from "@/features/departments/queries";
+import { getAssignablePeople, getEventPeople, getRoleOptions } from "@/features/departments/queries";
+import { TypedDeleteDialog } from "@/components/shared/typed-delete-dialog";
+import { deleteDepartmentAction } from "@/features/departments/actions";
 import { BudgetRevisionDialog, ExpenseRequestDialog } from "@/features/finance/finance-dialogs";
 import Link from "next/link";
 import { DEPARTMENT_ICONS, type DepartmentInput } from "@/lib/validations/department";
@@ -31,7 +33,7 @@ export default async function DepartmentPage({ params }: { params: Promise<{ eve
   const { data: dept } = await supabase.from("departments").select("*").eq("id", departmentId).eq("event_id", eventId).maybeSingle();
   if (!dept) notFound();
 
-  const [members, tasks, allocation, expenses, announcements, activity, people, roles] = await Promise.all([
+  const [members, tasks, allocation, expenses, announcements, activity, eventPeople, assignable, roles] = await Promise.all([
     supabase
       .from("department_members")
       .select("id, position, assigned_at, ended_at, end_reason, user:profiles!department_members_user_id_fkey(id, full_name, email, avatar_path), role:roles(name)")
@@ -43,9 +45,13 @@ export default async function DepartmentPage({ params }: { params: Promise<{ eve
     supabase.from("announcements").select("id, title, body, priority, pinned, published_at, created_by, author:profiles!announcements_created_by_fkey(full_name)").eq("department_id", departmentId).order("pinned", { ascending: false }).order("published_at", { ascending: false }).limit(20),
     supabase.from("activity_log").select("id, summary, created_at, actor:profiles!activity_log_actor_id_fkey(full_name)").eq("department_id", departmentId).order("created_at", { ascending: false }).limit(15),
     getEventPeople(eventId),
+    getAssignablePeople(),
     getRoleOptions("department"),
   ]);
 
+  // Event teammates first, then every other existing user the admin may assign.
+  const inEvent = new Set(eventPeople.map((p) => p.id));
+  const people = [...eventPeople, ...assignable.filter((p) => !inEvent.has(p.id))];
   const memberRows = members.data ?? [];
   const active: MemberRow[] = memberRows.filter((m) => !m.ended_at && m.user).map((m) => ({
     id: m.id, userId: m.user!.id, name: m.user!.full_name, email: m.user!.email, avatarPath: m.user!.avatar_path,
@@ -99,13 +105,30 @@ export default async function DepartmentPage({ params }: { params: Promise<{ eve
         description={dept.description ?? undefined}
         actions={
           canEdit ? (
-            <DepartmentFormDialog
-              eventId={eventId}
-              departmentId={dept.id}
-              defaults={defaults}
-              canEditStructure={canLead}
-              trigger={<Button variant="outline"><Pencil /> Edit</Button>}
-            />
+            <>
+              <DepartmentFormDialog
+                eventId={eventId}
+                departmentId={dept.id}
+                defaults={defaults}
+                canEditStructure={canLead}
+                trigger={<Button variant="outline"><Pencil /> Edit</Button>}
+              />
+              {canLead ? (
+                <TypedDeleteDialog
+                  label="Delete"
+                  title={`Delete the ${dept.name} department?`}
+                  description={
+                    <>
+                      <p>This cannot be undone. Its team assignments and department announcements are removed, and its tasks move to the event level.</p>
+                      <p>Departments with a budget or expense records cannot be deleted; archive them instead from Edit.</p>
+                    </>
+                  }
+                  name={dept.name}
+                  onDelete={deleteDepartmentAction.bind(null, eventId, dept.id)}
+                  redirectTo={`/events/${eventId}/departments`}
+                />
+              ) : null}
+            </>
           ) : null
         }
       />
