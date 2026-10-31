@@ -15,6 +15,8 @@ import { DepartmentIcon } from "@/features/departments/department-icon";
 import { DepartmentFormDialog } from "@/features/departments/department-form-dialog";
 import { DepartmentAnnouncements, DepartmentTeam, type AnnouncementRow, type MemberRow } from "@/features/departments/department-panels";
 import { getEventPeople, getRoleOptions } from "@/features/departments/queries";
+import { BudgetRevisionDialog, ExpenseRequestDialog } from "@/features/finance/finance-dialogs";
+import Link from "next/link";
 import { DEPARTMENT_ICONS, type DepartmentInput } from "@/lib/validations/department";
 import { formatCurrency, formatDate, formatDateTime, formatRelative, titleCase } from "@/lib/utils";
 
@@ -70,6 +72,8 @@ export default async function DepartmentPage({ params }: { params: Promise<{ eve
   const canAddMembers = canInDepartment(permissions, departmentId, "department.members.manage");
   const canPost = can(permissions, "announcements.manage") || canInDepartment(permissions, departmentId, "announcements.post");
   const cur = event.currency;
+  const canSubmitExpense = can(permissions, "expenses.submit") || canInDepartment(permissions, departmentId, "expenses.submit_department");
+  const canRequestRevision = can(permissions, "budgets.manage") || canInDepartment(permissions, departmentId, "budgets.request");
 
   const defaults: DepartmentInput = {
     name: dept.name, kind: dept.kind, description: dept.description ?? "", status: dept.status, progress_pct: dept.progress_pct,
@@ -150,6 +154,15 @@ export default async function DepartmentPage({ params }: { params: Promise<{ eve
               <Row label="Paid" value={formatCurrency(paid, cur)} />
               <Row label="Remaining" value={formatCurrency(allocated - approved, cur)} strong />
               <Row label="Pending requests" value={`${pendingExpenses.length} · ${formatCurrency(pendingExpenses.reduce((s, e) => s + Number(e.requested_amount), 0), cur)}`} />
+              {canRequestRevision ? (
+                <BudgetRevisionDialog
+                  eventId={eventId}
+                  departments={[{ id: dept.id, name: dept.name }]}
+                  currentAmounts={{ [dept.id]: allocated }}
+                  fixedDepartmentId={dept.id}
+                  trigger={<Button variant="outline" size="sm" className="w-full">Request budget revision</Button>}
+                />
+              ) : null}
               {allocated > 0 ? (
                 <div className="space-y-1 pt-1">
                   <Progress value={usedPct} tone={usedPct >= 100 ? "destructive" : usedPct >= 75 ? "warning" : "lime"} />
@@ -190,7 +203,15 @@ export default async function DepartmentPage({ params }: { params: Promise<{ eve
         </Card>
 
         <Card>
-          <CardHeader><CardTitle>Expense requests</CardTitle><CardDescription>Submitted by this department.</CardDescription></CardHeader>
+          <CardHeader className="flex-row items-start justify-between gap-3">
+            <div className="space-y-1">
+              <CardTitle>Expense requests</CardTitle>
+              <CardDescription>Submitted by this department.</CardDescription>
+            </div>
+            {canSubmitExpense && dept.status === "active" ? (
+              <ExpenseRequestDialog eventId={eventId} currency={cur} departments={[{ id: dept.id, name: dept.name }]} trigger={<Button size="sm">New request</Button>} />
+            ) : null}
+          </CardHeader>
           <CardContent>
             {expenseRows.length === 0 ? (
               <p className="text-sm text-muted-foreground">No expense requests yet.</p>
@@ -199,7 +220,7 @@ export default async function DepartmentPage({ params }: { params: Promise<{ eve
                 {expenseRows.slice(0, 10).map((e) => (
                   <li key={e.id} className="flex items-center justify-between gap-3 py-2.5 text-sm">
                     <div className="min-w-0">
-                      <p className="truncate font-medium">{e.title}</p>
+                      <Link href={`/events/${eventId}/finance/expenses/${e.id}`} className="block truncate font-medium hover:underline">{e.title}</Link>
                       <p className="text-xs text-muted-foreground">{e.request_number} · {formatDate(e.created_at)}</p>
                     </div>
                     <div className="text-right">
