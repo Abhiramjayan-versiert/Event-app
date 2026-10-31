@@ -6,7 +6,7 @@ import { useState, useTransition } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { MoreHorizontal, Send, UserCheck, UserPlus, UserX } from "lucide-react";
+import { KeyRound, MoreHorizontal, Send, UserCheck, UserPlus, UserX } from "lucide-react";
 import { DataTable } from "@/components/tables/data-table";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { FormField } from "@/components/shared/form-field";
@@ -17,7 +17,7 @@ import { NativeSelect } from "@/components/ui/native-select";
 import { UserAvatar } from "@/components/ui/avatar";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { inviteUserAction, resendInvitationAction, setUserStatusAction } from "@/features/users/actions";
+import { inviteUserAction, resendInvitationAction, sendPasswordResetAction, setUserStatusAction } from "@/features/users/actions";
 import { publicStorageUrl } from "@/lib/storage";
 import { formatDate } from "@/lib/utils";
 import type { ActionResult } from "@/lib/actions";
@@ -57,11 +57,11 @@ function RowActions({ user, isSuperAdmin, selfId }: { user: UserRow; isSuperAdmi
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         {user.invite_pending ? (
-          <>
-            <DropdownMenuItem onSelect={() => run(() => resendInvitationAction(user.id))}><Send /> Resend invitation</DropdownMenuItem>
-            <DropdownMenuSeparator />
-          </>
-        ) : null}
+          <DropdownMenuItem onSelect={() => run(() => resendInvitationAction(user.id))}><Send /> Resend invitation</DropdownMenuItem>
+        ) : (
+          <DropdownMenuItem onSelect={() => run(() => sendPasswordResetAction(user.id))}><KeyRound /> Send password reset</DropdownMenuItem>
+        )}
+        <DropdownMenuSeparator />
 
         {user.status === "active" ? (
           <DropdownMenuItem variant="destructive" onSelect={() => run(() => setUserStatusAction(user.id, "suspended"))}><UserX /> Suspend account</DropdownMenuItem>

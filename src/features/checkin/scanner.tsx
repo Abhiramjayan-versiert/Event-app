@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import jsQR from "jsqr";
 import { toast } from "sonner";
-import { Camera, CameraOff, CheckCircle2, CircleAlert, XCircle } from "lucide-react";
+import { Camera, CameraOff, CheckCircle2, CircleAlert, ImageUp, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -64,17 +64,63 @@ export function CheckInScanner({ eventId }: { eventId: string }) {
     setCameraOn(false);
   }, []);
 
+  const [cameraHelp, setCameraHelp] = useState<string | null>(null);
+
   const startCamera = async () => {
+    setCameraHelp(null);
+    const inApp = /FBAN|FBAV|Instagram|Line\/|WhatsApp|GSA\/|; wv\)/i.test(navigator.userAgent);
+    if (!window.isSecureContext || !navigator.mediaDevices?.getUserMedia) {
+      setCameraHelp(inApp
+        ? "This in-app browser can't use the camera. Open the page in Chrome or Safari (menu → Open in browser), or use “Scan with a photo” below."
+        : "This browser can't use the live camera here. Use “Scan with a photo” below, or open the page in Chrome or Safari.");
+      return;
+    }
     try {
-      const s = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio: false });
+      const s = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: "environment" } }, audio: false });
       stream.current = s;
       if (video.current) {
         video.current.srcObject = s;
         await video.current.play();
       }
+      setCameraHelp(null);
       setCameraOn(true);
+    } catch (e) {
+      const name = (e as DOMException)?.name ?? "";
+      setCameraHelp(
+        name === "NotAllowedError" || name === "SecurityError"
+          ? "Camera access is blocked for this site. Tap the lock or ⓘ icon next to the address (Android: ⋮ → Settings → Site settings → Camera; iPhone: aA → Website Settings → Camera), choose Allow, then reload. Or use “Scan with a photo”."
+          : name === "NotFoundError" || name === "OverconstrainedError"
+            ? "No camera was found on this device. Use “Scan with a photo” or type the code."
+            : name === "NotReadableError"
+              ? "The camera is being used by another app. Close it and try again, or use “Scan with a photo”."
+              : "The camera couldn't start. Use “Scan with a photo” or type the code.",
+      );
+    }
+  };
+
+  /** Fallback: take a photo with the phone's camera app and read the QR from it. */
+  const scanPhoto = async (file: File) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    try {
+      await new Promise<void>((res, rej) => { img.onload = () => res(); img.onerror = () => rej(new Error("load")); img.src = url; });
+      const c = canvas.current ?? document.createElement("canvas");
+      const ctx = c.getContext("2d", { willReadFrequently: true });
+      if (!ctx) return;
+      // Try a few sizes: large photos decode better scaled down.
+      for (const max of [1000, 1600, 700]) {
+        const k = Math.min(1, max / Math.max(img.width, img.height));
+        c.width = Math.round(img.width * k);
+        c.height = Math.round(img.height * k);
+        ctx.drawImage(img, 0, 0, c.width, c.height);
+        const code = jsQR(ctx.getImageData(0, 0, c.width, c.height).data, c.width, c.height, { inversionAttempts: "attemptBoth" });
+        if (code?.data) return submit(code.data);
+      }
+      toast.error("No QR code found in that photo. Hold the phone steady, fill the frame with the QR code and try again.");
     } catch {
-      toast.error("Camera unavailable. Allow camera access, or type the code below.");
+      toast.error("Couldn't read that photo.");
+    } finally {
+      URL.revokeObjectURL(url);
     }
   };
 
@@ -122,9 +168,17 @@ export function CheckInScanner({ eventId }: { eventId: string }) {
           </div>
         )}
       </div>
-      <div className="flex justify-center">
+      <div className="flex flex-wrap justify-center gap-2">
         {cameraOn ? <Button variant="outline" onClick={stop}><CameraOff /> Stop camera</Button> : <Button onClick={startCamera}><Camera /> Start camera</Button>}
+        <Button variant="outline" asChild>
+          <label className="cursor-pointer">
+            <ImageUp /> Scan with a photo
+            <input type="file" accept="image/*" capture="environment" className="sr-only"
+              onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ""; if (f) void scanPhoto(f); }} />
+          </label>
+        </Button>
       </div>
+      {cameraHelp ? <p role="alert" className="mx-auto max-w-sm rounded-md border border-amber-500 bg-amber-50 p-3 text-sm text-amber-900 dark:bg-amber-900/30 dark:text-amber-100">{cameraHelp}</p> : null}
       <form className="mx-auto flex max-w-sm gap-2" onSubmit={(e) => { e.preventDefault(); if (manual.trim()) { submit(manual); setManual(""); } }}>
         <Input placeholder="Or type the ticket code" value={manual} onChange={(e) => setManual(e.target.value)} className="font-mono uppercase" aria-label="Ticket code" />
         <Button type="submit" variant="outline" loading={pending}>Check in</Button>

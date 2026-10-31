@@ -30,7 +30,7 @@ export default function ForgotPasswordPage() {
           <MailCheck className="size-6" />
         </div>
         <h1 className="text-xl font-semibold">Check your inbox</h1>
-        <p className="text-sm text-muted-foreground">If an account exists for that address, a password reset link is on its way. The link expires in one hour.</p>
+        <p className="text-sm text-muted-foreground">If that address belongs to an EVENT APP account, a reset link is on its way (check spam too). The link expires in one hour. No email? Make sure you used the address your invitation was sent to, or ask your administrator to send you a reset link.</p>
         <Button asChild variant="outline" className="w-full">
           <Link href="/login">Back to sign in</Link>
         </Button>
@@ -42,7 +42,7 @@ export default function ForgotPasswordPage() {
     <div className="space-y-6">
       <div className="space-y-1.5">
         <h1 className="text-2xl font-semibold tracking-tight">Reset your password</h1>
-        <p className="text-sm text-muted-foreground">Enter your account email and we will send you a secure reset link.</p>
+        <p className="text-sm text-muted-foreground">Enter the email address your EVENT APP invitation was sent to, and we will send you a secure reset link.</p>
       </div>
       <form onSubmit={onSubmit} className="space-y-4" noValidate>
         <FormField id="email" label="Email" error={form.formState.errors.email?.message}>

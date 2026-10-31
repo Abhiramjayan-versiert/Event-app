@@ -92,3 +92,22 @@ export async function resendInvitationAction(userId: string): Promise<ActionResu
   return { ok: true, message: `Invitation re-sent to ${profile.email}.` };
 }
 
+
+/** Super Admin: email a password-reset link to a user's exact account address. */
+export async function sendPasswordResetAction(userId: string): Promise<ActionResult> {
+  if (!uuid.safeParse(userId).success) return { ok: false, error: "Invalid request." };
+  const supabase = await createClient();
+  const { data: { user: me } } = await supabase.auth.getUser();
+  const { data: myProfile } = await supabase.from("profiles").select("is_super_admin, status").eq("id", me?.id ?? "").maybeSingle();
+  if (!myProfile?.is_super_admin || myProfile.status !== "active") return { ok: false, error: "Only the Super Admin can send reset links." };
+  const admin = createAdminClient();
+  const { data, error: lookupError } = await admin.auth.admin.getUserById(userId);
+  const email = data?.user?.email;
+  if (lookupError || !email) return { ok: false, error: "User not found." };
+  if (!data.user.email_confirmed_at) return { ok: false, error: "This person hasn't accepted their invitation yet. Use “Resend invitation” instead." };
+  const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${publicEnv.appUrl}/auth/callback?next=/reset-password` });
+  if (error) {
+    return { ok: false, error: error.status === 429 ? "A reset email was sent very recently. Wait a minute and try again." : "Could not send the reset email." };
+  }
+  return { ok: true, message: `Password reset link sent to ${email}.` };
+}
