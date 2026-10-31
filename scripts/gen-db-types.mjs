@@ -56,7 +56,14 @@ const fks = await q(`
 
 const functions = await q(`
   select p.proname as name,
-         coalesce(p.proargnames, '{}')::text[] as arg_names,
+         -- Input argument names only (RETURNS TABLE columns are also in proargnames).
+         array(select a.name from unnest(coalesce(p.proargnames, '{}')::text[]) with ordinality a(name, ord)
+               where p.proargmodes is null or p.proargmodes[a.ord] in ('i', 'b') order by a.ord) as arg_names,
+         -- RETURNS TABLE / OUT columns as [name, typname] pairs.
+         array(select json_build_array(a.name, t2.typname)::text
+               from unnest(coalesce(p.proargnames, '{}')::text[], coalesce(p.proallargtypes, '{}')::oid[]) with ordinality a(name, typ, ord)
+               join pg_type t2 on t2.oid = a.typ
+               where p.proargmodes is not null and p.proargmodes[a.ord] in ('t', 'o') order by a.ord) as out_cols,
          array(select format_type(x, null) from unnest(p.proargtypes::oid[]) x) as arg_types,
          array(select t.typname::text from unnest(p.proargtypes::oid[]) with ordinality x(oid, ord) join pg_type t on t.oid = x.oid order by x.ord) as arg_typnames,
          p.pronargdefaults as n_defaults,
@@ -118,7 +125,11 @@ for (const f of functions) {
   const required = f.arg_names.length - f.n_defaults;
   const args = f.arg_names.map((n, i) => `${n}${i >= required ? "?" : ""}: ${f.arg_typnames[i].startsWith("_") ? `${scalar(f.arg_typnames[i].slice(1))}[]` : scalar(f.arg_typnames[i])}`);
   o += `${ind(3)}${f.name}: {\n${ind(4)}Args: ${args.length ? `{ ${args.join("; ")} }` : "never"};\n`;
-  o += `${ind(4)}Returns: ${scalar(f.return_type)}${f.returns_set ? "[]" : ""};\n${ind(3)}};\n`;
+  const outCols = f.out_cols.map((c) => JSON.parse(c));
+  const returns = outCols.length
+    ? `{ ${outCols.map(([n, t]) => `${n}: ${t.startsWith("_") ? `${scalar(t.slice(1))}[]` : scalar(t)}`).join("; ")} }`
+    : scalar(f.return_type);
+  o += `${ind(4)}Returns: ${returns}${f.returns_set ? "[]" : ""};\n${ind(3)}};\n`;
 }
 o += `${ind(2)}};\n${ind(2)}Enums: {\n`;
 for (const e of enums) o += `${ind(3)}${e.name}: ${e.labels.map((l) => `"${l}"`).join(" | ")};\n`;

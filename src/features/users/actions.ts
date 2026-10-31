@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { type ActionResult, fromDbError, fromZodError } from "@/lib/actions";
 import { inviteSchema } from "@/lib/validations/user";
+import { publicEnv } from "@/lib/env";
 import { findOrInviteUser } from "@/features/users/invite.server";
 import { addCollegeAdminAction } from "@/features/colleges/actions";
 import { addEventAdminAction } from "@/features/events/actions";
@@ -72,3 +73,32 @@ export async function setSuperAdminAction(userId: string, value: boolean): Promi
   revalidatePath("/users");
   return { ok: true, message: value ? "Super Admin access granted." : "Super Admin access revoked." };
 }
+
+/**
+ * Re-sends the invitation email to someone who has not accepted yet
+ * (Super Admin only). People who already set a password use "Forgot password".
+ */
+export async function resendInvitationAction(userId: string): Promise<ActionResult> {
+  if (!uuid.safeParse(userId).success) return { ok: false, error: "Invalid request." };
+  const supabase = await createClient();
+  // pending_invitations() raises for anyone who is not an active Super Admin.
+  const { data: pending, error } = await supabase.rpc("pending_invitations");
+  if (error) return fromDbError(error, "Could not check the invitation.");
+  if (!pending?.some((p) => p.user_id === userId)) {
+    return { ok: false, error: "This person has already accepted their invitation. They can use “Forgot password” on the sign-in page." };
+  }
+  const { data: profile } = await supabase.from("profiles").select("email, full_name").eq("id", userId).maybeSingle();
+  if (!profile) return { ok: false, error: "User not found." };
+
+  const admin = createAdminClient();
+  const { error: inviteError } = await admin.auth.admin.inviteUserByEmail(profile.email, {
+    data: { full_name: profile.full_name },
+    redirectTo: `${publicEnv.appUrl}/auth/confirm`,
+  });
+  if (inviteError) {
+    return { ok: false, error: inviteError.status === 429 ? "Email rate limit reached. Try again in a few minutes." : "Could not send the invitation email." };
+  }
+  revalidatePath("/users");
+  return { ok: true, message: `Invitation re-sent to ${profile.email}.` };
+}
+

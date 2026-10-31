@@ -5,7 +5,7 @@ import { useState, useTransition } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { MoreHorizontal, ShieldCheck, ShieldOff, UserCheck, UserPlus, UserX } from "lucide-react";
+import { MoreHorizontal, Send, ShieldCheck, ShieldOff, UserCheck, UserPlus, UserX } from "lucide-react";
 import { DataTable } from "@/components/tables/data-table";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { FormField } from "@/components/shared/form-field";
@@ -16,7 +16,7 @@ import { NativeSelect } from "@/components/ui/native-select";
 import { UserAvatar } from "@/components/ui/avatar";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { inviteUserAction, setSuperAdminAction, setUserStatusAction } from "@/features/users/actions";
+import { inviteUserAction, resendInvitationAction, setSuperAdminAction, setUserStatusAction } from "@/features/users/actions";
 import { publicStorageUrl } from "@/lib/storage";
 import { formatDate } from "@/lib/utils";
 import type { ActionResult } from "@/lib/actions";
@@ -30,6 +30,8 @@ export type UserRow = {
   is_super_admin: boolean;
   created_at: string;
   roles: string[];
+  /** Invited but has not accepted yet (Super Admin view only). */
+  invite_pending?: boolean;
 };
 
 function RowActions({ user, isSuperAdmin, selfId }: { user: UserRow; isSuperAdmin: boolean; selfId: string }) {
@@ -51,6 +53,12 @@ function RowActions({ user, isSuperAdmin, selfId }: { user: UserRow; isSuperAdmi
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
+        {user.invite_pending ? (
+          <>
+            <DropdownMenuItem onSelect={() => run(() => resendInvitationAction(user.id))}><Send /> Resend invitation</DropdownMenuItem>
+            <DropdownMenuSeparator />
+          </>
+        ) : null}
         {user.is_super_admin ? (
           <DropdownMenuItem onSelect={() => run(() => setSuperAdminAction(user.id, false))}><ShieldOff /> Revoke Super Admin</DropdownMenuItem>
         ) : (
@@ -96,7 +104,17 @@ export function UsersTable({ rows, isSuperAdmin, selfId }: { rows: UserRow[]; is
         </div>
       ),
     },
-    { accessorKey: "status", header: "Status", filterFn: "equals", cell: ({ getValue }) => <StatusBadge status={getValue<string>()} /> },
+    {
+      accessorKey: "status",
+      header: "Status",
+      filterFn: "equals",
+      cell: ({ row, getValue }) => (
+        <div className="flex flex-wrap items-center gap-1">
+          <StatusBadge status={getValue<string>()} />
+          {row.original.invite_pending ? <Badge variant="outline">Invite pending</Badge> : null}
+        </div>
+      ),
+    },
     { accessorKey: "created_at", header: "Joined", cell: ({ getValue }) => formatDate(getValue<string>()) },
     { id: "actions", header: "", enableHiding: false, enableSorting: false, cell: ({ row }) => <RowActions user={row.original} isSuperAdmin={isSuperAdmin} selfId={selfId} /> },
   ];

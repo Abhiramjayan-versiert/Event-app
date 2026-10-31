@@ -3784,6 +3784,10 @@ export type Database = {
         Args: { p_event: string };
         Returns: Json;
       };
+      pending_invitations: {
+        Args: never;
+        Returns: { user_id: string; invited_at: string }[];
+      };
       record_expense_payment: {
         Args: { p_expense: string; p_amount: number; p_paid_on: string; p_method: string; p_reference?: string; p_notes?: string; p_document?: string };
         Returns: string;
