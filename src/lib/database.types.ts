@@ -4612,6 +4612,10 @@ export type Database = {
         Args: { p_department: string; p_confirm_name: string };
         Returns: undefined;
       };
+      delete_department_assignment: {
+        Args: { p_assignment: string };
+        Returns: undefined;
+      };
       delete_event: {
         Args: { p_event: string; p_confirm_name: string };
         Returns: Json;
@@ -4853,7 +4857,7 @@ export type Database = {
       campaign_status: "planned" | "active" | "paused" | "completed" | "cancelled";
       college_status: "active" | "inactive" | "archived";
       department_kind: "finance" | "registration" | "sponsorship" | "media" | "marketing" | "technical" | "logistics" | "operations" | "hospitality" | "general";
-      department_position: "head" | "assistant_head" | "member";
+      department_position: "head" | "co_head" | "assistant_head" | "member";
       document_visibility: "event" | "department" | "finance" | "restricted";
       event_status: "planning" | "registration_open" | "registration_closed" | "upcoming" | "live" | "completed" | "archived" | "cancelled";
       expense_status: "draft" | "submitted" | "under_review" | "changes_requested" | "forwarded" | "approved" | "rejected" | "partially_paid" | "paid" | "cancelled";
@@ -4896,7 +4900,7 @@ export const Constants = {
       campaign_status: ["planned", "active", "paused", "completed", "cancelled"],
       college_status: ["active", "inactive", "archived"],
       department_kind: ["finance", "registration", "sponsorship", "media", "marketing", "technical", "logistics", "operations", "hospitality", "general"],
-      department_position: ["head", "assistant_head", "member"],
+      department_position: ["head", "co_head", "assistant_head", "member"],
       document_visibility: ["event", "department", "finance", "restricted"],
       event_status: ["planning", "registration_open", "registration_closed", "upcoming", "live", "completed", "archived", "cancelled"],
       expense_status: ["draft", "submitted", "under_review", "changes_requested", "forwarded", "approved", "rejected", "partially_paid", "paid", "cancelled"],

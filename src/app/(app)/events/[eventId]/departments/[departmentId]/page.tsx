@@ -57,7 +57,7 @@ export default async function DepartmentPage({ params }: { params: Promise<{ eve
     id: m.id, userId: m.user!.id, name: m.user!.full_name, email: m.user!.email, avatarPath: m.user!.avatar_path,
     position: m.position, role: m.role?.name ?? "—", since: m.assigned_at,
   }));
-  active.sort((a, b) => ["head", "assistant_head", "member"].indexOf(a.position) - ["head", "assistant_head", "member"].indexOf(b.position));
+  active.sort((a, b) => ["head", "co_head", "assistant_head", "member"].indexOf(a.position) - ["head", "co_head", "assistant_head", "member"].indexOf(b.position));
   const history = memberRows.filter((m) => m.ended_at);
 
   const taskRows = tasks.data ?? [];
@@ -161,6 +161,7 @@ export default async function DepartmentPage({ params }: { params: Promise<{ eve
               canLead={canLead}
               canAddMembers={canAddMembers && dept.status === "active"}
               selfId={access.user_id}
+              isSuperAdmin={access.is_super_admin}
             />
           </CardContent>
         </Card>

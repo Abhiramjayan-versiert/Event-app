@@ -18,7 +18,7 @@ import { FormField } from "@/components/shared/form-field";
 import { ConfirmButton } from "@/components/forms/confirm-button";
 import { AssignMemberDialog, type PersonOption, type RoleOption } from "@/features/departments/assign-member-dialog";
 import {
-  assignDepartmentMemberAction, deleteAnnouncementAction, endDepartmentAssignmentAction, postDepartmentAnnouncementAction,
+  assignDepartmentMemberAction, deleteAnnouncementAction, endDepartmentAssignmentAction, postDepartmentAnnouncementAction, deleteDepartmentAssignmentAction,
 } from "@/features/departments/actions";
 import { announcementSchema, type AnnouncementInput } from "@/lib/validations/department";
 import { publicStorageUrl } from "@/lib/storage";
@@ -30,15 +30,15 @@ export type MemberRow = {
   name: string;
   email: string;
   avatarPath: string | null;
-  position: "head" | "assistant_head" | "member";
+  position: "head" | "co_head" | "assistant_head" | "member";
   role: string;
   since: string;
 };
 
-const POSITION_LABEL = { head: "Head", assistant_head: "Assistant head", member: "Team member" } as const;
+const POSITION_LABEL = { head: "Head", co_head: "Co-head", assistant_head: "Assistant head", member: "Team member" } as const;
 
 export function DepartmentTeam({
-  eventId, departmentId, members, people, roles, canLead, canAddMembers, selfId,
+  eventId, departmentId, members, people, roles, canLead, canAddMembers, selfId, isSuperAdmin = false,
 }: {
   eventId: string;
   departmentId: string;
@@ -48,9 +48,10 @@ export function DepartmentTeam({
   canLead: boolean;
   canAddMembers: boolean;
   selfId: string;
+  isSuperAdmin?: boolean;
 }) {
   const positions = canLead
-    ? [{ value: "member", label: "Team member" }, { value: "assistant_head", label: "Assistant head" }, { value: "head", label: "Head (replaces current head)" }]
+    ? [{ value: "member", label: "Team member" }, { value: "assistant_head", label: "Assistant head" }, { value: "co_head", label: "Co-head (alongside the head)" }, { value: "head", label: "Head (replaces current head)" }]
     : [{ value: "member", label: "Team member" }];
   const memberIds = new Set(members.map((m) => m.userId));
 
@@ -70,7 +71,7 @@ export function DepartmentTeam({
                     <p className="truncate text-sm font-medium">{m.name || m.email}{m.userId === selfId ? " (you)" : ""}</p>
                     <p className="truncate text-xs text-muted-foreground">{m.role} · since {formatDate(m.since)}</p>
                   </div>
-                  <Badge variant={m.position === "head" ? "lime" : m.position === "assistant_head" ? "default" : "muted"}>{POSITION_LABEL[m.position]}</Badge>
+                  <Badge variant={m.position === "head" || m.position === "co_head" ? "lime" : m.position === "assistant_head" ? "default" : "muted"}>{POSITION_LABEL[m.position]}</Badge>
                 </div>
                 {removable ? (
                   <ConfirmButton
@@ -83,6 +84,19 @@ export function DepartmentTeam({
                     action={() => endDepartmentAssignmentAction(eventId, departmentId, m.id)}
                   >
                     <UserMinus /> Remove
+                  </ConfirmButton>
+                ) : null}
+                {isSuperAdmin ? (
+                  <ConfirmButton
+                    variant="ghost"
+                    size="sm"
+                    destructive
+                    title="Delete this role?"
+                    description={`${m.name || m.email}'s ${POSITION_LABEL[m.position].toLowerCase()} role is deleted completely, including from the history. Use Remove to revoke access but keep the record.`}
+                    confirmLabel="Delete role"
+                    action={() => deleteDepartmentAssignmentAction(eventId, departmentId, m.id)}
+                  >
+                    <Trash2 /> Delete
                   </ConfirmButton>
                 ) : null}
               </li>

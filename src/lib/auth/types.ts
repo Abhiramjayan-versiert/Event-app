@@ -3,7 +3,7 @@ export type AccessRole = {
   role_name: string;
   department_id: string | null;
   department_name: string | null;
-  position: "head" | "assistant_head" | "member" | null;
+  position: "head" | "co_head" | "assistant_head" | "member" | null;
 };
 
 export type AccessCollege = {

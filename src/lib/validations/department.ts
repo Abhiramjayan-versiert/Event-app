@@ -25,7 +25,7 @@ export const assignmentSchema = z
     user_id: z.string().uuid().optional().or(z.literal("")),
     email: emailSchema.optional().or(z.literal("")),
     full_name: z.string().trim().max(120).optional().or(z.literal("")),
-    position: z.enum(["head", "assistant_head", "member"]),
+    position: z.enum(["head", "co_head", "assistant_head", "member"]),
     role_key: z.string().max(64).optional().or(z.literal("")),
   })
   .refine((v) => v.user_id || (v.email && v.full_name && v.full_name.length >= 2), {

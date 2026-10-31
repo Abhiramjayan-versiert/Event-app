@@ -38,7 +38,7 @@ export function MyWorkspace({ access }: { access: AccessSummary }) {
                   <Badge variant="muted">College access</Badge>
                 ) : (
                   e.roles.map((r, i) => (
-                    <Badge key={i} variant={r.position === "head" || r.role_key === "event_admin" ? "lime" : "muted"}>
+                    <Badge key={i} variant={r.position === "head" || r.position === "co_head" || r.role_key === "event_admin" ? "lime" : "muted"}>
                       {r.role_name}
                       {r.department_name ? ` · ${r.department_name}` : ""}
                     </Badge>

@@ -176,3 +176,14 @@ export async function deleteDepartmentAction(eventId: string, departmentId: stri
   revalidatePath(`/events/${eventId}`, "layout");
   return { ok: true, message: "Department deleted. Its tasks moved to the event level." };
 }
+
+/** Super Admin: delete a department role assignment entirely (removed from history too). */
+export async function deleteDepartmentAssignmentAction(eventId: string, departmentId: string, assignmentId: string): Promise<ActionResult> {
+  if (![eventId, departmentId, assignmentId].every((v) => uuid.safeParse(v).success)) return { ok: false, error: "Invalid request." };
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("delete_department_assignment", { p_assignment: assignmentId });
+  if (error) return rpcError(error, "Could not delete the role.");
+  refresh(eventId, departmentId);
+  revalidatePath("/users", "layout");
+  return { ok: true, message: "Role deleted." };
+}

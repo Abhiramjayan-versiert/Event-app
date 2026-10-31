@@ -3,7 +3,7 @@
 import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Plus, ShieldOff, X } from "lucide-react";
+import { Plus, ShieldOff, Trash2, X } from "lucide-react";
 import type { ActionResult } from "@/lib/actions";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -11,7 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { NativeSelect } from "@/components/ui/native-select";
 import { addCollegeAdminAction, endCollegeMembershipAction } from "@/features/colleges/actions";
 import { endEventMembershipAction } from "@/features/events/actions";
-import { assignDepartmentMemberAction, assignEventRoleAction, endDepartmentAssignmentAction, removeUserFromEventAction } from "@/features/departments/actions";
+import { assignDepartmentMemberAction, assignEventRoleAction, deleteDepartmentAssignmentAction, endDepartmentAssignmentAction, removeUserFromEventAction } from "@/features/departments/actions";
 import { formatDate } from "@/lib/utils";
 import { ConfirmButton } from "@/components/forms/confirm-button";
 import { removeAllAccessAction } from "@/features/users/actions";
@@ -31,6 +31,7 @@ export type AccessData = {
 
 const POSITIONS = [
   { value: "head", label: "Head" },
+  { value: "co_head", label: "Co-head" },
   { value: "assistant_head", label: "Assistant head" },
   { value: "member", label: "Member" },
 ];
@@ -49,7 +50,7 @@ function useRun() {
   return { pending, run };
 }
 
-function Row({ title, detail, onRemove, pending }: { title: React.ReactNode; detail: React.ReactNode; onRemove: () => void; pending: boolean }) {
+function Row({ title, detail, onRemove, onDelete, pending }: { title: React.ReactNode; detail: React.ReactNode; onRemove: () => void; onDelete?: () => void; pending: boolean }) {
   return (
     <li className="flex items-center gap-3 py-2.5">
       <div className="min-w-0 flex-1">
@@ -59,6 +60,12 @@ function Row({ title, detail, onRemove, pending }: { title: React.ReactNode; det
       <Button variant="ghost" size="sm" disabled={pending} onClick={onRemove} aria-label="Remove access">
         <X /> Remove
       </Button>
+      {onDelete ? (
+        <Button variant="ghost" size="sm" disabled={pending} aria-label="Delete role"
+          onClick={() => { if (window.confirm("Delete this role completely, including from the history?")) onDelete(); }}>
+          <Trash2 /> Delete
+        </Button>
+      ) : null}
     </li>
   );
 }
@@ -152,7 +159,8 @@ export function UserAccessManager({ data }: { data: AccessData }) {
                 <Row key={a.id} pending={pending}
                   title={<>{a.department} <span className="font-normal text-muted-foreground">· {a.event}</span></>}
                   detail={`${a.position.replace(/_/g, " ")} · ${a.role} · since ${formatDate(a.since)}`}
-                  onRemove={() => run(() => endDepartmentAssignmentAction(a.event_id, a.department_id, a.id))} />
+                  onRemove={() => run(() => endDepartmentAssignmentAction(a.event_id, a.department_id, a.id))}
+                  onDelete={() => run(() => deleteDepartmentAssignmentAction(a.event_id, a.department_id, a.id))} />
               ))}
             </ul>
           )}

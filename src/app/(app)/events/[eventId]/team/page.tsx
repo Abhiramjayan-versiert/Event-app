@@ -6,7 +6,7 @@ import { TeamTable, type TeamRow } from "@/features/departments/team-table";
 
 export const metadata = { title: "Team" };
 
-const POSITION = { head: "Head", assistant_head: "Assistant head", member: "Member" } as Record<string, string>;
+const POSITION = { head: "Head", co_head: "Co-head", assistant_head: "Assistant head", member: "Member" } as Record<string, string>;
 
 export default async function TeamPage({ params }: { params: Promise<{ eventId: string }> }) {
   const { eventId } = await params;
