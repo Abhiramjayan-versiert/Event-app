@@ -65,6 +65,22 @@ npm run dev
 
 With the local seed, sign in as `superadmin@eventapp.local` / `EventApp-dev-2026`. There is one account per role; see `supabase/seed.sql`. **The seed is for local development only.**
 
+## Feature additions (after Phase 10)
+
+| # | Feature | Where |
+|---|---|---|
+| 11 | Copy an event as a new edition (structure, schedule, checklist, budget split; optional team) | Event → Settings → Copy as new event |
+| 12 | Personal calendar feed (events, schedule, tasks, duties) | Profile → Calendar sync |
+| 13 | Two-step sign-in with an authenticator app; Super Admin sees who has it | Profile → Two-step sign-in |
+| 14 | Public registration page, QR tickets, gate check-in with camera scanner | `/e/<college>/<event>`, `/t/<code>`, Event → Check-in |
+| 15 | Judging: criteria, judges, scoring, leaderboard, published results | Event → Judging |
+| 16 | Participation and winner certificates with QR verification and PDF | Event → Certificates, `/c/<code>` |
+| 17 | Volunteer duty roster with self check-in and no-show tracking | Event → Duty roster |
+| 18 | Feedback surveys with recommendation score | Event → Feedback, `/s/<token>` |
+| 19 | Push notifications on phones and desktops | Profile → Notifications on this device |
+
+Outgoing email (tickets, certificates, survey invitations) needs the `SMTP_*` variables from `.env.example` in Vercel. `supabase/manual/optional-hardening.sql` adds table-level write revocations that Supabase asks you to confirm by hand.
+
 ## The Super Admin
 
 There is exactly one Super Admin: the account whose sign-in email is set in `app.super_admin_email()` (migration 19, currently `abhiramjayan72@gmail.com`).
