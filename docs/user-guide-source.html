@@ -1,0 +1,666 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>EVENT APP User Guide</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+  :root {
+    --ink: #0a0a0a; --muted: #4f5449; --line: #dfe3d6; --soft: #f4f6ee; --lime: #b6f23a; --lime-dark: #5e8a12;
+    --display: "Archivo", "Arial Black", sans-serif; --body: "IBM Plex Sans", "DejaVu Sans", sans-serif; --mono: "IBM Plex Mono", "DejaVu Sans Mono", monospace;
+  }
+  @page { size: A4; margin: 18mm 17mm 20mm; }
+  @page :first { margin: 0; }
+  * { box-sizing: border-box; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { margin: 0; font-family: var(--body); font-size: 10.4pt; line-height: 1.5; color: var(--ink); }
+
+  /* Cover */
+  .cover { height: 297mm; background: var(--ink); color: #fff; padding: 30mm 22mm; display: flex; flex-direction: column; justify-content: space-between; page-break-after: always; }
+  .wordmark { font-family: var(--display); font-weight: 900; font-size: 58pt; letter-spacing: -0.04em; line-height: .9; text-transform: uppercase; margin: 0; }
+  .wordmark span { color: var(--lime); }
+  .cover h2 { font-family: var(--display); font-weight: 700; font-size: 26pt; margin: 18mm 0 4mm; letter-spacing: -0.01em; }
+  .cover p { color: #c9cec0; font-size: 12pt; max-width: 120mm; margin: 0; }
+  .cover .bar { height: 3mm; width: 40mm; background: var(--lime); margin-top: 10mm; }
+  .cover .meta { font-family: var(--mono); font-size: 9pt; color: #9ba191; display: grid; gap: 2mm; }
+  .cover .meta b { color: #fff; font-weight: 500; }
+
+  /* Contents */
+  .toc { page-break-after: always; }
+  .toc h2 { margin-top: 0; }
+  .toc ol { columns: 2; column-gap: 12mm; padding-left: 0; list-style: none; counter-reset: c; margin: 0; }
+  .toc li { counter-increment: c; break-inside: avoid; padding: 2.2mm 0; border-bottom: 1px solid var(--line); display: flex; gap: 3mm; }
+  .toc li::before { content: counter(c, decimal-leading-zero); font-family: var(--mono); color: var(--lime-dark); font-size: 9pt; padding-top: .6mm; }
+  .toc li span { color: var(--muted); font-size: 9pt; display: block; }
+
+  /* Chapters */
+  section.chapter { page-break-before: always; }
+  .kicker { font-family: var(--mono); font-size: 8.5pt; color: var(--lime-dark); letter-spacing: .08em; text-transform: uppercase; margin: 0 0 1mm; }
+  h2 { font-family: var(--display); font-weight: 900; font-size: 22pt; letter-spacing: -0.02em; margin: 0 0 3mm; line-height: 1.1; }
+  h2::after { content: ""; display: block; width: 18mm; height: 1.4mm; background: var(--lime); margin-top: 3mm; }
+  h3 { font-family: var(--display); font-weight: 700; font-size: 13pt; margin: 7mm 0 2mm; letter-spacing: -0.01em; break-after: avoid; }
+  h4 { font-size: 10.5pt; margin: 4mm 0 1mm; break-after: avoid; }
+  p { margin: 0 0 2.5mm; }
+  .lead { font-size: 11.5pt; color: var(--muted); max-width: 160mm; }
+  ul, ol { margin: 0 0 3mm; padding-left: 5mm; }
+  li { margin: 0 0 1.2mm; }
+  ol.steps { list-style: none; padding: 0; counter-reset: s; }
+  ol.steps > li { counter-increment: s; position: relative; padding-left: 9mm; break-inside: avoid; }
+  ol.steps > li::before { content: counter(s); position: absolute; left: 0; top: .3mm; width: 5.6mm; height: 5.6mm; border-radius: 50%; background: var(--ink); color: var(--lime); font-family: var(--mono); font-size: 8pt; display: grid; place-items: center; }
+  .path { font-family: var(--mono); font-size: 8.8pt; background: var(--soft); border: 1px solid var(--line); border-radius: 1.2mm; padding: .2mm 1.5mm; white-space: nowrap; }
+  b, strong { font-weight: 600; }
+  .note, .tip, .warn { border-left: 1.2mm solid var(--lime); background: var(--soft); padding: 2.5mm 4mm; margin: 3mm 0; border-radius: 0 1.5mm 1.5mm 0; break-inside: avoid; }
+  .warn { border-left-color: #d97706; background: #fdf6ea; }
+  .note b:first-child, .tip b:first-child, .warn b:first-child { display: block; font-family: var(--display); font-size: 9.5pt; text-transform: uppercase; letter-spacing: .05em; margin-bottom: .8mm; }
+  table { width: 100%; border-collapse: collapse; margin: 2mm 0 4mm; font-size: 9.3pt; break-inside: auto; }
+  th { text-align: left; font-family: var(--display); font-weight: 700; font-size: 9pt; background: var(--ink); color: #fff; padding: 2mm 2.5mm; }
+  td { padding: 1.8mm 2.5mm; border-bottom: 1px solid var(--line); vertical-align: top; }
+  tr { break-inside: avoid; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 6mm; }
+  .flow { display: flex; flex-wrap: wrap; align-items: center; gap: 1.5mm; margin: 2mm 0 4mm; font-size: 9pt; }
+  .flow span { border: 1px solid var(--ink); border-radius: 1.2mm; padding: 1mm 2.2mm; background: #fff; }
+  .flow span.on { background: var(--lime); }
+  .flow i { font-style: normal; color: var(--muted); }
+  figure { margin: 3mm 0; break-inside: avoid; }
+  figure img { width: 100%; border: 1px solid var(--line); border-radius: 2mm; }
+  figcaption { font-size: 8.5pt; color: var(--muted); margin-top: 1.5mm; }
+  .kbd { font-family: var(--mono); font-size: 8.8pt; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 1mm; padding: 0 1.2mm; }
+  .qa h4 { color: var(--ink); }
+  .qa p { color: var(--muted); }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <div>
+    <h1 class="wordmark">Event <span>App</span></h1>
+    <div class="bar"></div>
+    <h2>User Guide</h2>
+    <p>How to run a college fest on EVENT APP, from inviting your team to closing the books. Written for Super Admins, College Admins, Event Admins, department heads, volunteers and judges.</p>
+  </div>
+  <div class="meta">
+    <span><b>App:</b> https://event-app-blush.vercel.app</span>
+    <span><b>Works on:</b> Windows · Mac · Android · iPhone · iPad (browser or installed app)</span>
+    <span><b>Version:</b> October 2026</span>
+  </div>
+</div>
+
+<div class="toc">
+  <p class="kicker">Contents</p>
+  <h2>What's inside</h2>
+  <ol>
+    <li><div>Quick start<span>The first hour, step by step</span></div></li>
+    <li><div>Signing in &amp; your account<span>Invitations, passwords, two-step, install, alerts</span></div></li>
+    <li><div>Roles &amp; permissions<span>Who can see and do what</span></div></li>
+    <li><div>For the Super Admin<span>Users, access, activity, global reports</span></div></li>
+    <li><div>Colleges &amp; events<span>Create, configure, copy, archive, delete</span></div></li>
+    <li><div>Departments &amp; team<span>Heads, members, workspaces</span></div></li>
+    <li><div>Registrations<span>Competitions, public page, tickets, desk</span></div></li>
+    <li><div>Event day<span>Check-in, duty roster, schedule, operations</span></div></li>
+    <li><div>Finance<span>Budget, expenses, approvals, ledger</span></div></li>
+    <li><div>Sponsorship<span>Sponsors, deals, payments, deliverables</span></div></li>
+    <li><div>Tasks, media &amp; marketing<span>Boards, assets, campaigns</span></div></li>
+    <li><div>Judging &amp; results<span>Criteria, scoring, winners</span></div></li>
+    <li><div>Certificates<span>Issue, email, verify, revoke</span></div></li>
+    <li><div>Communication<span>Announcements, notifications, documents</span></div></li>
+    <li><div>Feedback surveys<span>Templates, invitations, results</span></div></li>
+    <li><div>Reports &amp; exports<span>12 reports, CSV, Excel, PDF</span></div></li>
+    <li><div>Closing an event<span>Checklist, final figures, archive</span></div></li>
+    <li><div>Troubleshooting &amp; FAQ<span>Fixes for common problems</span></div></li>
+    <li><div>Quick reference<span>Links, statuses, glossary</span></div></li>
+  </ol>
+</div>
+
+<!-- 1 -->
+<section class="chapter">
+  <p class="kicker">Chapter 1</p>
+  <h2>Quick start</h2>
+  <p class="lead">EVENT APP keeps everything about a fest in one place. A college runs one or more events; each event has departments; people are given roles inside them. Here is the shortest path from an empty app to a working event.</p>
+  <div class="flow"><span class="on">Super Admin</span><i>→</i><span>College</span><i>→</i><span>Event</span><i>→</i><span>Departments</span><i>→</i><span>Team</span><i>→</i><span>Participants</span></div>
+
+  <h3>The first hour</h3>
+  <ol class="steps">
+    <li><b>Create the college.</b> <span class="path">Colleges → New college</span>. Give it a name and a short code such as <b>CET</b>; the code becomes part of public links.</li>
+    <li><b>Appoint a College Admin</b> (optional). Open the college and invite the staff member who manages its events.</li>
+    <li><b>Create the event.</b> <span class="path">Events → New event</span>: pick the college, name, dates and venue. The app creates 18 departments and 10 sponsorship packages for you.</li>
+    <li><b>Appoint Event Admins.</b> <span class="path">Event → Settings → Event administrators → Appoint event admin</span>.</li>
+    <li><b>Appoint department heads.</b> <span class="path">Event → Departments → (department) → Assign person</span>, position <b>Head</b>.</li>
+    <li><b>Add competitions</b> under <span class="path">Event → Registrations</span>, with fees and team sizes.</li>
+    <li><b>Turn on the public registration page</b> in <span class="path">Event → Settings → Registration settings</span> and share the link.</li>
+    <li><b>Set the budget</b> in <span class="path">Event → Finance → Budget</span> and give each department its allocation.</li>
+  </ol>
+  <div class="tip"><b>Tip</b>Next year, use <span class="path">Event → Settings → Copy as new event</span>. It copies departments, packages, competitions, schedule, task checklist and budget split with the dates moved forward.</div>
+
+  <h3>Finding your way around</h3>
+  <ul>
+    <li><b>Left menu, top part:</b> things across the whole app: Overview, Colleges, Events, Reports, Users, Activity &amp; audit, Settings. You only see what your role allows.</li>
+    <li><b>Left menu, event part:</b> once you open an event, its modules appear: Departments, Team, Registrations, Check-in, Finance, Sponsorship, Judging, Certificates, Tasks, Duty roster, and more.</li>
+    <li><b>Top bar:</b> search, the event switcher, the notification bell, the light/dark switch and your account menu (Profile, Install app, Sign out).</li>
+  </ul>
+</section>
+
+<!-- 2 -->
+<section class="chapter">
+  <p class="kicker">Chapter 2</p>
+  <h2>Signing in &amp; your account</h2>
+  <p class="lead">EVENT APP is invitation-only. Nobody can sign up on their own; an administrator invites them by email.</p>
+  <figure><img src="guide-login.png" alt="The EVENT APP sign-in screen"><figcaption>The sign-in screen. “Forgot password?” sends a reset link to the invited address.</figcaption></figure>
+
+  <h3>Accepting an invitation</h3>
+  <ol class="steps">
+    <li>Open the email titled <b>“You're invited to EVENT APP”</b> (check spam).</li>
+    <li>Click <b>Accept invitation</b>. The app opens and asks you to choose a password: at least 10 characters with letters and numbers.</li>
+    <li>You're signed in. Your home page lists the events and roles you've been given.</li>
+  </ol>
+  <div class="note"><b>Good to know</b>After you set or change a password, Supabase (the app's sign-in service) emails a short “your password was changed” notice. It has no link and needs no action.</div>
+
+  <h3>Forgot your password</h3>
+  <ol class="steps">
+    <li>On the sign-in page, click <b>Forgot password?</b> and enter the email your invitation was sent to.</li>
+    <li>Open <b>“Reset your EVENT APP password”</b> and click <b>Reset password</b>. The link expires in an hour.</li>
+    <li>Choose a new password. If no email arrives, the address probably isn't the one you were invited with; ask your administrator to send a reset from the Users page.</li>
+  </ol>
+
+  <h3>Your profile</h3>
+  <p><span class="path">Account menu → Profile</span> holds:</p>
+  <ul>
+    <li><b>Your details and photo</b>: name, phone, job title.</li>
+    <li><b>Notifications on this device</b>: phone or desktop alerts. On iPhone/iPad, install the app first (below), open it from the Home Screen, then turn notifications on.</li>
+    <li><b>Two-step sign-in</b>: scan the QR code with Google Authenticator, Microsoft Authenticator or Authy, then type the 6-digit code. From then on you'll enter a code after your password. Strongly recommended for admins and finance roles.</li>
+    <li><b>Calendar sync</b>: one click gives a private link to add to Google, Apple or Outlook Calendar. Your events, schedule, task deadlines and duties appear there. Reset the link if it's ever shared by mistake.</li>
+    <li><b>Change password</b>.</li>
+  </ul>
+
+  <h3>Install the app</h3>
+  <table>
+    <tr><th>Device</th><th>How</th></tr>
+    <tr><td>Windows / Mac with Chrome or Edge</td><td>Install icon in the address bar, or <span class="path">Account menu → Install app</span></td></tr>
+    <tr><td>Mac with Safari</td><td>File → Add to Dock</td></tr>
+    <tr><td>Android</td><td><span class="path">Account menu → Install app</span>, or the browser menu → Install app</td></tr>
+    <tr><td>iPhone / iPad</td><td>Open in Safari → Share button → <b>Add to Home Screen</b></td></tr>
+  </table>
+  <p>The installed app updates itself whenever the app is improved. It needs an internet connection; without one it shows an offline page.</p>
+</section>
+
+<!-- 3 -->
+<section class="chapter">
+  <p class="kicker">Chapter 3</p>
+  <h2>Roles &amp; permissions</h2>
+  <p class="lead">What you can see depends on your role. If a module is missing from your menu, you don't have the permission for it; that's by design, not a bug.</p>
+  <table>
+    <tr><th style="width:28%">Role</th><th>Can do</th></tr>
+    <tr><td><b>Super Admin</b> (one person)</td><td>Everything, in every college. Manages all users and their access, sees all activity, runs global reports. Shown to others as “Contact Admin”. This role can't be given to anyone else.</td></tr>
+    <tr><td><b>College Admin</b></td><td>Everything inside their college: creates events, appoints Event Admins, manages college users, college reports, deletes events without money records.</td></tr>
+    <tr><td><b>Event Admin</b></td><td>Everything inside one event: departments, team, finance, registrations, sponsorship, operations, judging, certificates, closing.</td></tr>
+    <tr><td><b>Finance Head</b></td><td>Finance view and management, expense review, budgets, registration and sponsor figures.</td></tr>
+    <tr><td><b>Registration Head</b></td><td>Registrations, desk payments, exports, gate check-in.</td></tr>
+    <tr><td><b>Sponsorship / Media / Marketing Head</b></td><td>Their module plus their department workspace.</td></tr>
+    <tr><td><b>Department Head / Assistant Head</b></td><td>Their department: team, tasks, expense requests, budget requests, announcements, duty roster for the department.</td></tr>
+    <tr><td><b>Team member</b></td><td>Their department, their tasks and duties. Members of the Registration department can use gate check-in.</td></tr>
+    <tr><td><b>Event viewer</b></td><td>Read-only view of the event. Use it for outside judges.</td></tr>
+  </table>
+  <h3>Changing what a role can do</h3>
+  <p>The Super Admin can adjust permissions per role in <span class="path">Settings → Permissions</span>. Changes apply to everyone with that role straight away.</p>
+  <div class="note"><b>How department roles work</b>A department role only works inside its own department. A Media Head can manage Media's tasks and expenses, but not Finance's.</div>
+  <h3>Giving someone access</h3>
+  <ul>
+    <li><b>College Admin:</b> <span class="path">Colleges → (college) → Add admin</span>, or <span class="path">Users → (person) → College access</span>.</li>
+    <li><b>Event role:</b> <span class="path">Event → Team → Add person</span>, or <span class="path">Event → Settings → Appoint event admin</span>.</li>
+    <li><b>Department position:</b> <span class="path">Event → Departments → (department) → Assign person</span>.</li>
+  </ul>
+  <p>In each dialog choose <b>Existing user</b> to pick someone who already has an account, or <b>New person (email)</b> to invite someone new.</p>
+  <h3>Taking access away</h3>
+  <ul>
+    <li><b>Remove</b> next to a person ends that one role.</li>
+    <li><b>Replace</b> next to an admin hands the admin job to someone else in one step.</li>
+    <li><b>Remove all access</b> on <span class="path">Users → (person)</span> ends every role they hold, everywhere. Super Admin only.</li>
+  </ul>
+</section>
+
+<!-- 4 -->
+<section class="chapter">
+  <p class="kicker">Chapter 4</p>
+  <h2>For the Super Admin</h2>
+  <h3>Users</h3>
+  <p><span class="path">Users</span> lists everyone. Badges show <b>Invite pending</b> (not accepted yet) and <b>2-step</b> (two-step sign-in on). The <b>⋯</b> menu on each row offers:</p>
+  <ul>
+    <li><b>Resend invitation</b>, for people who lost or never got the email.</li>
+    <li><b>Send password reset</b>, which emails a reset link to their exact account address.</li>
+    <li><b>Suspend account / Reactivate account</b>. Suspension takes effect immediately; nothing is deleted.</li>
+  </ul>
+  <h3>One person's access, in one place</h3>
+  <p>Click a name on the Users page to open their access page:</p>
+  <ul>
+    <li><b>College access</b>: make College Admin, or remove.</li>
+    <li><b>Event roles</b>: add or remove event-wide roles.</li>
+    <li><b>Department assignments</b>: assign as head, assistant head or member of any department, or remove.</li>
+    <li><b>Remove from an event completely</b>: ends every role there and unassigns their open tasks.</li>
+    <li><b>Remove all access</b>: ends every college, event and department role they hold, everywhere. Their account and history stay, so you can give them a new, separate role afterwards.</li>
+    <li><b>Access history</b>: every past assignment.</li>
+  </ul>
+  <h3>Replacing an administrator</h3>
+  <p>To hand an admin job to someone else in one step:</p>
+  <ol class="steps">
+    <li>Go to the admin list: <span class="path">Colleges → (college) → administrators</span> for a College Admin, or <span class="path">Event → Settings → Event administrators</span> for an Event Admin.</li>
+    <li>Click <b>Replace</b> next to the current admin.</li>
+    <li>Enter the new person's name and email. An existing user is found automatically; a new person gets an invitation.</li>
+    <li>The new person becomes admin first, then the previous admin's admin access ends. Their history is kept.</li>
+  </ol>
+  <p>To give the previous admin a different role, use their access page (above) or the Team and Departments pages.</p>
+  <h3>Activity &amp; audit</h3>
+  <p><span class="path">Activity &amp; audit</span> has two tabs:</p>
+  <ul>
+    <li><b>Activity</b>: what people did, in plain language, across every college and event.</li>
+    <li><b>Data changes</b>: a permanent record of every record created, edited or deleted.</li>
+  </ul>
+  <p>Both can be searched, filtered and exported.</p>
+  <h3>Global reports</h3>
+  <p><span class="path">Reports</span> runs any of the 12 reports across all colleges, one college, or one event. College Admins see their own colleges only.</p>
+  <h3>Your privacy</h3>
+  <p>Everyone else sees you as <b>“Contact Admin”</b>, with no name, email, phone or photo. Only you see your real details.</p>
+</section>
+
+<!-- 5 -->
+<section class="chapter">
+  <p class="kicker">Chapter 5</p>
+  <h2>Colleges &amp; events</h2>
+  <h3>Create a college</h3>
+  <ol class="steps">
+    <li><span class="path">Colleges → New college</span>: name, short code, city and contact details. Upload a logo if you like.</li>
+    <li>Open the college to add College Admins, see its events and edit its details. Archive a college you no longer use; its records stay.</li>
+  </ol>
+  <h3>Create an event</h3>
+  <ol class="steps">
+    <li><span class="path">Events → New event</span>: college, name, web name (slug), category, dates, venue, registration window, contact details, currency.</li>
+    <li>Optionally invite the first Event Admin in the same form.</li>
+    <li>The event opens with 18 departments, 10 sponsorship packages and an empty budget, ready to fill.</li>
+  </ol>
+  <h3>Event settings</h3>
+  <p><span class="path">Event → Settings</span> contains:</p>
+  <ul>
+    <li><b>Event details</b>: everything from the create form.</li>
+    <li><b>Lifecycle</b>: the event status, plus Archive / Restore.</li>
+    <li><b>Branding</b>: logo and banner, shown on the public page and tickets.</li>
+    <li><b>Event administrators</b>: appoint, change role, remove.</li>
+    <li><b>Registration settings</b>: duplicate rules, team sizes, and the <b>Public registration page</b> switch with its link.</li>
+    <li><b>Copy as new event</b>: start next year's edition.</li>
+    <li><b>Delete event</b>: Super Admin and College Admins only.</li>
+  </ul>
+  <h3>Event statuses</h3>
+  <div class="flow"><span>Planning</span><i>→</i><span>Registration open</span><i>→</i><span>Registration closed</span><i>→</i><span>Upcoming</span><i>→</i><span class="on">Live</span><i>→</i><span>Completed</span><i>→</i><span>Archived</span></div>
+  <p>Registrations are refused when the event is <b>Registration closed</b>, <b>Completed</b> or <b>Archived</b>, or outside the registration window.</p>
+  <h3>Archive or delete?</h3>
+  <table>
+    <tr><th>Archive</th><th>Delete</th></tr>
+    <tr><td>Hides the event from day-to-day lists and keeps everything for reports and audit. Can be restored.</td><td>Removes the event permanently. You must type its name to confirm. Not allowed once it has real registrations, payments or financial records; archive those instead.</td></tr>
+  </table>
+</section>
+
+<!-- 6 -->
+<section class="chapter">
+  <p class="kicker">Chapter 6</p>
+  <h2>Departments &amp; team</h2>
+  <p class="lead">Every event starts with 18 departments: Finance, Media and PR, Marketing, Sponsorship, Registration, Technical, Logistics, Stage and Production, Hospitality, Transportation, Accommodation, Food and Catering, Security, Creative and Design, Documentation, Volunteer Management, Guest Management and Public Relations.</p>
+  <h3>Managing departments</h3>
+  <ul>
+    <li><b>Add:</b> <span class="path">Event → Departments → New department</span>.</li>
+    <li><b>Edit or archive:</b> open the department → <b>Edit</b>.</li>
+    <li><b>Delete:</b> open the department → <b>Delete</b>, then type its name. Its tasks move to the event level. A department with a budget or expense records can only be archived.</li>
+  </ul>
+  <h3>The department workspace</h3>
+  <p>Each department page shows:</p>
+  <ul>
+    <li>progress, team size, pending, completed and overdue tasks;</li>
+    <li>the budget and spending;</li>
+    <li>expense requests;</li>
+    <li>department announcements;</li>
+    <li>recent activity.</li>
+  </ul>
+  <h3>Appointing people</h3>
+  <ol class="steps">
+    <li>Open the department and click <b>Assign person</b>.</li>
+    <li>Choose <b>Existing user</b> and pick a name, or <b>New person (email)</b> to invite someone.</li>
+    <li>Pick the position: <b>Head</b>, <b>Assistant head</b> or <b>Member</b>. The role is chosen automatically for the department, or you can pick one.</li>
+    <li>The person is notified. Removing someone keeps their history.</li>
+  </ol>
+  <h3>The Team page</h3>
+  <p><span class="path">Event → Team</span> lists everyone in the event with their event roles and departments. <b>Add person</b> gives someone an event-wide role (for example Event Admin or Viewer). The list can be exported.</p>
+</section>
+
+<!-- 7 -->
+<section class="chapter">
+  <p class="kicker">Chapter 7</p>
+  <h2>Registrations</h2>
+  <h3>1. Set up competitions</h3>
+  <p>In <span class="path">Event → Registrations</span>, add each competition with:</p>
+  <ul>
+    <li>a short <b>code</b>;</li>
+    <li>the <b>fee</b> (0 for free);</li>
+    <li><b>Individual</b> or <b>Team</b>, with minimum and maximum team size;</li>
+    <li>an optional <b>capacity</b>, start time, venue and rules link.</li>
+  </ul>
+  <h3>2. Open the public registration page</h3>
+  <ol class="steps">
+    <li><span class="path">Event → Settings → Registration settings</span> → switch on <b>Public registration page</b> → <b>Save</b>.</li>
+    <li>Copy the link under the switch. It looks like <span class="path">event-app-blush.vercel.app/e/college-code/event-name</span>.</li>
+    <li>Share it on posters, WhatsApp and Instagram. Participants register without an account.</li>
+  </ol>
+  <h3>3. Tickets</h3>
+  <ul>
+    <li>After registering, each participant sees their <b>QR ticket</b> and gets it by email.</li>
+    <li><b>Free</b> registrations are confirmed instantly.</li>
+    <li><b>Paid</b> registrations show “Payment pending: pay at the registration desk” until staff record the payment.</li>
+    <li>Anyone can reopen their ticket from the email link. Organisers can reopen or re-email it from <span class="path">Registrations → (registration) → Ticket &amp; check-in</span>.</li>
+  </ul>
+  <h3>4. The registration desk</h3>
+  <ul>
+    <li><b>Add offline registration</b>: for walk-ins.</li>
+    <li><b>Record payment</b>: cash or UPI collected at the desk. The registration becomes Confirmed and the money appears in Finance.</li>
+    <li><b>Confirm, Waitlist, Cancel registration</b>: change status, with a reason.</li>
+    <li><b>Record refund</b>: money given back; it is recorded in the ledger.</li>
+  </ul>
+  <h3>5. Website integration (optional)</h3>
+  <p>If the college has its own website, <span class="path">Event → Integrations</span> creates API keys so the website can send registrations in. Use <b>Test</b> keys first, then live keys. Online payment (Razorpay) is built in but currently switched off.</p>
+  <div class="tip"><b>Tip</b>Duplicate rules, such as one registration per email per category, are in Registration settings. They stop the same person registering twice by mistake.</div>
+</section>
+
+<!-- 8 -->
+<section class="chapter">
+  <p class="kicker">Chapter 8</p>
+  <h2>Event day</h2>
+  <h3>Gate check-in</h3>
+  <p>Who can use it: Event Admins, the Registration Head, and members of the Registration department.</p>
+  <ol class="steps">
+    <li>On a phone, open the app in <b>Chrome</b> (Android) or <b>Safari</b> (iPhone), not inside WhatsApp or Gmail. Go to <span class="path">Event → Check-in</span>.</li>
+    <li>Tap <b>Start camera</b> and allow camera access. Point it at the participant's ticket QR.</li>
+    <li>If the live camera won't start, use <b>Scan with a photo</b>: take a picture of the QR with the phone's camera app. You can also type the code printed under the QR.</li>
+  </ol>
+  <table>
+    <tr><th style="width:32%">Result</th><th>Meaning / what to do</th></tr>
+    <tr><td>✅ Checked in. Welcome!</td><td>Let them in.</td></tr>
+    <tr><td>⚠️ Already checked in</td><td>This ticket was used before; the time is shown. Check ID.</td></tr>
+    <tr><td>⚠️ Not confirmed: payment pending</td><td>Send them to the desk to pay, then scan again.</td></tr>
+    <tr><td>⛔ Registration cancelled</td><td>Not valid for entry.</td></tr>
+    <tr><td>⛔ Ticket not found for this event</td><td>Wrong event or a fake ticket.</td></tr>
+  </table>
+  <p>The counters at the top update live. A mistaken check-in can be undone from the registration's page.</p>
+
+  <h3>Duty roster</h3>
+  <ol class="steps">
+    <li><span class="path">Event → Duty roster → New shift</span>: duty name, place, department, start and end, people needed, notes.</li>
+    <li>On the shift card, <b>Add a person</b> → <b>Assign</b>. They're notified. The app refuses double-booking someone for overlapping shifts.</li>
+    <li>Volunteers see <b>My duties</b> and tap <b>I'm here</b> from 30 minutes before their shift.</li>
+    <li>Leads mark people ✓ present or ✗ absent. The page counts unfilled spots, present and no-shows.</li>
+  </ol>
+  <h3>Schedule and operations</h3>
+  <ul>
+    <li><span class="path">Event → Schedule</span>: the master timeline of the event days.</li>
+    <li><span class="path">Event → Operations</span>: venues, vendors, inventory and emergency contacts.</li>
+  </ul>
+</section>
+
+<!-- 9 -->
+<section class="chapter">
+  <p class="kicker">Chapter 9</p>
+  <h2>Finance</h2>
+  <p class="lead">Finance has four tabs: Overview, Ledger, Expenses and Budget. Money records can't be edited or deleted; mistakes are corrected with a reversal, so the books always add up.</p>
+  <h3>Budget</h3>
+  <ol class="steps">
+    <li><span class="path">Finance → Budget</span>: set the total event budget.</li>
+    <li>Allocate an amount to each department.</li>
+    <li>Departments get alerts at <b>75%</b>, <b>90%</b> and <b>100%</b> of their allocation.</li>
+    <li>Departments can request more through a <b>budget revision</b>; finance approves or rejects it.</li>
+  </ol>
+  <h3>Income</h3>
+  <ul>
+    <li>Registration income is recorded automatically when desk or online payments are confirmed.</li>
+    <li>Sponsorship income is recorded when a sponsor payment is verified.</li>
+    <li>Anything else (donations, stall rent): <b>Record income</b>.</li>
+  </ul>
+  <h3>Expense requests</h3>
+  <div class="flow"><span>Draft</span><i>→</i><span>Submitted</span><i>→</i><span>Under review</span><i>→</i><span class="on">Approved</span><i>→</i><span>Partially paid</span><i>→</i><span>Paid</span></div>
+  <ol class="steps">
+    <li>A department head raises a request from their department page: <b>Request</b>. They fill in the title, category, amount, vendor and justification, attach the invoice, then <b>Submit for review</b>.</li>
+    <li>Finance clicks <b>Start review</b>, then:
+      <ul>
+        <li><b>Approve</b>, optionally for a smaller amount;</li>
+        <li><b>Send back</b> for changes;</li>
+        <li><b>Forward</b> to a higher approver;</li>
+        <li><b>Reject</b>.</li>
+      </ul>
+      Requests above the event's approval limit must be approved at the higher level.</li>
+    <li>When paid, use <b>Record payment</b>. This creates the expense entry in the ledger and updates the department's spending.</li>
+  </ol>
+  <h3>Ledger</h3>
+  <p>Every money movement has a number (TXN-…), date, category, method and reference. Finance can:</p>
+  <ul>
+    <li><b>Verify</b> or <b>Reject</b> entries that are waiting;</li>
+    <li><b>Reverse</b> a verified entry with a reason.</li>
+  </ul>
+  <h3>How the totals are calculated</h3>
+  <table>
+    <tr><th>Figure</th><th>Calculation</th></tr>
+    <tr><td>Total income received</td><td>Registration + sponsorship + other income (verified only)</td></tr>
+    <tr><td>Expenditure paid</td><td>Verified expenses</td></tr>
+    <tr><td>Approved, unpaid</td><td>Approved minus already paid</td></tr>
+    <tr><td>Outstanding sponsorship</td><td>Agreed minus received, for confirmed deals</td></tr>
+    <tr><td><b>Net cash position</b></td><td>Income − refunds − expenditure paid</td></tr>
+  </table>
+</section>
+
+<!-- 10 -->
+<section class="chapter">
+  <p class="kicker">Chapter 10</p>
+  <h2>Sponsorship</h2>
+  <h3>Pipeline stages</h3>
+  <div class="flow"><span>Lead identified</span><i>→</i><span>Contacted</span><i>→</i><span>Meeting scheduled</span><i>→</i><span>Proposal sent</span><i>→</i><span>Negotiation</span><i>→</i><span class="on">Confirmed</span><i>→</i><span>Partially paid</span><i>→</i><span>Fully paid</span></div>
+  <p>Deals that don't work out are marked <b>Rejected</b> or <b>Lost</b>.</p>
+  <ol class="steps">
+    <li><b>Packages:</b> 10 are ready (Title, Powered by, Associate, Gold, Silver, Bronze, Media, Technical, Food, Custom). Edit their prices, benefits and slots.</li>
+    <li><b>Sponsors:</b> add the company, contact person and owner from your team.</li>
+    <li><b>Deals:</b> create a deal for a sponsor with a package, proposed and agreed amounts, and the expected payment date. Move it across the pipeline board as talks progress.</li>
+    <li><b>Payments:</b> on the deal, <b>Record payment</b> with the date, method, reference and receipt. Finance <b>Verifies</b> it, which adds the income to the ledger and updates the amount received.</li>
+    <li><b>Deliverables:</b> logos, stalls, mentions, each with an owner and due date. Mark them done; pending deliverables appear on the closing checklist.</li>
+  </ol>
+</section>
+
+<!-- 11 -->
+<section class="chapter">
+  <p class="kicker">Chapter 11</p>
+  <h2>Tasks, media &amp; marketing</h2>
+  <h3>Tasks</h3>
+  <ul>
+    <li><b>Three views:</b> a board (drag between columns), a list, and a calendar. Filter to My tasks, a department, or all.</li>
+    <li><b>Each task has:</b> a department, priority, start and due dates, location, assignees, subtasks, comments and attachments.</li>
+    <li><b>Statuses:</b> Not started, In progress, Under review, Completed, On hold.</li>
+    <li><b>Reminders:</b> assignees get due-soon and overdue reminders automatically, and a notification when they're assigned.</li>
+  </ul>
+  <h3>Media &amp; PR</h3>
+  <p>Track posters, videos, press releases and photos, with owners, due dates and approval status.</p>
+  <h3>Marketing</h3>
+  <p>Record campaigns per platform: budget, spend, reach, impressions, engagement and registrations generated. The Marketing report works out the cost per registration.</p>
+</section>
+
+<!-- 12 -->
+<section class="chapter">
+  <p class="kicker">Chapter 12</p>
+  <h2>Judging &amp; results</h2>
+  <p class="lead">Organisers set up judging; judges score on their phone or laptop; the app ranks entrants; organisers publish the winners.</p>
+  <h3>Set up a competition (organisers)</h3>
+  <ol class="steps">
+    <li><span class="path">Event → Judging → (competition) → Setup</span>.</li>
+    <li>Add <b>criteria</b>, each with a maximum score and a weight. Example: Content out of 10, weight 2; Presentation out of 10, weight 1.</li>
+    <li>Add <b>judges</b>. Outside judges must first be added to the event, for example as Viewer, under <span class="path">Team → Add person</span>.</li>
+    <li><b>Save setup</b>. Judges are notified.</li>
+  </ol>
+  <h3>Scoring (judges)</h3>
+  <ol class="steps">
+    <li><span class="path">Event → Judging</span> shows only the competitions you judge.</li>
+    <li>Pick an entrant, enter a score for each criterion (and a comment if you like), then <b>Save scores</b>. Scores can be changed until results are published.</li>
+  </ol>
+  <p>Only confirmed registrations appear as entrants.</p>
+  <h3>Leaderboard and publishing (organisers)</h3>
+  <ul>
+    <li>The <b>Leaderboard</b> ranks entrants by the weighted average of all judges, as a percentage. It also shows how many judges have scored each entrant.</li>
+    <li>Choose awards (Winner, Runner-up, Second runner-up, Special mention…) and click <b>Publish results</b>.</li>
+    <li>Publishing locks the scores, shows the results on the public event page, and makes winner certificates available.</li>
+    <li><b>Unpublish results</b> reopens scoring if a correction is needed.</li>
+  </ul>
+</section>
+
+<!-- 13 -->
+<section class="chapter">
+  <p class="kicker">Chapter 13</p>
+  <h2>Certificates</h2>
+  <ol class="steps">
+    <li><span class="path">Event → Certificates → Certificate details</span>: enter up to two signatories (name and title) and an optional footer line, e.g. “Organised by the Student Council”.</li>
+    <li><b>Issue participation certificates</b>. With “Only people who checked in” ticked, only attendees get one. Every team member gets their own.</li>
+    <li><b>Issue winner certificates</b> after results are published.</li>
+    <li><b>Email unsent certificates</b> sends download links, up to 80 per click (Gmail allows about 500 emails a day).</li>
+  </ol>
+  <p>Each certificate is a landscape PDF with a QR code. Scanning it opens a verification page that shows whether the certificate is genuine. If a certificate was issued by mistake, <b>Revoke</b> it: the verification page then says “revoked”. <b>Restore</b> undoes this.</p>
+  <div class="tip"><b>Tip</b>Issuing again is safe. People who already have a certificate are skipped automatically.</div>
+</section>
+
+<!-- 14 -->
+<section class="chapter">
+  <p class="kicker">Chapter 14</p>
+  <h2>Communication</h2>
+  <h3>Announcements</h3>
+  <ul>
+    <li><b>Everyone</b> (Super Admin), <b>a college</b>, <b>an event</b> (<span class="path">Event → Announcements</span>) or <b>a department</b> (on its page).</li>
+    <li>Set the priority (normal, important, urgent) and pin important ones. Everyone in the audience gets a notification.</li>
+  </ul>
+  <h3>Notifications</h3>
+  <ul>
+    <li>The bell shows new notifications, and <span class="path">Notifications</span> lists them all.</li>
+    <li>Turn on <b>push notifications</b> in your Profile to get them on your phone or computer.</li>
+    <li>You're notified about assignments, approvals, duties, announcements, new registrations, judging and reminders.</li>
+  </ul>
+  <h3>Documents</h3>
+  <p>Upload agreements, invoices, receipts and plans to <span class="path">Event → Documents</span>, or attach them to expenses, deals and tasks.</p>
+  <p>Files are private and open through secure, expiring links. Choose who can see each one:</p>
+  <ul>
+    <li><b>Event</b>: everyone in the event;</li>
+    <li><b>Department</b>: that department only;</li>
+    <li><b>Finance</b>: finance roles;</li>
+    <li><b>Restricted</b>: event managers.</li>
+  </ul>
+  <p>Archive documents you no longer need.</p>
+</section>
+
+<!-- 15 -->
+<section class="chapter">
+  <p class="kicker">Chapter 15</p>
+  <h2>Feedback surveys</h2>
+  <ol class="steps">
+    <li><span class="path">Event → Feedback → New survey</span>. It starts from a template: overall rating (1–5), “How likely are you to recommend…” (0–10), what you liked, and what to improve. Edit, reorder or add questions (rating, 0–10, multiple choice, written answer).</li>
+    <li>Choose who answers:
+      <ul>
+        <li><b>Participants</b>: each person gets a personal emailed link and can answer only once.</li>
+        <li><b>Anyone with the link</b>: share one link anywhere.</li>
+      </ul></li>
+    <li>Set the status to <b>Open</b> and save. For participant surveys, click <b>Email participants who haven't been invited</b>, up to 80 per click.</li>
+    <li>Watch the <b>Results</b>: averages, bar charts, the recommendation score (promoters minus detractors) and written answers. Close the survey when done.</li>
+  </ol>
+  <p>The latest survey's score also appears on the event closing page.</p>
+</section>
+
+<!-- 16 -->
+<section class="chapter">
+  <p class="kicker">Chapter 16</p>
+  <h2>Reports &amp; exports</h2>
+  <p class="lead"><span class="path">Event → Reports</span> for one event; <span class="path">Reports</span> in the main menu for several events or colleges (Super Admin and College Admins).</p>
+  <table>
+    <tr><th style="width:34%">Report</th><th>Shows</th></tr>
+    <tr><td>Event summary</td><td>Registrations, income, spending, sponsorship, task completion</td></tr>
+    <tr><td>Registrations</td><td>Every registration with status and amounts</td></tr>
+    <tr><td>Payments</td><td>Online payment attempts and results</td></tr>
+    <tr><td>Income</td><td>Income and refunds from the ledger</td></tr>
+    <tr><td>Expenses</td><td>Requests with requested, approved and paid amounts</td></tr>
+    <tr><td>Budget utilization</td><td>Allocated vs approved vs paid, per department</td></tr>
+    <tr><td>Sponsorship</td><td>Deals by stage, agreed, received, outstanding</td></tr>
+    <tr><td>Department performance</td><td>Team, tasks, overdue work, budget use</td></tr>
+    <tr><td>Tasks</td><td>Status, due dates, on time or late</td></tr>
+    <tr><td>Marketing</td><td>Spend, reach, engagement, cost per registration</td></tr>
+    <tr><td>Participants</td><td>Contact details, college, team, competitions</td></tr>
+    <tr><td>Event closing</td><td>Final settlement and closing status</td></tr>
+  </table>
+  <p>Filter by date, department, category and status. With the “Export reports” permission you can download <b>CSV</b>, <b>Excel</b> or <b>PDF</b>. Each report shows what your role may see; a department head sees only their department.</p>
+</section>
+
+<!-- 17 -->
+<section class="chapter">
+  <p class="kicker">Chapter 17</p>
+  <h2>Closing an event</h2>
+  <ol class="steps">
+    <li>Set the event status to <b>Completed</b>. You can do this from the closing page with <b>Mark event completed</b>.</li>
+    <li>Open <span class="path">Event → Closing</span>. The checklist shows:
+      <ul>
+        <li><b>Red items, which block closing:</b> unverified transactions, open expense requests, unverified sponsor payments.</li>
+        <li><b>Amber items, which are warnings:</b> unpaid approved expenses, unpaid registrations, unfinished tasks, pending sponsor deliverables.</li>
+      </ul></li>
+    <li>Review the final figures, department performance and feedback score. Export the final reports for your records.</li>
+    <li>Click <b>Close finances</b> and write who reviewed the figures. The figures are frozen, and no new money entries can be added.</li>
+    <li><b>Archive event</b> when you're done. It stays available for reports and audit.</li>
+  </ol>
+  <div class="warn"><b>Need to fix something after closing?</b>Only the Super Admin can <b>Reopen finances</b>, with a reason. The reason is added to the closing note and the audit log.</div>
+</section>
+
+<!-- 18 -->
+<section class="chapter qa">
+  <p class="kicker">Chapter 18</p>
+  <h2>Troubleshooting &amp; FAQ</h2>
+  <h4>I didn't get an invitation or reset email.</h4>
+  <p>Check spam and promotions. Make sure it's the address you were invited with. The Super Admin can use <b>Users → ⋯ → Resend invitation</b> or <b>Send password reset</b>.</p>
+  <h4>I got “your password was changed” with no link.</h4>
+  <p>That's an automatic security notice after you set or change a password. Nothing to do.</p>
+  <h4>A menu item is missing.</h4>
+  <p>Your role doesn't include it. Ask an admin to change your role, or the Super Admin to adjust the permission matrix.</p>
+  <h4>The camera doesn't start on the check-in page.</h4>
+  <p>Open the app directly in Chrome or Safari, not inside WhatsApp or Gmail. Allow the camera in the site settings (the lock icon next to the address), or use <b>Scan with a photo</b>, or type the code.</p>
+  <h4>A participant registered twice.</h4>
+  <p>Cancel one registration with a reason. Tighten the duplicate rule in Registration settings.</p>
+  <h4>An expense was paid twice or recorded wrongly.</h4>
+  <p>Ledger entries can't be edited. Finance uses <b>Reverse</b> on the wrong entry, then records the correct one.</p>
+  <h4>I can't delete an event or department.</h4>
+  <p>It has registrations, payments or money records, which must be kept. Archive it instead.</p>
+  <h4>Push notifications don't arrive on iPhone.</h4>
+  <p>Install the app to the Home Screen, open it from there, then turn notifications on in Profile. iOS 16.4 or later is needed.</p>
+  <h4>Ticket or certificate emails aren't sending.</h4>
+  <p>The app sends through the Gmail account set up in Vercel. If Gmail's daily limit (about 500 emails) is reached, try the next day. The links can also be shared directly.</p>
+  <h4>I lost my phone with two-step sign-in.</h4>
+  <p>Ask the Super Admin to help reset your account access.</p>
+</section>
+
+<!-- 19 -->
+<section class="chapter">
+  <p class="kicker">Chapter 19</p>
+  <h2>Quick reference</h2>
+  <h3>Links</h3>
+  <table>
+    <tr><th style="width:36%">What</th><th>Address</th></tr>
+    <tr><td>The app</td><td><span class="path">https://event-app-blush.vercel.app</span></td></tr>
+    <tr><td>Public event page</td><td><span class="path">/e/&lt;college code&gt;/&lt;event web name&gt;</span></td></tr>
+    <tr><td>Ticket</td><td><span class="path">/t/&lt;ticket code&gt;</span></td></tr>
+    <tr><td>Certificate check</td><td><span class="path">/c/&lt;certificate number&gt;</span></td></tr>
+    <tr><td>Survey</td><td><span class="path">/s/&lt;survey link&gt;</span></td></tr>
+  </table>
+  <h3>Registration statuses</h3>
+  <p><b>Pending</b> (waiting for payment or confirmation) · <b>Confirmed</b> · <b>Waitlisted</b> · <b>Cancelled</b>.</p>
+  <h3>Payment statuses</h3>
+  <p><b>Not required</b> (free) · <b>Pending</b> · <b>Paid</b> · <b>Failed</b> · <b>Refunded</b> · <b>Partially refunded</b>.</p>
+  <h3>Glossary</h3>
+  <table>
+    <tr><td style="width:30%"><b>Ledger</b></td><td>The permanent list of all money that actually moved.</td></tr>
+    <tr><td><b>Allocation</b></td><td>The part of the event budget given to one department.</td></tr>
+    <tr><td><b>Reversal</b></td><td>A correcting entry that cancels a wrong ledger entry.</td></tr>
+    <tr><td><b>Deliverable</b></td><td>Something promised to a sponsor (a logo on the banner, a stall).</td></tr>
+    <tr><td><b>Recommendation score</b></td><td>% of people who'd strongly recommend (9–10) minus % who wouldn't (0–6).</td></tr>
+    <tr><td><b>Sandbox / test key</b></td><td>A practice API key whose registrations are marked as tests.</td></tr>
+  </table>
+  <div class="note"><b>Need help?</b>Contact your event's administrator, or the Super Admin (shown as “Contact Admin”).</div>
+</section>
+
+</body>
+</html>

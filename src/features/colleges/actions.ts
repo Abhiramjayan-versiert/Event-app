@@ -117,3 +117,29 @@ export async function endCollegeMembershipAction(collegeId: string, membershipId
   revalidatePath(`/colleges/${collegeId}`);
   return { ok: true, message: "Administrator removed. The assignment remains in the history." };
 }
+
+/**
+ * Replace a College Admin: the new person is appointed first, then the old
+ * admin's access ends (history kept). Refuses to "replace" someone with themselves.
+ */
+export async function replaceCollegeAdminAction(collegeId: string, membershipId: string, input: unknown): Promise<ActionResult> {
+  if (!uuid.safeParse(collegeId).success || !uuid.safeParse(membershipId).success) return { ok: false, error: "Invalid request." };
+  const parsed = inviteSchema.safeParse(input);
+  if (!parsed.success) return fromZodError(parsed.error);
+  const supabase = await createClient();
+  const { data: old } = await supabase
+    .from("college_members")
+    .select("id, user:profiles!college_members_user_id_fkey(full_name, email)")
+    .eq("id", membershipId)
+    .eq("college_id", collegeId)
+    .is("ended_at", null)
+    .maybeSingle();
+  if (!old) return { ok: false, error: "That administrator was not found or was already removed." };
+  if (old.user?.email?.toLowerCase() === parsed.data.email.toLowerCase()) return { ok: false, error: "Choose a different person to replace them." };
+
+  const added = await addCollegeAdminAction(collegeId, parsed.data);
+  if (!added.ok && !added.error.includes("already a College Admin")) return added;
+  const ended = await endCollegeMembershipAction(collegeId, membershipId);
+  if (!ended.ok) return { ok: false, error: `${parsed.data.full_name} was added, but the previous admin could not be removed: ${ended.error}` };
+  return { ok: true, message: `${parsed.data.full_name} replaced ${old.user?.full_name || old.user?.email || "the previous admin"} as College Admin.${added.ok && added.data?.invited ? " An invitation was sent." : ""}` };
+}

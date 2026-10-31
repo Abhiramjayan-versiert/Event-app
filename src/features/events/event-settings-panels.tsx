@@ -5,7 +5,7 @@ import { useTransition } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { Archive, ArchiveRestore, UserMinus, UserPlus } from "lucide-react";
+import { Archive, ArchiveRestore, Repeat, UserMinus, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { NativeSelect } from "@/components/ui/native-select";
@@ -17,7 +17,7 @@ import { BrandingUploader } from "@/components/forms/branding-uploader";
 import { ConfirmButton } from "@/components/forms/confirm-button";
 import { InviteDialog } from "@/components/forms/invite-dialog";
 import {
-  addEventAdminAction, changeEventRoleAction, endEventMembershipAction, setEventImageAction, setEventStatusAction, updateRegistrationSettingsAction,
+  addEventAdminAction, changeEventRoleAction, endEventMembershipAction, replaceEventAdminAction, setEventImageAction, setEventStatusAction, updateRegistrationSettingsAction,
 } from "@/features/events/actions";
 import { EVENT_STATUSES, registrationSettingsSchema, type RegistrationSettingsInput } from "@/lib/validations/event";
 import { publicStorageUrl } from "@/lib/storage";
@@ -129,6 +129,13 @@ export function EventAdmins({
                     {roles.map((r) => <option key={r.key} value={r.key}>{r.name}</option>)}
                   </NativeSelect>
                 ) : null}
+                <InviteDialog
+                  trigger={<Button variant="ghost" size="sm"><Repeat /> Replace</Button>}
+                  title={`Replace ${a.name || a.email}`}
+                  description={`The person you enter becomes an Event Admin and ${a.name || a.email} loses Event Admin access. Their history is kept.`}
+                  submitLabel="Replace"
+                  onSubmit={(values) => replaceEventAdminAction(eventId, a.membershipId, values)}
+                />
                 <ConfirmButton
                   variant="ghost"
                   size="sm"

@@ -111,3 +111,35 @@ export async function sendPasswordResetAction(userId: string): Promise<ActionRes
   }
   return { ok: true, message: `Password reset link sent to ${email}.` };
 }
+
+/**
+ * Super Admin: end every college, event and department role a person holds,
+ * everywhere. The account stays, so they can be given a new, separate role.
+ */
+export async function removeAllAccessAction(userId: string): Promise<ActionResult> {
+  if (!uuid.safeParse(userId).success) return { ok: false, error: "Invalid request." };
+  const supabase = await createClient();
+  const { data: { user: me } } = await supabase.auth.getUser();
+  const { data: myProfile } = await supabase.from("profiles").select("is_super_admin, status").eq("id", me?.id ?? "").maybeSingle();
+  if (!myProfile?.is_super_admin || myProfile.status !== "active") return { ok: false, error: "Only the Super Admin can remove all access." };
+  if (userId === me?.id) return { ok: false, error: "You cannot remove your own access." };
+
+  const [{ data: em }, { data: dm }] = await Promise.all([
+    supabase.from("event_members").select("event_id").eq("user_id", userId).is("ended_at", null),
+    supabase.from("department_members").select("event_id").eq("user_id", userId).is("ended_at", null),
+  ]);
+  const events = [...new Set([...(em ?? []), ...(dm ?? [])].map((r) => r.event_id))];
+  for (const eventId of events) {
+    const { error } = await supabase.rpc("remove_user_from_event", { p_event: eventId, p_user: userId, p_reason: "All access removed by Super Admin" });
+    if (error) return fromDbError(error, "Could not remove event access.");
+  }
+  const { error: collegeError } = await supabase
+    .from("college_members")
+    .update({ ended_at: new Date().toISOString() })
+    .eq("user_id", userId)
+    .is("ended_at", null);
+  if (collegeError) return fromDbError(collegeError, "Could not remove college access.");
+  revalidatePath("/users");
+  revalidatePath(`/users/${userId}`);
+  return { ok: true, message: `All access removed (${events.length} event${events.length === 1 ? "" : "s"}). The account remains and can be given a new role.` };
+}

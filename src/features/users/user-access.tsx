@@ -3,7 +3,7 @@
 import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Plus, X } from "lucide-react";
+import { Plus, ShieldOff, X } from "lucide-react";
 import type { ActionResult } from "@/lib/actions";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -13,6 +13,8 @@ import { addCollegeAdminAction, endCollegeMembershipAction } from "@/features/co
 import { endEventMembershipAction } from "@/features/events/actions";
 import { assignDepartmentMemberAction, assignEventRoleAction, endDepartmentAssignmentAction, removeUserFromEventAction } from "@/features/departments/actions";
 import { formatDate } from "@/lib/utils";
+import { ConfirmButton } from "@/components/forms/confirm-button";
+import { removeAllAccessAction } from "@/features/users/actions";
 
 type Option = { id: string; name: string };
 export type AccessData = {
@@ -177,6 +179,30 @@ export function UserAccessManager({ data }: { data: AccessData }) {
           </div>
         </CardContent>
       </Card>
+
+      {(data.collegeAccess.length + data.eventAccess.length + data.departmentAccess.length) > 0 && (
+        <Card className="border-destructive/40 lg:col-span-2">
+          <CardHeader>
+            <CardTitle>Remove all access</CardTitle>
+            <CardDescription>
+              Ends every college, event and department role this person holds, everywhere, and unassigns their open tasks. Their account and history stay,
+              so you can give them a new, separate role afterwards.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ConfirmButton
+              variant="destructive"
+              title={`Remove all of ${person.full_name}'s access?`}
+              description="They will no longer see any college or event until you give them a new role."
+              confirmLabel="Remove all access"
+              destructive
+              action={() => removeAllAccessAction(data.user.id)}
+            >
+              <ShieldOff /> Remove all access
+            </ConfirmButton>
+          </CardContent>
+        </Card>
+      )}
 
       {memberEvents.length > 0 && (
         <Card className="lg:col-span-2">

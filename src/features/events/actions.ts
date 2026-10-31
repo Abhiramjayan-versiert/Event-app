@@ -217,3 +217,26 @@ export async function cloneEventAction(sourceId: string, input: unknown): Promis
   revalidatePath("/dashboard");
   return { ok: true, data: { id: data as string }, message: "New event created from the copy. Review its dates and settings." };
 }
+
+/** Replace an Event Admin: appoint the new person first, then end the old admin's role (history kept). */
+export async function replaceEventAdminAction(eventId: string, membershipId: string, input: unknown): Promise<ActionResult> {
+  if (!uuid.safeParse(eventId).success || !uuid.safeParse(membershipId).success) return { ok: false, error: "Invalid request." };
+  const parsed = eventAdminSchema.safeParse(input);
+  if (!parsed.success) return fromZodError(parsed.error);
+  const supabase = await createClient();
+  const { data: old } = await supabase
+    .from("event_members")
+    .select("id, user:profiles!event_members_user_id_fkey(full_name, email)")
+    .eq("id", membershipId)
+    .eq("event_id", eventId)
+    .is("ended_at", null)
+    .maybeSingle();
+  if (!old) return { ok: false, error: "That administrator was not found or was already removed." };
+  if (old.user?.email?.toLowerCase() === parsed.data.email.toLowerCase()) return { ok: false, error: "Choose a different person to replace them." };
+
+  const added = await addEventAdminAction(eventId, parsed.data);
+  if (!added.ok && !added.error.includes("already an Event Admin")) return added;
+  const ended = await endEventMembershipAction(eventId, membershipId, `Replaced by ${parsed.data.full_name}`);
+  if (!ended.ok) return { ok: false, error: `${parsed.data.full_name} was appointed, but the previous admin could not be removed: ${ended.error}` };
+  return { ok: true, message: `${parsed.data.full_name} replaced ${old.user?.full_name || old.user?.email || "the previous admin"} as Event Admin.` };
+}

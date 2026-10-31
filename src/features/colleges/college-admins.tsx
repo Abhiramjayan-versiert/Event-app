@@ -1,12 +1,12 @@
 "use client";
 
-import { UserPlus, UserMinus } from "lucide-react";
+import { Repeat, UserPlus, UserMinus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { UserAvatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { InviteDialog } from "@/components/forms/invite-dialog";
 import { ConfirmButton } from "@/components/forms/confirm-button";
-import { addCollegeAdminAction, endCollegeMembershipAction } from "@/features/colleges/actions";
+import { addCollegeAdminAction, endCollegeMembershipAction, replaceCollegeAdminAction } from "@/features/colleges/actions";
 import { publicStorageUrl } from "@/lib/storage";
 import { formatDate } from "@/lib/utils";
 
@@ -38,6 +38,14 @@ export function CollegeAdmins({ collegeId, admins, canManage }: { collegeId: str
                 {a.status !== "active" ? <Badge variant="warning">{a.status}</Badge> : null}
               </div>
               {canManage ? (
+                <div className="flex shrink-0 items-center gap-1">
+                <InviteDialog
+                  trigger={<Button variant="ghost" size="sm"><Repeat /> Replace</Button>}
+                  title={`Replace ${a.name || a.email}`}
+                  description={`The person you enter becomes a College Admin and ${a.name || a.email} loses College Admin access. Their history is kept.`}
+                  submitLabel="Replace"
+                  onSubmit={(values) => replaceCollegeAdminAction(collegeId, a.membershipId, values)}
+                />
                 <ConfirmButton
                   variant="ghost"
                   size="sm"
@@ -49,6 +57,7 @@ export function CollegeAdmins({ collegeId, admins, canManage }: { collegeId: str
                 >
                   <UserMinus /> Remove
                 </ConfirmButton>
+                </div>
               ) : null}
             </li>
           ))}
