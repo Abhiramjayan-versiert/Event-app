@@ -9,16 +9,25 @@ export function isPublicPath(pathname: string) {
   return pathname === "/" ? false : PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(`${p}/`));
 }
 
-/** Refreshes the Supabase session cookie and guards private routes. */
-export async function updateSession(request: NextRequest) {
+/**
+ * Refreshes the Supabase session cookie and guards private routes.
+ * `extraHeaders` (the CSP nonce) are forwarded to the page on every pass.
+ */
+export async function updateSession(request: NextRequest, extraHeaders: Record<string, string> = {}) {
+  const forward = () => {
+    const headers = new Headers(request.headers);
+    for (const [k, v] of Object.entries(extraHeaders)) headers.set(k, v);
+    return NextResponse.next({ request: { headers } });
+  };
+
   if (!publicEnv.supabaseUrl || !publicEnv.supabaseAnonKey) {
     if (request.nextUrl.pathname.startsWith("/setup-required") || request.nextUrl.pathname.startsWith("/api/")) {
-      return NextResponse.next();
+      return forward();
     }
     return NextResponse.redirect(new URL("/setup-required", request.url));
   }
 
-  let response = NextResponse.next({ request });
+  let response = forward();
 
   const supabase = createServerClient<Database>(publicEnv.supabaseUrl, publicEnv.supabaseAnonKey, {
     cookies: {
@@ -27,7 +36,7 @@ export async function updateSession(request: NextRequest) {
       },
       setAll(cookiesToSet) {
         for (const { name, value } of cookiesToSet) request.cookies.set(name, value);
-        response = NextResponse.next({ request });
+        response = forward();
         for (const { name, value, options } of cookiesToSet) response.cookies.set(name, value, options);
       },
     },

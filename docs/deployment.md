@@ -54,5 +54,10 @@ Use **separate Supabase projects** for development/staging and production. Never
 - [ ] Upload a college logo and a profile picture (storage policies)
 - [ ] Dashboards load; the event dashboard hides finance figures for non-finance roles
 - [ ] PITR and backups enabled, off-site dump scheduled
-- [ ] Supabase Security Advisor shows no critical findings
+- [ ] Supabase Security Advisor shows no critical findings (expected warnings are listed in `docs/security.md`)
+- [ ] Leaked password protection enabled (Authentication → Passwords), if available on your plan
+- [ ] `pg_cron` job `event-app-task-reminders` is active (`select * from cron.job`)
+- [ ] Browser console on `/dashboard` shows no Content-Security-Policy violations
+- [ ] Reports: open the closing report for a test event and export CSV, Excel and PDF
+- [ ] Event closing: mark a test event completed, close its finances, confirm a new income entry is refused
 - [ ] Vercel production deployment uses the production Supabase project, and previews use staging

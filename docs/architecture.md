@@ -22,8 +22,8 @@ Payment gateway ───────► /api/v1/payments/webhook (signature ver
 
 1. **The database is the authorization boundary.** Every table has RLS. UI permission checks only decide what to *show*. Server actions run as the user, so a missing UI check still cannot leak or modify data.
 2. **The service role is the exception.** It is wrapped in `src/lib/supabase/admin.ts` (`server-only`) and used only after an explicit `check_permission` RPC for the current user.
-3. **Financial history is append-only.** Ledger rows are immutable and corrected with reversals or adjustments. Expense approvals and audit logs cannot be updated.
-4. **Tenancy is enforced, not trusted.** `college_id` is always derived from the event by trigger, `department_id` must belong to the row's event, and rows can never move between events.
+3. **Financial history is append-only.** Ledger rows are immutable and corrected with reversals or adjustments. Expense approvals and audit logs cannot be updated. ✅
+4. **Tenancy is enforced, not trusted.** `college_id` is always derived from the event by trigger, `department_id` must belong to the row's event, and rows can never move between events. ✅
 
 ## Tenancy model
 
@@ -124,11 +124,11 @@ Every event-scoped table carries `event_id` and `college_id` (derived), UUID pri
 
 1. Foundation ✅
 2. Administration ✅
-3. Departments: department list/dashboard, head and assistant appointment (history kept), team management, per-department permission view
-4. Finance: income recording/verification, expense workflow RPC (submit → review → approve/forward → pay), budgets and allocations with 75/90/100% warnings, ledger with reversals, exports
-5. Registrations: registration dashboard, participant search and filters, offline verification, cancellations and refunds; `/api/v1` endpoints, API key management, payment webhook with signature verification and idempotency
-6. Sponsorship: CRM, pipeline, packages, payments (verification books ledger income), deliverables
-7. Operations: tasks (Kanban, list, calendar), media, marketing, venues, vendors, inventory, master schedule
-8. Communication: announcements, notifications fan-out, comments, documents (signed URLs)
-9. Reporting: reports module, XLSX/PDF exports, event closure and financial settlement
-10. Finalization: security review, load testing, responsive QA, deployment
+3. Departments: department list/dashboard, head and assistant appointment (history kept), team management, per-department permission view ✅
+4. Finance: income recording/verification, expense workflow RPC (submit → review → approve/forward → pay), budgets and allocations with 75/90/100% warnings, ledger with reversals, exports ✅
+5. Registrations: registration dashboard, participant search and filters, offline verification, cancellations and refunds; `/api/v1` endpoints, API key management, payment webhook with signature verification and idempotency ✅
+6. Sponsorship: CRM, pipeline, packages, payments (verification books ledger income), deliverables ✅
+7. Operations: tasks (Kanban, list, calendar), media, marketing, venues, vendors, inventory, master schedule ✅
+8. Communication: announcements, notifications fan-out, comments, documents (signed URLs) ✅
+9. Reporting: 12 reports with filters and CSV/XLSX/PDF export, global reports, event closure and financial settlement ✅
+10. Finalization: advisor review and fixes, nonce CSP, dependency audit, penetration-test checklist, deployment ✅ (load testing is not done yet; see `docs/security.md` for the pre-event checklist)

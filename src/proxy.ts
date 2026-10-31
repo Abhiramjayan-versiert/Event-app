@@ -1,8 +1,14 @@
 import type { NextRequest } from "next/server";
 import { updateSession } from "@/lib/supabase/proxy";
+import { buildCsp, createNonce } from "@/lib/security/csp";
+import { publicEnv } from "@/lib/env";
 
 export async function proxy(request: NextRequest) {
-  return updateSession(request);
+  const nonce = createNonce();
+  const csp = buildCsp(nonce, publicEnv.supabaseUrl);
+  const response = await updateSession(request, { "x-nonce": nonce, "content-security-policy": csp });
+  response.headers.set("Content-Security-Policy", csp);
+  return response;
 }
 
 export const config = {
