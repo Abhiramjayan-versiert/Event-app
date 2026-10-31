@@ -1238,6 +1238,152 @@ export type Database = {
           },
         ];
       };
+      duty_assignments: {
+        Row: {
+          id: string;
+          shift_id: string;
+          event_id: string;
+          college_id: string;
+          user_id: string;
+          status: string;
+          marked_at: string | null;
+          marked_by: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          shift_id: string;
+          event_id: string;
+          college_id: string;
+          user_id: string;
+          status?: string;
+          marked_at?: string | null;
+          marked_by?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          shift_id?: string;
+          event_id?: string;
+          college_id?: string;
+          user_id?: string;
+          status?: string;
+          marked_at?: string | null;
+          marked_by?: string | null;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "duty_assignments_college_id_fkey";
+            columns: ["college_id"];
+            isOneToOne: false;
+            referencedRelation: "colleges";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "duty_assignments_event_id_fkey";
+            columns: ["event_id"];
+            isOneToOne: false;
+            referencedRelation: "events";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "duty_assignments_marked_by_fkey";
+            columns: ["marked_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "duty_assignments_shift_id_fkey";
+            columns: ["shift_id"];
+            isOneToOne: false;
+            referencedRelation: "duty_shifts";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "duty_assignments_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      duty_shifts: {
+        Row: {
+          id: string;
+          event_id: string;
+          college_id: string;
+          department_id: string | null;
+          title: string;
+          location: string | null;
+          starts_at: string;
+          ends_at: string;
+          needed: number;
+          notes: string | null;
+          created_by: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          event_id: string;
+          college_id: string;
+          department_id?: string | null;
+          title: string;
+          location?: string | null;
+          starts_at: string;
+          ends_at: string;
+          needed?: number;
+          notes?: string | null;
+          created_by?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          event_id?: string;
+          college_id?: string;
+          department_id?: string | null;
+          title?: string;
+          location?: string | null;
+          starts_at?: string;
+          ends_at?: string;
+          needed?: number;
+          notes?: string | null;
+          created_by?: string | null;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "duty_shifts_college_id_fkey";
+            columns: ["college_id"];
+            isOneToOne: false;
+            referencedRelation: "colleges";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "duty_shifts_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "duty_shifts_department_id_fkey";
+            columns: ["department_id"];
+            isOneToOne: false;
+            referencedRelation: "departments";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "duty_shifts_event_id_fkey";
+            columns: ["event_id"];
+            isOneToOne: false;
+            referencedRelation: "events";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       emergency_contacts: {
         Row: {
           id: string;
@@ -4107,6 +4253,10 @@ export type Database = {
         Args: { p_department: string; p_user: string; p_position: Database["public"]["Enums"]["department_position"]; p_role_key?: string };
         Returns: string;
       };
+      assign_duty: {
+        Args: { p_shift: string; p_user: string };
+        Returns: undefined;
+      };
       assign_event_role: {
         Args: { p_event: string; p_user: string; p_role_key: string };
         Returns: string;
@@ -4199,6 +4349,10 @@ export type Database = {
         Args: { p_ids: string[] };
         Returns: undefined;
       };
+      mark_duty: {
+        Args: { p_assignment: string; p_status: string };
+        Returns: undefined;
+      };
       my_access: {
         Args: never;
         Returns: Json;
@@ -4263,6 +4417,10 @@ export type Database = {
         Args: { p_registration: string; p_status: Database["public"]["Enums"]["registration_status"]; p_reason?: string };
         Returns: undefined;
       };
+      remove_duty_shift: {
+        Args: { p_shift: string };
+        Returns: undefined;
+      };
       remove_user_from_event: {
         Args: { p_event: string; p_user: string; p_reason?: string };
         Returns: undefined;
@@ -4278,6 +4436,10 @@ export type Database = {
       revoke_api_credential: {
         Args: { p_credential: string };
         Returns: undefined;
+      };
+      save_duty_shift: {
+        Args: { p_event: string; p_shift: string; p_data: Json };
+        Returns: string;
       };
       set_certificate_revoked: {
         Args: { p_certificate: string; p_revoked: boolean; p_reason?: string };
@@ -4298,6 +4460,10 @@ export type Database = {
       two_step_users: {
         Args: never;
         Returns: { user_id: string }[];
+      };
+      unassign_duty: {
+        Args: { p_assignment: string };
+        Returns: undefined;
       };
       undo_check_in: {
         Args: { p_registration: string };
