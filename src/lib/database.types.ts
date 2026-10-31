@@ -3736,6 +3736,10 @@ export type Database = {
         Args: { p_event: string };
         Returns: number;
       };
+      clone_event: {
+        Args: { p_source: string; p_name: string; p_slug: string; p_starts_on: string; p_ends_on: string; p_include_team?: boolean };
+        Returns: string;
+      };
       close_event_finances: {
         Args: { p_event: string; p_note: string };
         Returns: undefined;

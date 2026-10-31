@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { requireAccess, requireEventPermission } from "@/lib/auth/session";
 import { TypedDeleteDialog } from "@/components/shared/typed-delete-dialog";
 import { deleteEventAction } from "@/features/events/actions";
+import { CloneEventDialog } from "@/features/events/clone-event-dialog";
 import { can } from "@/lib/permissions";
 import { PageHeader } from "@/components/shared/page-header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,7 +17,7 @@ export default async function EventSettingsPage({ params }: { params: Promise<{ 
   const { event, permissions } = await requireEventPermission(eventId, "event.manage");
   const supabase = await createClient();
   const access = await requireAccess();
-  const [{ data: settings }, { data: admins }, { data: collegeManager }, { data: eventRoles }] = await Promise.all([
+  const [{ data: settings }, { data: admins }, { data: collegeManager }, { data: canCreate }, { data: eventRoles }] = await Promise.all([
     supabase.from("event_settings").select("registration_settings").eq("event_id", eventId).single(),
     supabase
       .from("event_members")
@@ -25,6 +26,7 @@ export default async function EventSettingsPage({ params }: { params: Promise<{ 
       .eq("role.key", "event_admin")
       .is("ended_at", null),
     supabase.rpc("check_permission", { p_scope: "college", p_id: event.college_id, p_permission: "college.manage" }),
+    supabase.rpc("check_permission", { p_scope: "college", p_id: event.college_id, p_permission: "college.events.create" }),
     supabase.from("roles").select("key, name").eq("scope", "event").order("sort_order"),
   ]);
   const canDelete = access.is_super_admin || Boolean(collegeManager);
@@ -55,7 +57,11 @@ export default async function EventSettingsPage({ params }: { params: Promise<{ 
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Event settings" description="Details, branding, registration rules and administrators." />
+      <PageHeader
+        title="Event settings"
+        description="Details, branding, registration rules and administrators."
+        actions={access.is_super_admin || canCreate ? <CloneEventDialog eventId={event.id} name={event.name} startsOn={event.starts_on} endsOn={event.ends_on} /> : null}
+      />
       <div className="grid gap-6 xl:grid-cols-[1fr_380px]">
         <Card>
           <CardHeader>

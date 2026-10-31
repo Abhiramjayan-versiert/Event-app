@@ -188,3 +188,32 @@ export async function changeEventRoleAction(eventId: string, membershipId: strin
   if (!ended.ok) return ended;
   return { ok: true, message: "Role changed." };
 }
+
+const cloneSchema = z
+  .object({
+    name: z.string().trim().min(3, "Enter a name").max(150),
+    slug: z.string().trim().toLowerCase().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Lowercase letters, numbers and dashes").max(80),
+    starts_on: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Choose a start date"),
+    ends_on: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Choose an end date"),
+    include_team: z.boolean(),
+  })
+  .refine((v) => v.ends_on >= v.starts_on, { message: "The end date must be on or after the start date", path: ["ends_on"] });
+
+/** Creates a new event from an existing one (structure, schedule, checklist, budget split; optionally the team). */
+export async function cloneEventAction(sourceId: string, input: unknown): Promise<ActionResult<{ id: string }>> {
+  if (!uuid.safeParse(sourceId).success) return { ok: false, error: "Invalid request." };
+  const parsed = cloneSchema.safeParse(input);
+  if (!parsed.success) return fromZodError(parsed.error);
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("clone_event", {
+    p_source: sourceId, p_name: parsed.data.name, p_slug: parsed.data.slug,
+    p_starts_on: parsed.data.starts_on, p_ends_on: parsed.data.ends_on, p_include_team: parsed.data.include_team,
+  });
+  if (error) {
+    if (error.code === "23505") return { ok: false, error: "Another event in this college already uses that URL slug.", fieldErrors: { slug: ["Slug already in use"] } };
+    return error.code === "42501" ? { ok: false, error: error.message } : fromDbError(error, "Could not copy the event.");
+  }
+  revalidatePath("/events");
+  revalidatePath("/dashboard");
+  return { ok: true, data: { id: data as string }, message: "New event created from the copy. Review its dates and settings." };
+}
