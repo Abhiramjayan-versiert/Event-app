@@ -1,6 +1,6 @@
 import {
   Bell, Building2, CalendarDays, CalendarRange, ClipboardList, FileText, Handshake, LayoutDashboard, Layers, ListChecks,
-  Megaphone, Camera, Plug, Settings, ShieldCheck, Users, Wallet, BarChart3, Truck, UsersRound, Lock, ScanLine, Gavel, Award, ClipboardClock, MessageSquareHeart, type LucideIcon,
+  Megaphone, Camera, Plug, Settings, ShieldCheck, KeyRound, Users, Wallet, BarChart3, Truck, UsersRound, Lock, ScanLine, Gavel, Award, ClipboardClock, MessageSquareHeart, type LucideIcon,
 } from "lucide-react";
 import type { AccessSummary } from "@/lib/auth/types";
 import { canSeeGlobalDashboard } from "@/lib/auth/types";
@@ -55,11 +55,14 @@ export const EVENT_MODULES: EventModule[] = [
   { title: "Settings", segment: "settings", icon: Settings, permission: "event.manage", available: true },
 ];
 
-export function eventNav(eventId: string, perms: EventPermissionSet | null): NavItem[] {
-  return EVENT_MODULES.filter((m) => m.available && canAnywhere(perms, m.permission)).map((m) => ({
+export function eventNav(eventId: string, perms: EventPermissionSet | null, controlsAccess = false): NavItem[] {
+  const items: NavItem[] = EVENT_MODULES.filter((m) => m.available && canAnywhere(perms, m.permission)).map((m) => ({
     title: m.title,
     href: `/events/${eventId}${m.segment ? `/${m.segment}` : ""}`,
     icon: m.icon,
     exact: m.segment === "",
   }));
+  // College Admins and the Super Admin decide who can open which department.
+  if (controlsAccess) items.push({ title: "Department access", href: `/events/${eventId}/access`, icon: KeyRound });
+  return items;
 }

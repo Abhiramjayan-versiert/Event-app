@@ -959,6 +959,98 @@ export type Database = {
           },
         ];
       };
+      department_access_grants: {
+        Row: {
+          id: string;
+          event_id: string;
+          college_id: string;
+          department_id: string;
+          user_id: string;
+          access: string;
+          role_id: string;
+          granted_by: string | null;
+          granted_at: string;
+          ended_at: string | null;
+          ended_by: string | null;
+        };
+        Insert: {
+          id?: string;
+          event_id: string;
+          college_id: string;
+          department_id: string;
+          user_id: string;
+          access: string;
+          role_id: string;
+          granted_by?: string | null;
+          granted_at?: string;
+          ended_at?: string | null;
+          ended_by?: string | null;
+        };
+        Update: {
+          id?: string;
+          event_id?: string;
+          college_id?: string;
+          department_id?: string;
+          user_id?: string;
+          access?: string;
+          role_id?: string;
+          granted_by?: string | null;
+          granted_at?: string;
+          ended_at?: string | null;
+          ended_by?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "department_access_grants_college_id_fkey";
+            columns: ["college_id"];
+            isOneToOne: false;
+            referencedRelation: "colleges";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "department_access_grants_department_id_fkey";
+            columns: ["department_id"];
+            isOneToOne: false;
+            referencedRelation: "departments";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "department_access_grants_ended_by_fkey";
+            columns: ["ended_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "department_access_grants_event_id_fkey";
+            columns: ["event_id"];
+            isOneToOne: false;
+            referencedRelation: "events";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "department_access_grants_granted_by_fkey";
+            columns: ["granted_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "department_access_grants_role_id_fkey";
+            columns: ["role_id"];
+            isOneToOne: false;
+            referencedRelation: "roles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "department_access_grants_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       department_members: {
         Row: {
           id: string;
@@ -1556,6 +1648,7 @@ export type Database = {
           end_reason: string | null;
           created_at: string;
           updated_at: string;
+          all_departments: boolean;
         };
         Insert: {
           id?: string;
@@ -1571,6 +1664,7 @@ export type Database = {
           end_reason?: string | null;
           created_at?: string;
           updated_at?: string;
+          all_departments?: boolean;
         };
         Update: {
           id?: string;
@@ -1586,6 +1680,7 @@ export type Database = {
           end_reason?: string | null;
           created_at?: string;
           updated_at?: string;
+          all_departments?: boolean;
         };
         Relationships: [
           {
@@ -4656,6 +4751,10 @@ export type Database = {
         Args: { p_college?: string; p_event?: string; p_status?: Database["public"]["Enums"]["event_status"]; p_from?: string; p_to?: string };
         Returns: Json;
       };
+      grant_department_access: {
+        Args: { p_department: string; p_user: string; p_access: string };
+        Returns: string;
+      };
       issue_certificates: {
         Args: { p_event: string; p_kind: string; p_only_checked_in?: boolean };
         Returns: number;
@@ -4788,6 +4887,10 @@ export type Database = {
         Args: { p_credential: string };
         Returns: undefined;
       };
+      revoke_department_access: {
+        Args: { p_grant: string };
+        Returns: undefined;
+      };
       save_duty_shift: {
         Args: { p_event: string; p_shift: string; p_data: Json };
         Returns: string;
@@ -4799,6 +4902,10 @@ export type Database = {
       save_survey: {
         Args: { p_event: string; p_survey: string; p_data: Json };
         Returns: string;
+      };
+      set_all_departments_access: {
+        Args: { p_event: string; p_user: string; p_all: boolean };
+        Returns: undefined;
       };
       set_certificate_revoked: {
         Args: { p_certificate: string; p_revoked: boolean; p_reason?: string };

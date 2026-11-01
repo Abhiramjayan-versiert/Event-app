@@ -1,5 +1,7 @@
 "use client";
 
+import { canSeeGlobalDashboard } from "@/lib/auth/types";
+
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Logo } from "@/components/brand/logo";
@@ -39,7 +41,7 @@ export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
     // Inside an event, "Events" should not stay highlighted over the event modules.
     eventId && item.href === "/events" ? { ...item, exact: true } : item,
   );
-  const modules = eventId ? eventNav(eventId, perms) : [];
+  const modules = eventId ? eventNav(eventId, perms, canSeeGlobalDashboard(access)) : [];
 
   return (
     <div className="flex h-full flex-col bg-sidebar text-sidebar-foreground">
