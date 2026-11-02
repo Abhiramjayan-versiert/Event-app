@@ -57,8 +57,8 @@ export function SurveyEditor({ eventId, surveyId, initial }: { eventId: string; 
         {v.questions.map((q, i) => (
           <div key={q.id} className="space-y-2 rounded-md border p-3">
             <div className="flex flex-wrap items-center gap-2">
-              <Input className="min-w-56 flex-1" value={q.label} onChange={(e) => setQ(i, { label: e.target.value })} aria-label={`Question ${i + 1}`} />
-              <NativeSelect className="w-44" value={q.type} onChange={(e) => setQ(i, { type: e.target.value as QuestionType, options: e.target.value === "choice" ? (q.options ?? ["Option 1", "Option 2"]) : undefined })} aria-label="Type">
+              <Input className="w-full min-w-0 flex-1 sm:min-w-56" value={q.label} onChange={(e) => setQ(i, { label: e.target.value })} aria-label={`Question ${i + 1}`} />
+              <NativeSelect className="w-full sm:w-44" value={q.type} onChange={(e) => setQ(i, { type: e.target.value as QuestionType, options: e.target.value === "choice" ? (q.options ?? ["Option 1", "Option 2"]) : undefined })} aria-label="Type">
                 {Object.entries(TYPE_LABEL).map(([k, l]) => <option key={k} value={k}>{l}</option>)}
               </NativeSelect>
               <label className="flex items-center gap-1.5 text-xs"><Checkbox checked={Boolean(q.required)} onCheckedChange={(c) => setQ(i, { required: c === true })} /> Required</label>

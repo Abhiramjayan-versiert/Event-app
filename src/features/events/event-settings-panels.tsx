@@ -180,7 +180,7 @@ export function EventLifecycle({ eventId, status }: { eventId: string; status: s
           id="quick-status"
           value={status}
           disabled={pending || archived}
-          className="w-56"
+          className="w-full sm:w-56"
           onChange={(e) =>
             startTransition(async () => {
               const result = await setEventStatusAction(eventId, e.target.value);

@@ -191,7 +191,7 @@ function Setup({ eventId, sheet, people }: { eventId: string; sheet: Sheet; peop
         <CardHeader><CardTitle>Criteria</CardTitle><CardDescription>Each criterion has a maximum score and a weight (how much it counts).</CardDescription></CardHeader>
         <CardContent className="space-y-3">
           {criteria.map((c, i) => (
-            <div key={i} className="grid grid-cols-[1fr_5rem_5rem_auto] items-end gap-2">
+            <div key={i} className="grid grid-cols-[1fr_4.5rem_4.5rem_auto] items-end gap-2 max-sm:grid-cols-[1fr_1fr_auto] max-sm:[&>*:first-child]:col-span-3">
               <div className="space-y-1"><Label className="text-xs">Name</Label><Input value={c.name} disabled={locked} onChange={(e) => setCriteria((cs) => cs.map((x, j) => (j === i ? { ...x, name: e.target.value } : x)))} /></div>
               <div className="space-y-1"><Label className="text-xs">Max</Label><Input type="number" min={1} value={c.max_score} disabled={locked} onChange={(e) => setCriteria((cs) => cs.map((x, j) => (j === i ? { ...x, max_score: e.target.value } : x)))} /></div>
               <div className="space-y-1"><Label className="text-xs">Weight</Label><Input type="number" min={0.5} step="0.5" value={c.weight} disabled={locked} onChange={(e) => setCriteria((cs) => cs.map((x, j) => (j === i ? { ...x, weight: e.target.value } : x)))} /></div>

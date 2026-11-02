@@ -55,7 +55,7 @@ export default async function DealPage({ params }: { params: Promise<{ eventId: 
         actions={
           canManage ? (
             <>
-              <div className="w-48"><StageSelect eventId={eventId} dealId={d.id} stage={d.stage} /></div>
+              <div className="w-full sm:w-48"><StageSelect eventId={eventId} dealId={d.id} stage={d.stage} /></div>
               <DealDialog
                 eventId={eventId}
                 dealId={d.id}

@@ -15,6 +15,7 @@ function SheetContent({ className, children, side = "left", ...props }: React.Co
     <SheetPrimitive.Portal>
       <SheetPrimitive.Overlay className="fixed inset-0 z-50 bg-black/60 data-[state=open]:animate-in data-[state=open]:fade-in-0" />
       <SheetPrimitive.Content
+        data-slot="sheet-content"
         className={cn(
           "fixed inset-y-0 z-50 flex w-72 max-w-[85vw] flex-col shadow-xl data-[state=open]:animate-in data-[state=open]:duration-200",
           side === "left" ? "left-0 data-[state=open]:slide-in-from-left" : "right-0 data-[state=open]:slide-in-from-right",
@@ -23,7 +24,7 @@ function SheetContent({ className, children, side = "left", ...props }: React.Co
         {...props}
       >
         {children}
-        <SheetPrimitive.Close className="absolute right-3 top-3 rounded-sm p-1 opacity-70 hover:opacity-100">
+        <SheetPrimitive.Close className="absolute right-2 top-2 rounded-sm p-2 opacity-70 hover:opacity-100">
           <X className="size-4" />
           <span className="sr-only">Close</span>
         </SheetPrimitive.Close>

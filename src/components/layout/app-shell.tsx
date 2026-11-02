@@ -27,7 +27,7 @@ export function AppShell({ access, children }: { access: AccessSummary; children
         </SheetContent>
       </Sheet>
       <div className="lg:pl-64">
-        <header className="sticky top-0 z-20 flex h-14 items-center gap-2 border-b bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/80 sm:gap-3 lg:px-6">
+        <header className="sticky top-0 z-20 flex h-14 items-center gap-1 border-b bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/80 sm:gap-3 lg:px-6">
           <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setMobileOpen(true)} aria-label="Open navigation">
             <Menu />
           </Button>
@@ -43,7 +43,7 @@ export function AppShell({ access, children }: { access: AccessSummary; children
           <ThemeToggle />
           <UserMenu />
         </header>
-        <main className="mx-auto w-full max-w-[1400px] px-4 py-6 lg:px-8 lg:py-8">{children}</main>
+        <main className="mx-auto w-full max-w-[1400px] px-4 pb-[calc(1.5rem+env(safe-area-inset-bottom))] pt-5 lg:px-8 lg:py-8">{children}</main>
       </div>
     </ShellProvider>
   );

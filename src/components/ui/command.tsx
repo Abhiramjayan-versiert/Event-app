@@ -12,7 +12,7 @@ function CommandInput({ className, ...props }: React.ComponentProps<typeof Comma
   return (
     <div className="flex items-center gap-2 border-b px-3">
       <Search className="size-4 shrink-0 text-muted-foreground" />
-      <CommandPrimitive.Input className={cn("flex h-11 w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground", className)} {...props} />
+      <CommandPrimitive.Input className={cn("flex h-11 w-full bg-transparent text-base outline-none sm:text-sm placeholder:text-muted-foreground", className)} {...props} />
     </div>
   );
 }

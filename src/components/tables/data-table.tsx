@@ -131,7 +131,44 @@ export function DataTable<TData>({
       {data.length === 0 ? (
         <EmptyState title={emptyTitle} description={emptyDescription} action={emptyAction} />
       ) : (
-        <div className="overflow-hidden rounded-lg border bg-card">
+        <>
+        {/* Phones: each row as a card showing every visible column. */}
+        <ul className="space-y-2 md:hidden">
+          {table.getRowModel().rows.length === 0 ? (
+            <li className="rounded-lg border bg-card p-6 text-center text-sm text-muted-foreground">No records match your filters.</li>
+          ) : (
+            table.getRowModel().rows.map((row) => {
+              const [first, ...rest] = row.getVisibleCells();
+              const labelled = rest.filter((c) => typeof c.column.columnDef.header === "string" && c.column.columnDef.header !== "");
+              const unlabelled = rest.filter((c) => !(typeof c.column.columnDef.header === "string" && c.column.columnDef.header !== ""));
+              return (
+                <li
+                  key={row.id}
+                  className={cn("space-y-2 rounded-lg border bg-card p-4 text-sm", onRowClick && "cursor-pointer active:bg-muted/50")}
+                  onClick={onRowClick ? () => onRowClick(row.original) : undefined}
+                >
+                  {first ? <div className="min-w-0 font-medium [&_*]:max-w-none">{flexRender(first.column.columnDef.cell, first.getContext())}</div> : null}
+                  {labelled.length ? (
+                    <dl className="grid grid-cols-[minmax(6rem,auto)_1fr] gap-x-3 gap-y-1.5">
+                      {labelled.map((cell) => (
+                        <div key={cell.id} className="contents">
+                          <dt className="text-xs text-muted-foreground">{cell.column.columnDef.header as string}</dt>
+                          <dd className="min-w-0 break-words [&_*]:max-w-none [&_.truncate]:whitespace-normal">{flexRender(cell.column.columnDef.cell, cell.getContext())}</dd>
+                        </div>
+                      ))}
+                    </dl>
+                  ) : null}
+                  {unlabelled.length ? (
+                    <div className="flex flex-wrap items-center gap-2 border-t pt-2" onClick={(e) => e.stopPropagation()}>
+                      {unlabelled.map((cell) => <div key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</div>)}
+                    </div>
+                  ) : null}
+                </li>
+              );
+            })
+          )}
+        </ul>
+        <div className="hidden overflow-hidden rounded-lg border bg-card md:block">
           <Table>
             <TableHeader>
               {table.getHeaderGroups().map((group) => (
@@ -174,6 +211,7 @@ export function DataTable<TData>({
             </TableBody>
           </Table>
         </div>
+        </>
       )}
 
       {data.length > 0 ? (
@@ -181,7 +219,7 @@ export function DataTable<TData>({
           <span>
             {filteredRows.length} of {data.length} record{data.length === 1 ? "" : "s"}
           </span>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center justify-center gap-2">
             <NativeSelect aria-label="Rows per page" className="h-8 w-auto" value={table.getState().pagination.pageSize} onChange={(e) => table.setPageSize(Number(e.target.value))}>
               {[10, 20, 50, 100].map((n) => <option key={n} value={n}>{n} / page</option>)}
             </NativeSelect>

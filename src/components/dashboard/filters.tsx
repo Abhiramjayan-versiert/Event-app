@@ -31,9 +31,9 @@ export function FilterBar({ filters }: { filters: FilterDef[] }) {
     <div className="flex flex-wrap items-end gap-2" aria-busy={pending}>
       {filters.map((f) =>
         f.type === "select" ? (
-          <label key={f.name} className="grid gap-1 text-xs text-muted-foreground">
+          <label key={f.name} className="grid gap-1 text-xs text-muted-foreground max-sm:w-full">
             {f.label}
-            <NativeSelect className="h-8 min-w-40 text-sm text-foreground" value={params.get(f.name) ?? ""} onChange={(e) => update(f.name, e.target.value)}>
+            <NativeSelect className="h-8 w-full sm:w-auto sm:min-w-40 text-sm text-foreground" value={params.get(f.name) ?? ""} onChange={(e) => update(f.name, e.target.value)}>
               <option value="">All</option>
               {f.options.map((o) => (
                 <option key={o.value} value={o.value}>{o.label}</option>
@@ -41,9 +41,9 @@ export function FilterBar({ filters }: { filters: FilterDef[] }) {
             </NativeSelect>
           </label>
         ) : (
-          <label key={f.name} className="grid gap-1 text-xs text-muted-foreground">
+          <label key={f.name} className="grid gap-1 text-xs text-muted-foreground max-sm:min-w-0 max-sm:flex-1">
             {f.label}
-            <Input type="date" className="h-8 w-40 text-sm text-foreground" value={params.get(f.name) ?? ""} onChange={(e) => update(f.name, e.target.value)} />
+            <Input type="date" className="h-8 w-full sm:w-40 text-sm text-foreground" value={params.get(f.name) ?? ""} onChange={(e) => update(f.name, e.target.value)} />
           </label>
         ),
       )}

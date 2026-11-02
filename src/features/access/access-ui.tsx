@@ -77,8 +77,8 @@ export function AccessRow({ eventId, person, departments }: { eventId: string; p
             </span>
           ))}
           {options.length > 0 ? (
-            <div className="flex flex-wrap items-center gap-2">
-              <NativeSelect className="h-8 w-48" value={dept} onChange={(e) => setDept(e.target.value)} aria-label="Department">
+            <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">
+              <NativeSelect className="h-8 w-full sm:w-48" value={dept} onChange={(e) => setDept(e.target.value)} aria-label="Department">
                 <option value="">Add a department…</option>
                 {options.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}
               </NativeSelect>
