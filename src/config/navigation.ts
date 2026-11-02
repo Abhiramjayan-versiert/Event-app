@@ -62,7 +62,10 @@ export function eventNav(eventId: string, perms: EventPermissionSet | null, cont
     icon: m.icon,
     exact: m.segment === "",
   }));
-  // College Admins and the Super Admin decide who can open which department.
-  if (controlsAccess) items.push({ title: "Department access", href: `/events/${eventId}/access`, icon: KeyRound });
+  // College Admins and the Super Admin decide who can open which department (listed right after Team).
+  if (controlsAccess) {
+    const at = items.findIndex((i) => i.href.endsWith("/team"));
+    items.splice(at >= 0 ? at + 1 : items.length, 0, { title: "Department access", href: `/events/${eventId}/access`, icon: KeyRound });
+  }
   return items;
 }

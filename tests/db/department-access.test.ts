@@ -41,6 +41,10 @@ describe("department confinement", () => {
     const [p] = await asUser(mediaHead.id, (q) => q<{ p: { all_departments: boolean; departments: Record<string, string[]> } }>("select public.my_event_permissions($1) as p", [event.id]));
     expect(p.p.all_departments).toBe(false);
     expect(Object.keys(p.p.departments)).toEqual([media]);
+    const [o] = await asUser(mediaHead.id, (q) => q<{ o: { id: string }[] }>("select public.event_departments_overview($1) as o", [event.id]));
+    expect(o.o.map((d) => d.id)).toEqual([media]);
+    const [f] = await asUser(financeHead.id, (q) => q<{ o: { id: string }[] }>("select public.event_departments_overview($1) as o", [event.id]));
+    expect(f.o.length).toBeGreaterThan(1); // finance oversees every department's budget
   });
 
   it("College Admins can give access to other departments or to all; Event Admins cannot", async () => {

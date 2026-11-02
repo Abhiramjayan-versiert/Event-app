@@ -96,13 +96,13 @@ describe("end_department_assignment & remove_user_from_event", () => {
 });
 
 describe("event_departments_overview", () => {
-  it("returns all departments with heads, and hides budgets from non-finance users", async () => {
+  it("lists only a head's own department, and every department (with budgets) for admins", async () => {
     const [{ d }] = await asUser(mediaHead.id, (q) => q<{ d: { name: string; head: { user_id: string } | null; budget: unknown }[] }>(
       "select public.event_departments_overview($1) d", [event.id]));
-    expect(d.length).toBeGreaterThanOrEqual(18);
-    expect(d.find((x) => x.name === "Media and PR")?.head?.user_id).toBe(mediaHead.id);
-    expect(d.find((x) => x.name === "Finance")?.budget).toBeNull();
+    expect(d.map((x) => x.name)).toEqual(["Media and PR"]);
+    expect(d[0].head?.user_id).toBe(mediaHead.id);
     const [{ d: adminView }] = await asUser(admin.id, (q) => q<{ d: { name: string; budget: unknown }[] }>("select public.event_departments_overview($1) d", [event.id]));
+    expect(adminView.length).toBeGreaterThanOrEqual(18);
     expect(adminView.find((x) => x.name === "Finance")?.budget).not.toBeNull();
   });
 

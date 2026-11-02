@@ -14,13 +14,18 @@ export default async function TeamPage({ params }: { params: Promise<{ eventId: 
   const { permissions } = await getEventContext(eventId);
   const [people, roles, assignable] = await Promise.all([getEventPeople(eventId), getRoleOptions("event"), getAssignablePeople()]);
 
-  const rows: TeamRow[] = people.map((p) => ({
+  // People limited to their own department see only the teams they can open.
+  const confined = !permissions.all_departments && !can(permissions, "event.members.manage");
+  const openable = new Set(Object.keys(permissions.departments));
+  const visible = confined ? people.filter((p) => p.id === access.user_id || p.departmentRoles.some((d) => openable.has(d.departmentId))) : people;
+
+  const rows: TeamRow[] = visible.map((p) => ({
     id: p.id,
     name: p.name,
     email: p.email,
     avatar_path: p.avatar_path,
-    eventRoles: p.eventRoles.map((r) => r.role),
-    departments: p.departmentRoles.map((d) => ({
+    eventRoles: confined ? [] : p.eventRoles.map((r) => r.role),
+    departments: p.departmentRoles.filter((d) => !confined || openable.has(d.departmentId)).map((d) => ({
       id: d.departmentId,
       label: `${d.department} · ${d.position === "member" ? d.role : POSITION[d.position]}`,
       lead: d.position !== "member",

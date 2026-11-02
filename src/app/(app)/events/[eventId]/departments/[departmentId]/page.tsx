@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { AlarmClock, CheckCircle2, ListTodo, Pencil, PiggyBank, UsersRound } from "lucide-react";
+import { AlarmClock, CheckCircle2, ListTodo, Pencil, KeyRound, PiggyBank, UsersRound } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getEventContext, requireAccess } from "@/lib/auth/session";
 import { can, canInDepartment } from "@/lib/permissions";
@@ -13,6 +13,7 @@ import { Progress } from "@/components/ui/progress";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { DepartmentIcon } from "@/features/departments/department-icon";
 import { DepartmentFormDialog } from "@/features/departments/department-form-dialog";
+import { DepartmentAccessCard } from "@/features/access/access-ui";
 import { DepartmentAnnouncements, DepartmentTeam, type AnnouncementRow, type MemberRow } from "@/features/departments/department-panels";
 import { getAssignablePeople, getEventPeople, getRoleOptions } from "@/features/departments/queries";
 import { TypedDeleteDialog } from "@/components/shared/typed-delete-dialog";
@@ -33,7 +34,9 @@ export default async function DepartmentPage({ params }: { params: Promise<{ eve
   const { data: dept } = await supabase.from("departments").select("*").eq("id", departmentId).eq("event_id", eventId).maybeSingle();
   if (!dept) notFound();
 
-  const [members, tasks, allocation, expenses, announcements, activity, eventPeople, assignable, roles] = await Promise.all([
+  const { data: isCollegeAdmin } = await supabase.rpc("check_permission", { p_scope: "college", p_id: event.college_id, p_permission: "college.manage" });
+  const controlsAccess = access.is_super_admin || Boolean(isCollegeAdmin);
+  const [members, tasks, allocation, expenses, announcements, activity, eventPeople, assignable, roles, accessGrants] = await Promise.all([
     supabase
       .from("department_members")
       .select("id, position, assigned_at, ended_at, end_reason, user:profiles!department_members_user_id_fkey(id, full_name, email, avatar_path), role:roles(name)")
@@ -47,6 +50,9 @@ export default async function DepartmentPage({ params }: { params: Promise<{ eve
     getEventPeople(eventId),
     getAssignablePeople(),
     getRoleOptions("department"),
+    controlsAccess
+      ? supabase.from("department_access_grants").select("id, user_id, access, user:profiles!department_access_grants_user_id_fkey(full_name, email)").eq("department_id", departmentId).is("ended_at", null)
+      : Promise.resolve({ data: null }),
   ]);
 
   // Event teammates first, then every other existing user the admin may assign.
@@ -165,6 +171,23 @@ export default async function DepartmentPage({ params }: { params: Promise<{ eve
             />
           </CardContent>
         </Card>
+
+        {controlsAccess ? (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2"><KeyRound className="size-4" /> Access from other departments</CardTitle>
+              <CardDescription>Only you (College Admin / Super Admin) can give or revoke this. View lets them see the department; Manage lets them work in it like its head.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <DepartmentAccessCard
+                eventId={eventId}
+                departmentId={dept.id}
+                grants={(accessGrants.data ?? []).map((g) => ({ id: g.id, userId: g.user_id, name: g.user?.full_name || g.user?.email || "", access: g.access as "view" | "manage" }))}
+                people={eventPeople.filter((p) => !active.some((m) => m.userId === p.id)).map((p) => ({ id: p.id, name: p.name, email: p.email }))}
+              />
+            </CardContent>
+          </Card>
+        ) : null}
 
         {canSeeBudget ? (
           <Card>

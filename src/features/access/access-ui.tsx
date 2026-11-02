@@ -97,3 +97,54 @@ export function AccessRow({ eventId, person, departments }: { eventId: string; p
     </li>
   );
 }
+
+/** Department page (College Admins / Super Admin): who else can open this department. */
+export function DepartmentAccessCard({
+  eventId, departmentId, grants, people,
+}: {
+  eventId: string;
+  departmentId: string;
+  grants: { id: string; userId: string; name: string; access: "view" | "manage" }[];
+  people: { id: string; name: string; email: string }[];
+}) {
+  const { pending, run } = useRun();
+  const [user, setUser] = useState("");
+  const [level, setLevel] = useState<"view" | "manage">("view");
+  const granted = new Set(grants.map((g) => g.userId));
+  const options = people.filter((p) => !granted.has(p.id));
+  return (
+    <div className="space-y-3">
+      {grants.length === 0 ? (
+        <p className="text-sm text-muted-foreground">Only this department&apos;s own team (and College Admins) can open it.</p>
+      ) : (
+        <ul className="divide-y">
+          {grants.map((g) => (
+            <li key={g.id} className="flex items-center justify-between gap-2 py-2 text-sm">
+              <span className="min-w-0 truncate">{g.name}</span>
+              <span className="flex items-center gap-2">
+                <Badge variant={g.access === "manage" ? "lime" : "muted"}>{g.access === "manage" ? "Manage" : "View"}</Badge>
+                <Button size="sm" variant="ghost" disabled={pending} onClick={() => run(() => revokeDepartmentAccessAction(eventId, g.id))}>
+                  <X /> Revoke
+                </Button>
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
+      <div className="flex flex-wrap items-center gap-2">
+        <NativeSelect className="h-8 w-full sm:w-56" value={user} onChange={(e) => setUser(e.target.value)} aria-label="Person">
+          <option value="">Give access to…</option>
+          {options.map((p) => <option key={p.id} value={p.id}>{p.name || p.email}</option>)}
+        </NativeSelect>
+        <NativeSelect className="h-8 w-28" value={level} onChange={(e) => setLevel(e.target.value as "view" | "manage")} aria-label="Access level">
+          <option value="view">View</option>
+          <option value="manage">Manage</option>
+        </NativeSelect>
+        <Button size="sm" variant="outline" disabled={!user || pending}
+          onClick={() => run(async () => { const r = await grantDepartmentAccessAction(eventId, departmentId, user, level); if (r.ok) setUser(""); return r; })}>
+          <Plus /> Give access
+        </Button>
+      </div>
+    </div>
+  );
+}
