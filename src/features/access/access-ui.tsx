@@ -9,7 +9,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { NativeSelect } from "@/components/ui/native-select";
 import { Switch } from "@/components/ui/switch";
-import { grantDepartmentAccessAction, revokeDepartmentAccessAction, setAllDepartmentsAction } from "@/features/access/actions";
+import {
+  grantDepartmentAccessAction, removeDepartmentLinkAction, revokeDepartmentAccessAction, setAllDepartmentsAction, setDepartmentLinkAction,
+} from "@/features/access/actions";
 
 export type AccessPerson = {
   userId: string;
@@ -143,6 +145,65 @@ export function DepartmentAccessCard({
         <Button size="sm" variant="outline" disabled={!user || pending}
           onClick={() => run(async () => { const r = await grantDepartmentAccessAction(eventId, departmentId, user, level); if (r.ok) setUser(""); return r; })}>
           <Plus /> Give access
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+export type DepartmentLink = { id: string; fromId: string; from: string; toId: string | null; to: string | null; access: "view" | "manage"; isDefault: boolean };
+
+/** Department access page: automatic department-to-department links. */
+export function DepartmentLinks({ eventId, links, departments }: { eventId: string; links: DepartmentLink[]; departments: { id: string; name: string }[] }) {
+  const { pending, run } = useRun();
+  const [from, setFrom] = useState("");
+  const [to, setTo] = useState("");
+  const [level, setLevel] = useState<"view" | "manage">("view");
+  return (
+    <div className="space-y-3">
+      {links.length === 0 ? (
+        <p className="text-sm text-muted-foreground">No links. Each department is open only to its own team.</p>
+      ) : (
+        <ul className="divide-y">
+          {links.map((l) => (
+            <li key={l.id} className="flex flex-wrap items-center justify-between gap-2 py-2.5 text-sm">
+              <span className="min-w-0">
+                <span className="font-medium">{l.from}</span> <span className="text-muted-foreground">→</span>{" "}
+                <span className="font-medium">{l.to ?? "All departments"}</span>
+                {l.isDefault ? <Badge variant="outline" className="ml-2">Automatic</Badge> : null}
+              </span>
+              <span className="flex items-center gap-2">
+                <NativeSelect className="h-8 w-28" value={l.access} disabled={pending} aria-label="Access level"
+                  onChange={(e) => run(() => setDepartmentLinkAction(eventId, l.fromId, l.toId, e.target.value as "view" | "manage"))}>
+                  <option value="view">View</option>
+                  <option value="manage">Manage</option>
+                </NativeSelect>
+                <Button size="sm" variant="ghost" disabled={pending} onClick={() => run(() => removeDepartmentLinkAction(eventId, l.id))}>
+                  <X /> Remove
+                </Button>
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
+      <div className="flex flex-wrap items-center gap-2 border-t pt-3">
+        <NativeSelect className="h-8 w-full sm:w-48" value={from} onChange={(e) => setFrom(e.target.value)} aria-label="Department that gets access">
+          <option value="">Leadership of…</option>
+          {departments.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}
+        </NativeSelect>
+        <span className="text-sm text-muted-foreground">can</span>
+        <NativeSelect className="h-8 w-28" value={level} onChange={(e) => setLevel(e.target.value as "view" | "manage")} aria-label="Access level">
+          <option value="view">View</option>
+          <option value="manage">Manage</option>
+        </NativeSelect>
+        <NativeSelect className="h-8 w-full sm:w-48" value={to} onChange={(e) => setTo(e.target.value)} aria-label="Department they can open">
+          <option value="">Choose…</option>
+          <option value="all">All departments</option>
+          {departments.filter((d) => d.id !== from).map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}
+        </NativeSelect>
+        <Button size="sm" variant="outline" disabled={!from || !to || pending}
+          onClick={() => run(async () => { const r = await setDepartmentLinkAction(eventId, from, to === "all" ? null : to, level); if (r.ok) { setFrom(""); setTo(""); } return r; })}>
+          <Plus /> Add link
         </Button>
       </div>
     </div>

@@ -10,6 +10,8 @@ beforeAll(async () => {
   [admin, head, member, finance] = await Promise.all([createUser("C Admin"), createUser("C Head"), createUser("C Member"), createUser("C Finance")]);
   college = await createCollege("Comm College");
   event = await createEvent(college.id, "Comm Fest");
+  // These tests cover access without the automatic department links (tested in links-broadcasts).
+  await asOwner((q) => q("delete from public.department_links where event_id = $1", [event.id]));
   tech = await departmentId(event.id, "Technical");
   await addEventMember(event.id, admin.id, "event_admin");
   await addDepartmentMember(tech, head.id, "department_head");

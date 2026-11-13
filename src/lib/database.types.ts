@@ -81,6 +81,39 @@ export type Database = {
           },
         ];
       };
+      announcement_reads: {
+        Row: {
+          announcement_id: string;
+          user_id: string;
+          read_at: string;
+        };
+        Insert: {
+          announcement_id: string;
+          user_id: string;
+          read_at?: string;
+        };
+        Update: {
+          announcement_id?: string;
+          user_id?: string;
+          read_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "announcement_reads_announcement_id_fkey";
+            columns: ["announcement_id"];
+            isOneToOne: false;
+            referencedRelation: "announcements";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "announcement_reads_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       announcements: {
         Row: {
           id: string;
@@ -97,6 +130,7 @@ export type Database = {
           expires_at: string | null;
           created_at: string;
           updated_at: string;
+          is_broadcast: boolean;
         };
         Insert: {
           id?: string;
@@ -113,6 +147,7 @@ export type Database = {
           expires_at?: string | null;
           created_at?: string;
           updated_at?: string;
+          is_broadcast?: boolean;
         };
         Update: {
           id?: string;
@@ -129,6 +164,7 @@ export type Database = {
           expires_at?: string | null;
           created_at?: string;
           updated_at?: string;
+          is_broadcast?: boolean;
         };
         Relationships: [
           {
@@ -1047,6 +1083,78 @@ export type Database = {
             columns: ["user_id"];
             isOneToOne: false;
             referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      department_links: {
+        Row: {
+          id: string;
+          event_id: string;
+          from_department_id: string;
+          to_department_id: string | null;
+          access: string;
+          role_id: string;
+          is_default: boolean;
+          created_by: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          event_id: string;
+          from_department_id: string;
+          to_department_id?: string | null;
+          access?: string;
+          role_id: string;
+          is_default?: boolean;
+          created_by?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          event_id?: string;
+          from_department_id?: string;
+          to_department_id?: string | null;
+          access?: string;
+          role_id?: string;
+          is_default?: boolean;
+          created_by?: string | null;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "department_links_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "department_links_event_id_fkey";
+            columns: ["event_id"];
+            isOneToOne: false;
+            referencedRelation: "events";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "department_links_from_department_id_fkey";
+            columns: ["from_department_id"];
+            isOneToOne: false;
+            referencedRelation: "departments";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "department_links_role_id_fkey";
+            columns: ["role_id"];
+            isOneToOne: false;
+            referencedRelation: "roles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "department_links_to_department_id_fkey";
+            columns: ["to_department_id"];
+            isOneToOne: false;
+            referencedRelation: "departments";
             referencedColumns: ["id"];
           },
         ];
@@ -4603,6 +4711,10 @@ export type Database = {
     };
     Views: { [_ in never]: never };
     Functions: {
+      ack_broadcast: {
+        Args: { p_announcement: string };
+        Returns: undefined;
+      };
       api_attach_payment_order: {
         Args: { p_registration: string; p_provider: string; p_order_id: string; p_amount: number };
         Returns: undefined;
@@ -4646,6 +4758,10 @@ export type Database = {
       assign_event_role: {
         Args: { p_event: string; p_user: string; p_role_key: string };
         Returns: string;
+      };
+      broadcast_read_count: {
+        Args: { p_announcement: string };
+        Returns: number;
       };
       calendar_feed_items: {
         Args: { p_token: string };
@@ -4791,6 +4907,10 @@ export type Database = {
         Args: never;
         Returns: Json;
       };
+      my_unread_broadcasts: {
+        Args: never;
+        Returns: { id: string; title: string; body: string; priority: string; published_at: string }[];
+      };
       pending_invitations: {
         Args: never;
         Returns: { user_id: string; invited_at: string }[];
@@ -4855,6 +4975,10 @@ export type Database = {
         Args: { p_registration: string; p_status: Database["public"]["Enums"]["registration_status"]; p_reason?: string };
         Returns: undefined;
       };
+      remove_department_link: {
+        Args: { p_link: string };
+        Returns: undefined;
+      };
       remove_duty_shift: {
         Args: { p_shift: string };
         Returns: undefined;
@@ -4914,6 +5038,10 @@ export type Database = {
       set_department_allocation: {
         Args: { p_department: string; p_amount: number; p_notes?: string };
         Returns: undefined;
+      };
+      set_department_link: {
+        Args: { p_from: string; p_to: string; p_access: string };
+        Returns: string;
       };
       set_judging_setup: {
         Args: { p_competition: string; p_criteria: Json; p_judges: string[] };

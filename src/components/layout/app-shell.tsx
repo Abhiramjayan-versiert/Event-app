@@ -10,6 +10,7 @@ import { NotificationBell } from "@/components/layout/notification-bell";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { UserMenu } from "@/components/layout/user-menu";
 import { ShellProvider } from "@/components/layout/shell-context";
+import { BroadcastPopup } from "@/components/layout/broadcast-popup";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { LogoMark } from "@/components/brand/logo";
@@ -19,6 +20,7 @@ export function AppShell({ access, children }: { access: AccessSummary; children
   const [mobileOpen, setMobileOpen] = useState(false);
   return (
     <ShellProvider access={access}>
+      <BroadcastPopup />
       <Sidebar />
       <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
         <SheetContent side="left" className="border-sidebar-border p-0 text-sidebar-foreground [&>button]:text-white">

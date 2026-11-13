@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getEventContext, requireAccess } from "@/lib/auth/session";
 import { PageHeader } from "@/components/shared/page-header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { AccessRow, type AccessPerson } from "@/features/access/access-ui";
+import { AccessRow, DepartmentLinks, type AccessPerson, type DepartmentLink } from "@/features/access/access-ui";
 
 export const metadata = { title: "Department access" };
 
@@ -18,12 +18,20 @@ export default async function DepartmentAccessPage({ params }: { params: Promise
   const { data: isCollegeAdmin } = await supabase.rpc("check_permission", { p_scope: "college", p_id: event.college_id, p_permission: "college.manage" });
   if (!access.is_super_admin && !isCollegeAdmin) notFound();
 
-  const [depts, em, dm, grants] = await Promise.all([
+  const [depts, em, dm, grants, linkRows] = await Promise.all([
     supabase.from("departments").select("id, name").eq("event_id", eventId).neq("status", "archived").order("sort_order").order("name"),
     supabase.from("event_members").select("user_id, all_departments, role:roles(name), user:profiles!event_members_user_id_fkey(full_name, email)").eq("event_id", eventId).is("ended_at", null),
     supabase.from("department_members").select("user_id, department_id, position, department:departments(name), user:profiles!department_members_user_id_fkey(full_name, email)").eq("event_id", eventId).is("ended_at", null),
     supabase.from("department_access_grants").select("id, user_id, department_id, access, department:departments(name), user:profiles!department_access_grants_user_id_fkey(full_name, email)").eq("event_id", eventId).is("ended_at", null),
+    supabase.from("department_links").select("id, from_department_id, to_department_id, access, is_default").eq("event_id", eventId).order("created_at"),
   ]);
+  const deptName = new Map((depts.data ?? []).map((d) => [d.id, d.name]));
+  const links: DepartmentLink[] = (linkRows.data ?? [])
+    .filter((l) => deptName.has(l.from_department_id) && (l.to_department_id === null || deptName.has(l.to_department_id)))
+    .map((l) => ({
+      id: l.id, fromId: l.from_department_id, from: deptName.get(l.from_department_id) ?? "", toId: l.to_department_id,
+      to: l.to_department_id ? deptName.get(l.to_department_id) ?? "" : null, access: l.access as "view" | "manage", isDefault: l.is_default,
+    }));
 
   const people = new Map<string, AccessPerson>();
   const person = (id: string, u: { full_name: string; email: string } | null) => {
@@ -62,9 +70,20 @@ export default async function DepartmentAccessPage({ params }: { params: Promise
               <li>People placed in a department can open only that department, even if they are also an Event Admin.</li>
               <li>Switch on <b>All departments</b> for organisers who need the whole event (Event Admin powers apply again).</li>
               <li>Or give access to specific departments: <b>View</b> to see it, <b>Manage</b> to work in it like its head.</li>
+              <li><b>Department links</b> give a department's leadership access to related departments automatically.</li>
               <li>Head roles keep their event-wide area: Finance sees finance for every department, Registration sees registrations, Media sees media.</li>
             </ul>
         </CardContent>
+      </Card>
+      <Card>
+        <CardHeader>
+          <CardTitle>Department links</CardTitle>
+          <CardDescription>
+            The head, co-heads and assistant heads of a department automatically get access to the departments it is linked to. Finance → all
+            departments and Marketing ↔ Media are set up automatically; change or remove them, or add your own.
+          </CardDescription>
+        </CardHeader>
+        <CardContent><DepartmentLinks eventId={eventId} links={links} departments={depts.data ?? []} /></CardContent>
       </Card>
       <Card>
         <CardHeader>

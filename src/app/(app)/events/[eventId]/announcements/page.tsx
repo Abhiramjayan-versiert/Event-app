@@ -16,7 +16,7 @@ export default async function EventAnnouncementsPage({ params }: { params: Promi
       <PageHeader
         title="Announcements"
         description="Event-wide and department announcements. Department heads post to their department from the department page."
-        actions={can(permissions, "announcements.manage") ? <ComposeAnnouncement audiences={[{ label: `Everyone in ${event.name}`, value: "event", target: { scope: "event", event_id: eventId } }]} /> : null}
+        actions={can(permissions, "announcements.manage") ? <ComposeAnnouncement audiences={[{ label: `Everyone in ${event.name}`, value: "event", target: { scope: "event", event_id: eventId } }]} broadcast={access.is_super_admin} /> : null}
       />
       <AnnouncementFeed items={items} path={`/events/${eventId}/announcements`} />
     </div>

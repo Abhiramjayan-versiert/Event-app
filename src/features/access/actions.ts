@@ -38,3 +38,24 @@ export async function revokeDepartmentAccessAction(eventId: string, grantId: str
   refresh(eventId);
   return { ok: true, message: "Access removed." };
 }
+
+export async function setDepartmentLinkAction(eventId: string, fromId: string, toId: string | null, access: "view" | "manage"): Promise<ActionResult> {
+  if (!uuid.safeParse(eventId).success || !uuid.safeParse(fromId).success || (toId !== null && !uuid.safeParse(toId).success) || !["view", "manage"].includes(access)) {
+    return { ok: false, error: "Invalid request." };
+  }
+  const supabase = await createClient();
+  // The generated type marks p_to as required; null means "every department".
+  const { error } = await supabase.rpc("set_department_link", { p_from: fromId, p_to: toId as unknown as string, p_access: access });
+  if (error) return fail(error, "Could not save the link.");
+  refresh(eventId);
+  return { ok: true, message: "Link saved. It applies to the department's leadership straight away." };
+}
+
+export async function removeDepartmentLinkAction(eventId: string, linkId: string): Promise<ActionResult> {
+  if (!uuid.safeParse(eventId).success || !uuid.safeParse(linkId).success) return { ok: false, error: "Invalid request." };
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("remove_department_link", { p_link: linkId });
+  if (error) return fail(error, "Could not remove the link.");
+  refresh(eventId);
+  return { ok: true, message: "Link removed." };
+}

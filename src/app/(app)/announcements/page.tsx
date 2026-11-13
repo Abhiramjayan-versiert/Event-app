@@ -28,7 +28,7 @@ export default async function AnnouncementsPage() {
   const items = await loadAnnouncements({ limit: 100 }, access.user_id);
   return (
     <div className="max-w-3xl space-y-6">
-      <PageHeader title="Announcements" description="Platform, college, event and department announcements addressed to you." actions={<ComposeAnnouncement audiences={audiences} />} />
+      <PageHeader title="Announcements" description="Platform, college, event and department announcements addressed to you." actions={<ComposeAnnouncement audiences={audiences} broadcast={access.is_super_admin} />} />
       <AnnouncementFeed items={items} path="/announcements" />
     </div>
   );

@@ -19,7 +19,7 @@ import { formatRelative } from "@/lib/utils";
 
 export type Audience = { label: string; value: string; target: { scope: "global" } | { scope: "college"; college_id: string } | { scope: "event"; event_id: string } };
 
-export function ComposeAnnouncement({ audiences }: { audiences: Audience[] }) {
+export function ComposeAnnouncement({ audiences, broadcast = false }: { audiences: Audience[]; broadcast?: boolean }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [pending, startTransition] = useTransition();
@@ -59,6 +59,12 @@ export function ComposeAnnouncement({ audiences }: { audiences: Audience[] }) {
             </NativeSelect>
             <div className="flex items-center gap-2"><Switch id="an-pin2" checked={v.pinned} onCheckedChange={(c) => setV({ ...v, pinned: c })} /><Label htmlFor="an-pin2">Pin to top</Label></div>
           </div>
+          {broadcast ? (
+            <p className="rounded-md bg-muted p-3 text-xs text-muted-foreground">
+              Your announcements are broadcasts: everyone in the audience gets a pop-up inside the app that they must acknowledge, whatever their
+              notification settings, plus a phone notification where those are allowed.
+            </p>
+          ) : null}
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
             <Button type="submit" loading={pending}>Publish</Button>

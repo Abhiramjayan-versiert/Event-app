@@ -18,6 +18,8 @@ beforeAll(async () => {
   const college = await createCollege("Access College");
   await addCollegeMember(college.id, collegeAdmin.id, "college_admin");
   event = await createEvent(college.id, "Access Fest");
+  // These tests cover access without the automatic department links (tested in links-broadcasts).
+  await asOwner((q) => q("delete from public.department_links where event_id = $1", [event.id]));
   media = await departmentId(event.id, "Media and PR");
   marketing = await departmentId(event.id, "Marketing");
   finance = await departmentId(event.id, "Finance");
