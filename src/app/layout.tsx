@@ -6,6 +6,7 @@ import { ThemeProvider } from "next-themes";
 import { Toaster } from "sonner";
 import { siteConfig } from "@/config/site";
 import { ServiceWorkerRegistrar } from "@/components/layout/pwa";
+import { LiquidPointer } from "@/components/layout/liquid-pointer";
 import "@fontsource-variable/sora";
 import "./globals.css";
 
@@ -56,6 +57,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange nonce={nonce}>
           {children}
           <ServiceWorkerRegistrar />
+          <LiquidPointer />
           <Toaster position="bottom-right" toastOptions={{ classNames: { toast: "!rounded-md !border-border" } }} />
         </ThemeProvider>
       </body>
