@@ -3,7 +3,7 @@ import { Logo } from "@/components/brand/logo";
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
     <main className="grid min-h-screen lg:grid-cols-[1.05fr_1fr]">
-      <section className="relative hidden flex-col justify-between overflow-hidden bg-ink p-10 text-white lg:flex">
+      <section className="relative hidden flex-col justify-between overflow-hidden bg-hero p-10 text-white lg:flex">
         <Logo tone="light" size="lg" />
         <div className="relative z-10 max-w-md space-y-5">
           <p className="text-4xl font-semibold leading-[1.1] tracking-tight">
@@ -27,7 +27,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         <div className="mb-10 lg:hidden">
           <Logo size="lg" />
         </div>
-        <div className="w-full max-w-sm">{children}</div>
+        <div className="glass w-full max-w-sm rounded-2xl border bg-card p-6 sm:p-8">{children}</div>
       </section>
     </main>
   );

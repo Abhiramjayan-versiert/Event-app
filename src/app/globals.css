@@ -4,105 +4,124 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* ==========================================================================
-   EVENT APP design tokens — BLACK + WHITE + LIME GREEN.
+   EVENT APP design tokens — "liquid glass": frosted translucent surfaces over a
+   soft grey crystal backdrop, violet accent with pastel sky / butter / peach.
    Every colour used in the UI must come from these tokens.
    ========================================================================== */
 :root {
   /* Brand palette */
-  --brand-black: #0a0a0a;
-  --brand-white: #ffffff;
-  --brand-lime: #b6f23a;
-  --brand-lime-dark: #91c927;
-  --brand-lime-light: #eaf8c9;
-  --brand-grey: #f4f4f4;
-  --brand-border: #e5e5e5;
-  --brand-text-secondary: #777777;
+  --brand-ink: #1e1b39;          /* text */
+  --brand-violet: #6c5ce7;       /* primary accent */
+  --brand-violet-hover: #5a4ad6;
+  --brand-indigo: #3d2f9e;       /* deep buttons / emphasis surfaces */
+  --brand-lavender: #c9c2ff;     /* accent on dark/violet surfaces */
+  --brand-lavender-light: #ecebff;
+  --brand-sky: #cfe8f8;
+  --brand-butter: #f3f0b0;
+  --brand-peach: #f8cdb0;
+  --brand-text-secondary: #6b6f86;
+
+  /* Glass */
+  --glass: rgb(255 255 255 / 0.58);
+  --glass-strong: rgb(255 255 255 / 0.78);
+  --glass-border: rgb(255 255 255 / 0.75);
+  --glass-shadow: 0 1px 0 rgb(255 255 255 / 0.8) inset, 0 10px 30px -12px rgb(40 46 90 / 0.18);
+  --backdrop: linear-gradient(160deg, #e9edf2 0%, #d5dbe3 45%, #c3cad5 100%);
 
   /* Semantic tokens (light) */
-  --background: var(--brand-white);
-  --foreground: var(--brand-black);
-  --card: var(--brand-white);
-  --card-foreground: var(--brand-black);
-  --popover: var(--brand-white);
-  --popover-foreground: var(--brand-black);
-  --primary: var(--brand-lime);
-  --primary-hover: var(--brand-lime-dark);
-  --primary-foreground: var(--brand-black);
-  --secondary: var(--brand-grey);
-  --secondary-foreground: var(--brand-black);
-  --muted: var(--brand-grey);
+  --background: rgb(255 255 255 / 0.72);
+  --foreground: var(--brand-ink);
+  --card: var(--glass);
+  --card-foreground: var(--brand-ink);
+  --popover: var(--glass-strong);
+  --popover-foreground: var(--brand-ink);
+  --primary: var(--brand-violet);
+  --primary-hover: var(--brand-violet-hover);
+  --primary-foreground: #ffffff;
+  --secondary: rgb(108 92 231 / 0.08);
+  --secondary-foreground: var(--brand-ink);
+  --muted: rgb(108 92 231 / 0.07);
   --muted-foreground: var(--brand-text-secondary);
-  --accent: var(--brand-lime-light);
-  --accent-foreground: #3b5208;
-  --border: var(--brand-border);
-  --input: var(--brand-border);
-  --ring: var(--brand-lime-dark);
-  --success: var(--brand-lime-dark);
-  --success-foreground: #2f4506;
-  --success-surface: var(--brand-lime-light);
-  --warning: #a16207;
-  --warning-surface: #fdf6d8;
-  --destructive: #dc2626;
+  --accent: var(--brand-lavender-light);
+  --accent-foreground: var(--brand-indigo);
+  --border: rgb(30 27 57 / 0.09);
+  --input: rgb(30 27 57 / 0.12);
+  --ring: var(--brand-violet);
+  --success: #17946a;
+  --success-foreground: #0f6b4c;
+  --success-surface: #dcf5ea;
+  --warning: #9a6a07;
+  --warning-surface: var(--brand-butter);
+  --destructive: #d93a4a;
   --destructive-foreground: #ffffff;
-  --destructive-surface: #fdecec;
+  --destructive-surface: #fde3e1;
 
-  /* Sidebar is always black */
-  --sidebar: var(--brand-black);
-  --sidebar-foreground: #f5f5f5;
-  --sidebar-muted: #9a9a9a;
-  --sidebar-border: #1f1f1f;
-  --sidebar-hover: #171717;
-  --sidebar-active: var(--brand-lime);
-  --sidebar-active-foreground: var(--brand-black);
+  /* Sidebar: a floating glass panel */
+  --sidebar: var(--glass);
+  --sidebar-foreground: var(--brand-ink);
+  --sidebar-muted: var(--brand-text-secondary);
+  --sidebar-border: var(--glass-border);
+  --sidebar-hover: rgb(108 92 231 / 0.09);
+  --sidebar-active: var(--brand-violet);
+  --sidebar-active-foreground: #ffffff;
 
-  /* Charts: lime, black and greys only */
-  --chart-1: var(--brand-lime-dark);
-  --chart-2: var(--brand-black);
-  --chart-3: var(--brand-lime-dark);
-  --chart-4: #a3a3a3;
-  --chart-5: #d4d4d4;
-  --chart-grid: #ededed;
+  /* Charts: violet with pastel companions */
+  --chart-1: var(--brand-violet);
+  --chart-2: var(--brand-indigo);
+  --chart-3: #f2a26f;
+  --chart-4: #7dbfe6;
+  --chart-5: #d9d4f7;
+  --chart-grid: rgb(30 27 57 / 0.08);
 
-  --radius: 0.5rem;
+  --radius: 0.875rem;
 }
 
 .dark {
-  --background: #0a0a0a;
-  --foreground: #fafafa;
-  --card: #111111;
-  --card-foreground: #fafafa;
-  --popover: #111111;
-  --popover-foreground: #fafafa;
-  --secondary: #1a1a1a;
-  --secondary-foreground: #fafafa;
-  --muted: #1a1a1a;
-  --muted-foreground: #8a8a8a;
-  --accent: #1d2a0b;
-  --accent-foreground: var(--brand-lime);
-  --border: #262626;
-  --input: #2a2a2a;
-  --ring: var(--brand-lime);
-  --success: var(--brand-lime);
-  --success-foreground: var(--brand-lime);
-  --success-surface: #1d2a0b;
-  --warning: #e8c24a;
-  --warning-surface: #2a2410;
-  --destructive: #f05252;
-  --destructive-surface: #2b1212;
+  --brand-ink: #eeedf8;
+  --glass: rgb(34 32 70 / 0.55);
+  --glass-strong: rgb(30 28 62 / 0.85);
+  --glass-border: rgb(255 255 255 / 0.10);
+  --glass-shadow: 0 1px 0 rgb(255 255 255 / 0.06) inset, 0 10px 30px -12px rgb(0 0 0 / 0.5);
+  --backdrop: linear-gradient(160deg, #1b1a3a 0%, #14132b 50%, #0e0d1f 100%);
 
-  --sidebar: #050505;
-  --sidebar-border: #1a1a1a;
-  --sidebar-hover: #141414;
+  --background: rgb(20 19 44 / 0.7);
+  --foreground: #eeedf8;
+  --card-foreground: #eeedf8;
+  --popover-foreground: #eeedf8;
+  --primary: #8b7cf6;
+  --primary-hover: #9d90f8;
+  --secondary: rgb(139 124 246 / 0.14);
+  --secondary-foreground: #eeedf8;
+  --muted: rgb(139 124 246 / 0.12);
+  --muted-foreground: #a3a2c0;
+  --accent: rgb(139 124 246 / 0.18);
+  --accent-foreground: var(--brand-lavender);
+  --border: rgb(255 255 255 / 0.09);
+  --input: rgb(255 255 255 / 0.14);
+  --ring: #8b7cf6;
+  --success: #4fd1a1;
+  --success-foreground: #4fd1a1;
+  --success-surface: rgb(79 209 161 / 0.14);
+  --warning: #f0d264;
+  --warning-surface: rgb(240 210 100 / 0.14);
+  --destructive: #f26b78;
+  --destructive-surface: rgb(242 107 120 / 0.14);
 
-  --chart-1: var(--brand-lime);
-  --chart-2: #fafafa;
-  --chart-4: #6b6b6b;
-  --chart-5: #3a3a3a;
-  --chart-grid: #1f1f1f;
+  --sidebar-foreground: #eeedf8;
+  --sidebar-muted: #a3a2c0;
+  --sidebar-hover: rgb(139 124 246 / 0.16);
+  --sidebar-active: #8b7cf6;
+
+  --chart-1: #8b7cf6;
+  --chart-2: var(--brand-lavender);
+  --chart-3: #f2a26f;
+  --chart-4: #7dbfe6;
+  --chart-5: #4a4580;
+  --chart-grid: rgb(255 255 255 / 0.08);
 }
 
 @theme inline {
-  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Sora Variable", var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 
   --color-background: var(--background);
@@ -140,10 +159,20 @@
   --color-sidebar-active: var(--sidebar-active);
   --color-sidebar-active-foreground: var(--sidebar-active-foreground);
 
-  --color-lime: var(--brand-lime);
-  --color-lime-dark: var(--brand-lime-dark);
-  --color-lime-light: var(--brand-lime-light);
-  --color-ink: var(--brand-black);
+  /* Legacy names kept so existing classes follow the new palette:
+     lime = accent on dark/violet surfaces, lime-dark = accent on light, ink = deep surface. */
+  --color-lime: var(--brand-lavender);
+  --color-lime-dark: var(--primary);
+  --color-lime-light: var(--brand-lavender-light);
+  --color-ink: var(--brand-indigo);
+  --color-violet: var(--brand-violet);
+  --color-indigo: var(--brand-indigo);
+  --color-sky: var(--brand-sky);
+  --color-butter: var(--brand-butter);
+  --color-peach: var(--brand-peach);
+  --color-glass: var(--glass);
+  --color-glass-strong: var(--glass-strong);
+  --color-glass-border: var(--glass-border);
 
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
@@ -155,6 +184,7 @@
   --radius-md: var(--radius);
   --radius-lg: calc(var(--radius) + 2px);
   --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 10px);
 }
 
 @layer base {
@@ -166,12 +196,49 @@
     -moz-osx-font-smoothing: grayscale;
   }
   body {
-    @apply bg-background text-foreground font-sans;
-    font-feature-settings: "cv11", "ss01";
+    @apply text-foreground font-sans;
+    min-height: 100dvh;
+    background: #d5dbe3;
+  }
+  .dark body {
+    background: #14132b;
+  }
+  /* The backdrop lives on a fixed layer (iPhone Safari ignores fixed backgrounds). */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background: url("/bg/crystal.svg") center / cover no-repeat, var(--backdrop);
+  }
+  .dark body::before {
+    background: radial-gradient(60% 50% at 15% 10%, rgb(108 92 231 / 0.24), transparent 70%),
+      radial-gradient(50% 45% at 90% 85%, rgb(125 191 230 / 0.12), transparent 70%), var(--backdrop);
   }
   ::selection {
-    background: var(--brand-lime);
-    color: var(--brand-black);
+    background: var(--brand-lavender);
+    color: var(--brand-indigo);
+  }
+}
+
+/* Frosted glass for every surface built on the card / popover tokens. */
+@layer components {
+  .bg-card,
+  .bg-popover,
+  .bg-sidebar,
+  .glass {
+    -webkit-backdrop-filter: blur(22px) saturate(170%);
+    backdrop-filter: blur(22px) saturate(170%);
+  }
+  .bg-card,
+  .glass {
+    border-color: var(--glass-border);
+    box-shadow: var(--glass-shadow);
+  }
+  /* Violet "hero" surface used for highlighted figures (like the reference banner). */
+  .bg-hero {
+    background: radial-gradient(120% 140% at 100% 0%, #8f82f8 0%, transparent 55%), linear-gradient(135deg, #7464f0 0%, #5a49d9 100%);
   }
 }
 

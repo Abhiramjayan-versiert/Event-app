@@ -41,9 +41,9 @@ export default async function TicketPage({ params, searchParams }: { params: Pro
         <Logo />
         <PrintButton />
       </div>
-      {fresh ? <p className="rounded-md bg-ink px-4 py-3 text-sm text-white">Registration received! Save this page, as it is your ticket. A copy has been emailed to you.</p> : null}
+      {fresh ? <p className="rounded-md bg-hero px-4 py-3 text-sm text-white">Registration received! Save this page, as it is your ticket. A copy has been emailed to you.</p> : null}
       <div className="overflow-hidden rounded-xl border bg-card">
-        <div className="bg-ink px-5 py-4 text-white">
+        <div className="bg-hero px-5 py-4 text-white">
           <p className="text-xs text-white/60">{t.event.college}</p>
           <h1 className="text-xl font-bold">{t.event.name}</h1>
           <p className="text-sm text-white/70">{formatDateRange(t.event.starts_on, t.event.ends_on)}{t.event.venue ? ` · ${t.event.venue}` : ""}</p>

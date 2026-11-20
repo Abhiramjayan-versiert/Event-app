@@ -19,11 +19,11 @@ export async function buildCertificatePdf(c: CertificateData, verifyUrl: string)
   const H = doc.internal.pageSize.getHeight();
   const center = (text: string, y: number) => doc.text(latin(text), W / 2, y, { align: "center" });
 
-  doc.setFillColor(10, 10, 10);
+  doc.setFillColor(90, 73, 217);
   doc.rect(0, 0, W, H, "F");
   doc.setFillColor(255, 255, 255);
   doc.rect(22, 22, W - 44, H - 44, "F");
-  doc.setDrawColor(182, 242, 58);
+  doc.setDrawColor(201, 194, 255);
   doc.setLineWidth(3);
   doc.rect(34, 34, W - 68, H - 68);
 
@@ -45,7 +45,7 @@ export async function buildCertificatePdf(c: CertificateData, verifyUrl: string)
   doc.setFontSize(32);
   doc.setTextColor(10, 10, 10);
   center(c.recipient_name, 248);
-  doc.setDrawColor(145, 201, 39);
+  doc.setDrawColor(108, 92, 231);
   doc.setLineWidth(1.2);
   doc.line(W / 2 - 180, 262, W / 2 + 180, 262);
 
@@ -87,7 +87,7 @@ export async function buildCertificatePdf(c: CertificateData, verifyUrl: string)
   doc.setFontSize(8);
   doc.setTextColor(10, 10, 10);
   doc.text("EVENT", 52, H - 52);
-  doc.setTextColor(145, 201, 39);
+  doc.setTextColor(108, 92, 231);
   doc.text("APP", 52 + doc.getTextWidth("EVENT "), H - 52);
   if (c.revoked) {
     doc.setTextColor(200, 30, 30);

@@ -21,8 +21,8 @@ function NavLink({ item, pathname, onNavigate }: { item: NavItem; pathname: stri
       onClick={onNavigate}
       aria-current={active ? "page" : undefined}
       className={cn(
-        "group flex h-9 items-center gap-3 rounded-md px-3 text-sm font-medium transition-colors",
-        active ? "bg-sidebar-active text-sidebar-active-foreground" : "text-sidebar-muted hover:bg-sidebar-hover hover:text-sidebar-foreground",
+        "group flex h-10 items-center gap-3 rounded-full px-3.5 text-sm font-medium transition-all",
+        active ? "bg-sidebar-active text-sidebar-active-foreground shadow-[0_6px_16px_-6px_rgb(108_92_231/0.7)]" : "text-sidebar-muted hover:bg-sidebar-hover hover:text-sidebar-foreground",
       )}
     >
       <Icon className="size-4 shrink-0" />
@@ -44,10 +44,10 @@ export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   const modules = eventId ? eventNav(eventId, perms, canSeeGlobalDashboard(access)) : [];
 
   return (
-    <div className="flex h-full flex-col bg-sidebar text-sidebar-foreground">
-      <div className="flex h-14 items-center border-b border-sidebar-border px-5">
+    <div className="flex h-full flex-col text-sidebar-foreground">
+      <div className="flex h-16 items-center px-5">
         <Link href="/dashboard" onClick={onNavigate} aria-label="EVENT APP home">
-          <Logo tone="light" size="md" />
+          <Logo size="md" />
         </Link>
       </div>
       <nav className="flex-1 space-y-6 overflow-y-auto px-3 py-4" aria-label="Main navigation">
@@ -67,7 +67,7 @@ export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
           </div>
         ) : null}
       </nav>
-      <div className="border-t border-sidebar-border px-5 py-3 text-[11px] text-sidebar-muted/70">
+      <div className="mx-3 mb-3 truncate rounded-2xl bg-sidebar-hover px-4 py-2.5 text-[11px] text-sidebar-muted">
         {access.is_super_admin ? "Super Admin" : "Signed in"} · {access.email}
       </div>
     </div>
@@ -76,7 +76,7 @@ export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
 
 export function Sidebar() {
   return (
-    <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 border-r border-sidebar-border lg:block">
+    <aside className="glass fixed inset-y-3 left-3 z-30 hidden w-60 overflow-hidden rounded-2xl border bg-sidebar lg:block">
       <SidebarContent />
     </aside>
   );

@@ -6,6 +6,7 @@ import { ThemeProvider } from "next-themes";
 import { Toaster } from "sonner";
 import { siteConfig } from "@/config/site";
 import { ServiceWorkerRegistrar } from "@/components/layout/pwa";
+import "@fontsource-variable/sora";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -32,8 +33,8 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   viewportFit: "cover",
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#0a0a0a" },
+    { media: "(prefers-color-scheme: light)", color: "#dfe4ea" },
+    { media: "(prefers-color-scheme: dark)", color: "#14132b" },
   ],
 };
 

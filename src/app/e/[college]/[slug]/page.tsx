@@ -34,7 +34,7 @@ export default async function PublicEventPage({ params }: { params: Promise<{ co
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="relative overflow-hidden bg-ink text-white">
+      <header className="relative overflow-hidden bg-hero text-white">
         {banner ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={banner} alt="" className="absolute inset-0 size-full object-cover opacity-35" />

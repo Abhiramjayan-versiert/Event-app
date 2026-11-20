@@ -23,13 +23,13 @@ export function AppShell({ access, children }: { access: AccessSummary; children
       <BroadcastPopup />
       <Sidebar />
       <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-        <SheetContent side="left" className="border-sidebar-border p-0 text-sidebar-foreground [&>button]:text-white">
+        <SheetContent side="left" className="glass border-r bg-sidebar p-0 text-sidebar-foreground">
           <SheetTitle className="sr-only">Navigation</SheetTitle>
           <SidebarContent onNavigate={() => setMobileOpen(false)} />
         </SheetContent>
       </Sheet>
-      <div className="lg:pl-64">
-        <header className="sticky top-0 z-20 flex h-14 items-center gap-1 border-b bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/80 sm:gap-3 lg:px-6">
+      <div className="lg:pl-[16.5rem]">
+        <header className="glass sticky top-2 z-20 mx-2 mt-2 flex h-14 items-center gap-1 rounded-2xl border bg-glass px-3 sm:gap-3 lg:mx-4 lg:mt-3 lg:px-5">
           <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setMobileOpen(true)} aria-label="Open navigation">
             <Menu />
           </Button>

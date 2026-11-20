@@ -20,17 +20,17 @@ export function StatCard({
   return (
     <div
       className={cn(
-        "flex flex-col gap-3 rounded-lg border p-4",
-        highlight ? "border-transparent bg-ink text-white dark:bg-card dark:ring-1 dark:ring-primary/40" : "bg-card",
+        "flex flex-col gap-3 rounded-xl border p-4",
+        highlight ? "border-transparent bg-hero text-white shadow-[0_14px_30px_-14px_rgb(90_73_217/0.75)]" : "bg-card",
         className,
       )}
     >
       <div className="flex items-center justify-between gap-2">
-        <span className={cn("text-xs font-medium uppercase tracking-wide", highlight ? "text-white/60" : "text-muted-foreground")}>{label}</span>
-        {Icon ? <Icon className={cn("size-4", highlight ? "text-lime" : "text-muted-foreground")} /> : null}
+        <span className={cn("text-xs font-medium uppercase tracking-wide", highlight ? "text-white/75" : "text-muted-foreground")}>{label}</span>
+        {Icon ? <Icon className={cn("size-4", highlight ? "text-white/80" : "text-muted-foreground")} /> : null}
       </div>
-      <div className={cn("tabular text-2xl font-semibold tracking-tight", highlight && "text-lime")}>{value}</div>
-      {hint ? <div className={cn("text-xs", highlight ? "text-white/60" : "text-muted-foreground")}>{hint}</div> : null}
+      <div className={cn("tabular text-2xl font-semibold tracking-tight", highlight && "text-white")}>{value}</div>
+      {hint ? <div className={cn("text-xs", highlight ? "text-white/75" : "text-muted-foreground")}>{hint}</div> : null}
     </div>
   );
 }

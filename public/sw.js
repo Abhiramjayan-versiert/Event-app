@@ -5,7 +5,7 @@
  * - Fingerprinted build assets (/_next/static) and icons are cached so the app
  *   shell opens quickly once installed.
  */
-const VERSION = "v2";
+const VERSION = "v3";
 const STATIC_CACHE = `event-app-static-${VERSION}`;
 const OFFLINE_URL = "/offline.html";
 const PRECACHE = [OFFLINE_URL, "/icons/icon-192.png", "/icons/icon-512.png"];
