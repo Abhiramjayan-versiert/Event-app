@@ -11,6 +11,7 @@ import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { UserMenu } from "@/components/layout/user-menu";
 import { ShellProvider } from "@/components/layout/shell-context";
 import { BroadcastPopup } from "@/components/layout/broadcast-popup";
+import { MobileDock } from "@/components/layout/mobile-dock";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { LogoMark } from "@/components/brand/logo";
@@ -45,8 +46,9 @@ export function AppShell({ access, children }: { access: AccessSummary; children
           <ThemeToggle />
           <UserMenu />
         </header>
-        <main className="mx-auto w-full max-w-[1400px] px-4 pb-[calc(1.5rem+env(safe-area-inset-bottom))] pt-5 lg:px-8 lg:py-8">{children}</main>
+        <main className="mx-auto w-full max-w-[1400px] px-4 pb-[calc(6.5rem+env(safe-area-inset-bottom))] lg:pb-8 pt-5 lg:px-8 lg:py-8">{children}</main>
       </div>
+      <MobileDock onMenu={() => setMobileOpen(true)} />
     </ShellProvider>
   );
 }

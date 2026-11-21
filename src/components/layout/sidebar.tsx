@@ -23,7 +23,7 @@ function NavLink({ item, pathname, onNavigate }: { item: NavItem; pathname: stri
       data-liquid=""
       className={cn(
         "liquid-press relative isolate group flex h-10 items-center gap-3 overflow-hidden rounded-full px-3.5 text-sm font-medium",
-        active ? "bg-sidebar-active text-sidebar-active-foreground shadow-[0_6px_16px_-6px_rgb(108_92_231/0.7)]" : "text-sidebar-muted hover:bg-sidebar-hover hover:text-sidebar-foreground",
+        active ? "bg-sidebar-active text-sidebar-active-foreground shadow-[0_8px_18px_-8px_var(--glow)]" : "text-sidebar-muted hover:bg-sidebar-hover hover:text-sidebar-foreground",
       )}
     >
       <Icon className="size-4 shrink-0" />

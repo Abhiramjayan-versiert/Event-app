@@ -21,7 +21,7 @@ export function StatCard({
     <div
       className={cn(
         "flex flex-col gap-3 rounded-xl border p-4",
-        highlight ? "border-transparent bg-hero text-white shadow-[0_14px_30px_-14px_rgb(90_73_217/0.75)]" : "bg-card",
+        highlight ? "border-transparent bg-hero text-white shadow-[0_16px_32px_-16px_var(--glow)]" : "bg-card",
         className,
       )}
     >

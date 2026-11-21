@@ -28,7 +28,7 @@ export async function buildXlsx(report: ReportOutput, scope: string, filterLabel
   const head = ws.addRow(report.columns.map((c) => c.header));
   head.eachCell((cell) => {
     cell.font = { bold: true, color: { argb: "FF0A0A0A" } };
-    cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFE4E1FF" } };
+    cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFF3D9CB" } };
   });
   for (const r of report.rows) ws.addRow(report.columns.map((c) => rawCell(r[c.key], c, report)));
   report.columns.forEach((c, i) => {
@@ -67,7 +67,7 @@ export async function buildPdf(report: ReportOutput, scope: string, filterLabel:
   doc.setFontSize(12);
   doc.setTextColor(10, 10, 10);
   doc.text("EVENT", 40, 40);
-  doc.setTextColor(108, 92, 231);
+  doc.setTextColor(168, 91, 64);
   doc.text("APP", 40 + doc.getTextWidth("EVENT "), 40);
   doc.setTextColor(10, 10, 10);
   doc.setFontSize(16);
@@ -89,8 +89,8 @@ export async function buildPdf(report: ReportOutput, scope: string, filterLabel:
     head: [report.columns.map((c) => c.header)],
     body: report.rows.map((r) => report.columns.map((c) => fmt(r[c.key], c))),
     styles: { fontSize: wide ? 6.5 : 8, cellPadding: 3, overflow: "linebreak" },
-    headStyles: { fillColor: [90, 73, 217], textColor: [255, 255, 255] },
-    alternateRowStyles: { fillColor: [244, 243, 255] },
+    headStyles: { fillColor: [142, 78, 58], textColor: [255, 255, 255] },
+    alternateRowStyles: { fillColor: [250, 242, 236] },
     columnStyles: Object.fromEntries(report.columns.map((c, i) => [i, c.kind && NUMERIC.has(c.kind) ? { halign: "right" as const } : {}])),
     margin: { left: 40, right: 40 },
     didDrawPage: () => {

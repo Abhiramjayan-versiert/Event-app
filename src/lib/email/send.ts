@@ -36,12 +36,12 @@ const esc = (s: string) => s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&
 export function emailLayout(title: string, paragraphs: string[], cta?: { label: string; url: string }) {
   const body = paragraphs.map((p) => `<p style="margin:0 0 14px;line-height:1.5">${esc(p)}</p>`).join("");
   const button = cta
-    ? `<p style="margin:22px 0"><a href="${esc(cta.url)}" style="background:#6C5CE7;color:#FFFFFF;padding:12px 20px;border-radius:8px;font-weight:600;text-decoration:none;display:inline-block">${esc(cta.label)}</a></p>`
+    ? `<p style="margin:22px 0"><a href="${esc(cta.url)}" style="background:#A85B40;color:#FFFFFF;padding:12px 20px;border-radius:8px;font-weight:600;text-decoration:none;display:inline-block">${esc(cta.label)}</a></p>`
     : "";
-  const html = `<!doctype html><html><body style="margin:0;background:#eef0f5;font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif;color:#1e1b39">
+  const html = `<!doctype html><html><body style="margin:0;background:#f6efe8;font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif;color:#3b2c26">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="padding:24px 12px"><tr><td align="center">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;background:#fff;border:1px solid #e5e5e5;border-radius:10px;overflow:hidden">
-<tr><td style="background:#5A49D9;padding:18px 24px;font-weight:900;font-size:18px;color:#fff">EVENT <span style="color:#C9C2FF">APP</span></td></tr>
+<tr><td style="background:#8E4E3A;padding:18px 24px;font-weight:900;font-size:18px;color:#fff">EVENT <span style="color:#F3D9CB">APP</span></td></tr>
 <tr><td style="padding:24px"><h1 style="margin:0 0 16px;font-size:20px">${esc(title)}</h1>${body}${button}</td></tr>
 </table></td></tr></table></body></html>`;
   const text = [title, "", ...paragraphs, ...(cta ? ["", `${cta.label}: ${cta.url}`] : [])].join("\n");

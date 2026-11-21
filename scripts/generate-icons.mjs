@@ -16,10 +16,10 @@ const svg = (variant) => {
   const rx = variant === "rounded" ? 14 : 0;
   const scale = variant === "maskable" ? 0.72 : 1;
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="100%" height="100%">
-    <rect width="64" height="64" rx="${rx}" fill="#5A49D9"/>
+    <rect width="64" height="64" rx="${rx}" fill="#A85B40"/>
     <g transform="translate(32 32) scale(${scale}) translate(-32 -32)">
       <text x="32" y="43" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-weight="900" font-size="30" letter-spacing="-2">
-        <tspan fill="#FFFFFF">E</tspan><tspan fill="#C9C2FF">A</tspan>
+        <tspan fill="#FFFFFF">E</tspan><tspan fill="#F3D9CB">A</tspan>
       </text>
     </g>
   </svg>`;

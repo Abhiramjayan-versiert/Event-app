@@ -9,7 +9,7 @@ export default function GlobalError({ reset }: { error: Error & { digest?: strin
             EVENT <span style={{ color: "#91C927" }}>APP</span>
           </p>
           <p>Something went wrong. The error has been logged.</p>
-          <button onClick={reset} style={{ background: "#6C5CE7", color: "#fff", border: 0, padding: "8px 16px", borderRadius: 6, fontWeight: 600, cursor: "pointer" }}>
+          <button onClick={reset} style={{ background: "#A85B40", color: "#fff", border: 0, padding: "8px 16px", borderRadius: 6, fontWeight: 600, cursor: "pointer" }}>
             Try again
           </button>
         </div>
